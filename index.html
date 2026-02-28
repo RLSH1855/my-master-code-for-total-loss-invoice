@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <title>3J's Auto Body - Total Loss Invoice</title>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;800&display=swap" rel="stylesheet">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
 
@@ -59,13 +59,14 @@
 
         /* ============================================================
            CSS 1 — BASE & BODY
+           Global letter-spacing 0.5px applied here (#3)
         ============================================================ */
         body {
             background-color: #ffffff;
             font-family: 'Montserrat', sans-serif;
             font-size: 11px;
             font-weight: 500;
-            letter-spacing: 0.05px;
+            letter-spacing: 0.5px;
             padding: 0;
             margin: 0;
         }
@@ -85,41 +86,53 @@
         .sidebar {
             background: #2C3E50;
             color: white;
-            padding: 15px;
+            padding: 0;
             border-right: 1px solid #1a252f;
             height: 100vh;
             position: sticky;
             top: 0;
             overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Scrollable middle area */
+        .sidebar-inner {
+            flex: 1;
+            overflow-y: auto;
+            padding: 15px 8px 10px 8px;
         }
 
         .sidebar h6 {
             font-weight: 800;
             text-transform: uppercase;
             border-bottom: 1px solid #34495e;
-            padding-bottom: 10px;
-            margin-bottom: 15px;
-            letter-spacing: 0.05px;
+            padding-bottom: 8px;
+            margin-bottom: 12px;
+            letter-spacing: 0.5px;
+            padding-left: 4px;
         }
 
+        /* Full-width buttons */
         .sidebar-actions .btn {
-            width: 85%;
+            width: 100%;
             display: block;
-            margin: 0 auto 8px auto;
-            padding-top: 7px;
-            padding-bottom: 7px;
+            margin: 0 0 7px 0;
+            padding: 8px 10px;
             font-size: 10px;
             text-transform: uppercase;
             font-weight: 500;
             letter-spacing: 0.5px;
             transition: all 0.2s ease;
+            border-radius: 4px;
         }
 
-        .sidebar-actions .btn:hover,
-        .history-item:hover {
+        /* Hover: light gray with inset white border */
+        .sidebar-actions .btn:hover {
             background-color: #D3D3D3 !important;
             color: #000000 !important;
             border-color: #D3D3D3 !important;
+            box-shadow: inset 0 0 0 1px rgba(255,255,255,0.45) !important;
         }
 
         .btn-wipe {
@@ -133,70 +146,117 @@
             border: 1px solid #bdc3c7;
             color: #000;
             font-size: 11px;
-            padding: 8px;
+            padding: 7px 8px;
             width: 100%;
             border-radius: 4px;
-            margin-bottom: 6px;
+            margin-bottom: 5px;
             font-weight: 500;
+            letter-spacing: 0.5px;
         }
 
         .record-count {
             font-size: 9px;
             color: #aaa;
             text-align: right;
-            margin-bottom: 10px;
-            letter-spacing: 0.05px;
+            margin-bottom: 8px;
+            letter-spacing: 0.5px;
+            padding-right: 2px;
         }
 
+        /* Compact record card */
         .history-item {
             background: #3E5871;
-            border-radius: 4px;
-            padding: 10px;
-            margin-bottom: 10px;
+            border-radius: 3px;
+            padding: 6px 10px;
+            margin-bottom: 5px;
             cursor: pointer;
             position: relative;
             transition: all 0.2s ease;
+            border-left: 3px solid transparent;
+        }
+
+        .history-item:hover {
+            background-color: #4a6680 !important;
+            border-left-color: #2ecc71 !important;
+            box-shadow: inset 0 0 0 1px rgba(255,255,255,0.15);
         }
 
         .history-item .delete-btn {
             position: absolute;
-            top: 6px;
-            right: 6px;
-            background: #8B0000;
-            color: white;
+            top: 50%;
+            right: 8px;
+            transform: translateY(-50%);
+            background: transparent;
+            color: #e74c3c;
             border: none;
-            border-radius: 3px;
-            font-size: 9px;
-            padding: 2px 5px;
+            font-size: 12px;
+            padding: 0 2px;
             cursor: pointer;
             font-weight: 800;
-            transition: background 0.2s ease;
+            line-height: 1;
+            transition: color 0.2s ease;
         }
 
         .history-item .delete-btn:hover {
-            background: #ff0000 !important;
-            color: white !important;
+            color: #ff0000 !important;
+            background: transparent !important;
         }
 
         .history-item .record-ro {
             font-weight: 800;
-            font-size: 11px;
-            padding-right: 20px;
+            font-size: 10px;
+            padding-right: 18px;
+            letter-spacing: 0.5px;
+            color: #fff;
+            line-height: 1.3;
         }
 
         .history-item .record-name {
-            font-size: 10px;
-            color: #ccc;
+            font-size: 9px;
+            color: #b0c4d8;
+            letter-spacing: 0.5px;
+            line-height: 1.3;
         }
 
         .history-item .record-date {
-            font-size: 9px;
-            color: #aaa;
-            margin-top: 2px;
+            font-size: 8px;
+            color: #7f9ab0;
+            margin-top: 1px;
+            letter-spacing: 0.5px;
+            line-height: 1.3;
         }
 
-        /* ============================================================
+        /* Bottom utility bar */
+        .sidebar-footer {
+            border-top: 1px solid #34495e;
+            padding: 10px 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0;
+        }
+
+        .sidebar-footer button {
+            background: none;
+            border: none;
+            color: #7f9ab0;
+            font-size: 9px;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            cursor: pointer;
+            padding: 2px 4px;
+            transition: color 0.2s ease;
+        }
+
+        .sidebar-footer button:hover {
+            color: #ffffff;
+        }
+
+                /* ============================================================
            CSS 4 — TOAST NOTIFICATION
+           #1: loaded toast text is regular weight (400), 0.9px spacing
         ============================================================ */
         #toast {
             position: fixed;
@@ -208,17 +268,27 @@
             padding: 8px 20px;
             border-radius: 4px;
             font-size: 11px;
-            font-weight: 800;
+            font-weight: 400;
             font-family: 'Montserrat', sans-serif;
             z-index: 9999;
             display: none;
             box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-            letter-spacing: 0.05px;
+            letter-spacing: 0.9px;
         }
 
         /* ============================================================
            CSS 5 — FOCUS STATE
         ============================================================ */
+
+        /* Hide number input spinner arrows in all browsers */
+        input[type="number"]::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        input[type="number"] {
+            -moz-appearance: textfield;
+        }
         input:focus, textarea:focus, select:focus {
             outline: none !important;
             border: 2px solid #3498db !important;
@@ -253,10 +323,14 @@
             font-weight: 800;
             line-height: 1.4;
             color: #333;
+            letter-spacing: 0.5px;
         }
 
         /* ============================================================
            CSS 7 — RATES & CUSTOMER INFO
+           #2 & #5: labels semi-bold (600), 0.9px spacing
+           #2: customer inputs semi-bold, 0.5px spacing
+           #2: WONum placeholder styling via ::placeholder
         ============================================================ */
         .top-grid {
             display: grid;
@@ -272,13 +346,11 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 3px;
-            letter-spacing: 0.5px;
         }
 
         .rate-field label {
-            font-weight: 800;
-            letter-spacing: 0.05px;
-            letter-spacing: 0.5px;
+            font-weight: 600;
+            letter-spacing: 0.9px;
         }
 
         .rate-field input {
@@ -286,7 +358,7 @@
             text-align: right;
             border: 1px solid #ccc;
             font-family: inherit;
-            font-weight: 500;
+            font-weight: 400;
             letter-spacing: 0.5px;
         }
 
@@ -298,8 +370,8 @@
 
         .customer-field label {
             width: 110px;
-            font-weight: 800;
-            letter-spacing: 0.5px;
+            font-weight: 600;
+            letter-spacing: 0.9px;
         }
 
         .customer-field input {
@@ -307,7 +379,7 @@
             border: 1px solid #ccc;
             padding: 1px 5px;
             font-family: inherit;
-            font-weight: 500;
+            font-weight: 600;
             letter-spacing: 0.5px;
         }
 
@@ -315,25 +387,38 @@
             display: flex;
             align-items: center;
             justify-content: flex-start;
-            gap: 5px;
+            gap: 0;
         }
 
         .tax-input {
-            width: 50px !important;
-            text-align: left;
+            width: 36px !important;
+            text-align: right;
             border: none !important;
             background: transparent !important;
             font-weight: 500;
             letter-spacing: 0.5px;
+            padding-right: 2px;
         }
 
+        /* WONum: semi-bold field, styled placeholder (#2 & #4) */
         #WONum {
             background-color: #e8f0fe;
-            font-weight: 800;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        #WONum::placeholder {
+            font-weight: 400;
+            letter-spacing: 0.5px;
+            color: #aaa;
         }
 
         /* ============================================================
            CSS 8 — SERVICE TABLE
+           #7: TIME/COST/DAYS column wider to prevent wrapping
+           #7: input boxes in table normal weight (400)
+           #8: Subtotal header right-aligned; dollar amounts semi-bold
+           #9: tax checkboxes centered
         ============================================================ */
         table {
             width: 100%;
@@ -350,7 +435,13 @@
             font-weight: 800;
             text-transform: uppercase;
             font-size: 10px;
-            letter-spacing: 0.05px;
+            letter-spacing: 0.5px;
+        }
+
+        /* #8: right-align the Subtotal header specifically */
+        th.th-subtotal {
+            text-align: right;
+            padding-right: 8px;
         }
 
         .section-header {
@@ -360,16 +451,22 @@
             font-weight: 800;
             padding: 8px !important;
             text-transform: uppercase;
-            letter-spacing: 0.05px;
+            letter-spacing: 0.5px;
         }
 
         td {
             border: 1px solid #ccc;
-            padding: 6px 4px;
+            padding: 9px 4px;
             vertical-align: middle;
             font-weight: 500;
             font-size: 11px;
-            letter-spacing: 0.05px;
+            letter-spacing: 0.5px;
+        }
+
+        /* #9: center tax checkboxes */
+        td.tax-chk-cell {
+            text-align: center;
+            vertical-align: middle;
         }
 
         .days-input {
@@ -377,14 +474,15 @@
             text-align: center;
             background: #fff;
             border: 1px solid #ddd;
-            font-weight: 800;
+            font-weight: 400;
             padding: 2px;
+            letter-spacing: 0.5px;
         }
 
         .cost-input-container {
             position: relative;
             display: inline-block;
-            width: 70px;
+            width: 58px;
         }
 
         .cost-input-container span {
@@ -392,16 +490,18 @@
             left: 5px;
             top: 50%;
             transform: translateY(-50%);
-            font-weight: 800;
+            font-weight: 400;
             pointer-events: none;
         }
 
+        /* #7: table inputs normal weight, taller with padding */
         .cost-input-container input {
             width: 100%;
-            padding-left: 15px;
+            padding: 5px 4px 5px 14px;
             text-align: right;
             border: 1px solid #ddd;
-            font-weight: 800;
+            font-weight: 400;
+            letter-spacing: 0.5px;
         }
 
         .type-select {
@@ -411,24 +511,42 @@
             width: 100%;
             text-align: center;
             font-family: 'Montserrat', sans-serif;
-            font-weight: 500;
+            font-weight: 400;
+            letter-spacing: 0.5px;
         }
 
+        /* #8: subtotal and tax dollar values semi-bold */
         .val-out {
             text-align: right;
-            font-weight: 500;
+            font-weight: 600;
+            letter-spacing: 0.5px;
         }
 
         /* ============================================================
            CSS 9 — SUMMARY & TOTALS
+           #9: itemized totals dollar values semi-bold
+           #9: grand total row bold with 0.5px letter spacing
         ============================================================ */
         .bg-black-bar {
             background: black !important;
             color: white !important;
             font-weight: 800;
-            letter-spacing: 0.05px;
+            letter-spacing: 0.5px;
             padding: 6px;
             text-transform: uppercase;
+        }
+
+        /* #9: grand total row — bold, 0.5px spacing */
+        .grand-total-row td {
+            font-weight: 800 !important;
+            letter-spacing: 0.5px !important;
+            font-size: 1.2em;
+        }
+
+        /* #9: itemized dollar amounts semi-bold */
+        .itemized-amount {
+            font-weight: 600;
+            text-align: right;
         }
 
         .bg-grey {
@@ -450,6 +568,17 @@
             padding: 12px;
             border: 1px solid #ccc;
             line-height: 1.4;
+            letter-spacing: 0.5px;
+        }
+
+        /* #10: disclaimer title semi-bold */
+        .disclaimer-title {
+            font-weight: 600;
+            font-size: inherit;
+            text-align: center;
+            display: block;
+            margin-bottom: 12px;
+            letter-spacing: 0.5px;
         }
 
         .sig-grid {
@@ -468,6 +597,7 @@
             white-space: nowrap;
             margin-right: 5px;
             font-weight: 800;
+            letter-spacing: 0.5px;
         }
 
         .sig-line {
@@ -566,26 +696,33 @@
     ============================================================ -->
     <div class="sidebar no-print">
 
-        <h6>ACTIONS</h6>
-        <div class="sidebar-actions mb-4">
-            <button class="btn btn-sm btn-success"           onclick="createNewForm(); this.blur();">+ Create New Form</button>
-            <button class="btn btn-sm btn-warning text-dark" onclick="saveRecord(); this.blur();">Save Record</button>
-            <button class="btn btn-sm btn-wipe"              onclick="clearForm(); this.blur();">Wipe Form Data</button>
-            <button class="btn btn-sm btn-primary"           onclick="window.print(); this.blur();">Print to PDF</button>
-            <button class="btn btn-sm btn-secondary"         onclick="window.print(); this.blur();">Local Printer</button>
-        </div>
+        <!-- Scrollable top section: actions + records -->
+        <div class="sidebar-inner">
 
-        <h6>
-            RECORDS
-            <span id="autoSaveStatus" style="display:none; color:#2ecc71; font-size:10px;">• Saved</span>
-        </h6>
-        <input type="text" id="sidebarSearch" class="search-box" placeholder="Search RO or Name..." onkeyup="filterSidebar()" spellcheck="false">
-        <div id="recordCount" class="record-count"></div>
-        <button class="btn btn-sm btn-info text-dark" onclick="exportRecordsBackup(); this.blur();"
-                style="width:85%; display:block; margin:0 auto 10px auto; padding-top:7px; padding-bottom:7px; font-size:10px; text-transform:uppercase; font-weight:500; letter-spacing:0.5px;">
-            Export Backup
-        </button>
-        <div id="sidebarList"></div>
+            <h6>ACTIONS</h6>
+            <div class="sidebar-actions mb-4">
+                <button class="btn btn-sm btn-success"           onclick="createNewForm(); this.blur();">+ Create New Form</button>
+                <button class="btn btn-sm btn-warning text-dark" onclick="saveRecord(); this.blur();">Save Record</button>
+                <button class="btn btn-sm btn-wipe"              onclick="clearForm(); this.blur();">Wipe Form Data</button>
+                <button class="btn btn-sm btn-primary"           onclick="window.print(); this.blur();">Print to PDF</button>
+                <button class="btn btn-sm btn-secondary"         onclick="window.print(); this.blur();">Local Printer</button>
+            </div>
+
+            <h6>
+                RECORDS
+                <span id="autoSaveStatus" style="display:none; color:#2ecc71; font-size:10px;">&#8226; Saved</span>
+            </h6>
+            <input type="text" id="sidebarSearch" class="search-box" placeholder="Search RO or Name..." onkeyup="filterSidebar()" spellcheck="false">
+            <div id="recordCount" class="record-count"></div>
+            <div id="sidebarList"></div>
+
+        </div><!-- /sidebar-inner -->
+
+        <!-- Pinned footer: Import / Export utility links -->
+        <div class="sidebar-footer">
+            <button onclick="importRecordsBackup(); this.blur();">&#8593; Import Backup</button>
+            <button onclick="exportRecordsBackup(); this.blur();">&#8595; Export Backup</button>
+        </div>
 
     </div><!-- /HTML 1 — SIDEBAR -->
 
@@ -609,8 +746,8 @@
                 </div>
             </div>
 
-            <h6 class="text-center fw-bold mb-1">TOTAL LOSS INVOICE</h6>
-            <div class="text-end small mb-2" id="currentDate"></div>
+            <h6 class="text-center fw-bold mb-1" style="letter-spacing:0.5px;">TOTAL LOSS INVOICE</h6>
+            <div class="text-end small mb-2" id="currentDate" style="letter-spacing:0.5px;"></div>
             <!-- /HTML 2 — INVOICE HEADER -->
 
 
@@ -661,34 +798,31 @@
                 <div>
                     <div class="customer-field">
                         <label>Repair Order #</label>
-                        <input type="text" id="WONum" placeholder="Ex: 12345" spellcheck="false">
+                        <input type="text" id="WONum" placeholder="Ex: 12345" spellcheck="false" class="enter-blur">
                     </div>
                     <div class="customer-field">
                         <label>Vehicle Owner</label>
-                        <input type="text" id="Cust" class="proper-case" oninput="syncFields()">
+                        <input type="text" id="Cust" class="proper-case enter-blur" oninput="syncFields()">
                     </div>
                     <div class="customer-field">
                         <label>Insurance Co</label>
-                        <input type="text" id="InsCoTop" class="proper-case" oninput="syncFields()">
+                        <input type="text" id="InsCoTop" class="proper-case enter-blur" oninput="syncFields()">
                     </div>
                     <div class="customer-field">
                         <label>Claim #</label>
-                        <input type="text" id="ClaimNumTop" oninput="syncFields()">
+                        <input type="text" id="ClaimNumTop" class="enter-blur" oninput="syncFields()">
                     </div>
                     <div class="customer-field">
                         <label>Vehicle</label>
-                        <input type="text" id="Veh" class="proper-case">
+                        <input type="text" id="Veh" class="proper-case enter-blur">
                     </div>
                     <div class="customer-field">
                         <label>VIN #</label>
-                        <input type="text" id="VIN" maxlength="17" style="text-transform:uppercase;">
+                        <input type="text" id="VIN" maxlength="17" style="text-transform:uppercase;" class="enter-blur">
                     </div>
                     <div class="customer-field">
                         <label>Tax Rate</label>
-                        <div class="tax-container">
-                            <input type="number" id="TaxRate" value="10.5" class="tax-input auto-clear">
-                            <span>%</span>
-                        </div>
+                        <span style="font-weight:600; letter-spacing:0.5px;">10.5%</span>
                     </div>
                 </div>
 
@@ -704,9 +838,9 @@
                         <th style="width:30px" class="no-print">Sel</th>
                         <th>Name</th>
                         <th style="width:90px">Type</th>
-                        <th style="width:110px">Time / Cost / Days</th>
-                        <th style="width:110px">Subtotal</th>
-                        <th style="width:90px">Tax</th>
+                        <th style="width:140px; white-space:nowrap;">Time / Cost / Days</th>
+                        <th style="width:110px" class="th-subtotal">Subtotal</th>
+                        <th style="width:90px; text-align:right; padding-right:8px;">Tax</th>
                         <th style="width:40px" class="no-print">Tax?</th>
                     </tr>
                 </thead>
@@ -723,14 +857,14 @@
                 <!-- Applied Rates Reference Box -->
                 <div class="p-2 border border-dark" style="min-width:220px;">
                     <div class="bg-black-bar mb-2">APPLIED RATES</div>
-                    <div style="font-size:10px; line-height:1.6;">
-                        <div class="d-flex justify-content-between"><span>Body Rate:</span>       <span class="fw-bold" id="refBody">$0.00</span></div>
-                        <div class="d-flex justify-content-between"><span>Frame Rate:</span>      <span class="fw-bold" id="refFrame">$0.00</span></div>
-                        <div class="d-flex justify-content-between"><span>Mechanical Rate:</span> <span class="fw-bold" id="refMech">$0.00</span></div>
-                        <div class="d-flex justify-content-between"><span>Inside CC&amp;P:</span>     <span class="fw-bold" id="refIn">$0.00</span></div>
-                        <div class="d-flex justify-content-between"><span>Outside CC&amp;P:</span>    <span class="fw-bold" id="refOut">$0.00</span></div>
-                        <div class="d-flex justify-content-between"><span>Photo Fee (ea):</span>  <span class="fw-bold" id="refPhoto">$0.00</span></div>
-                        <div class="d-flex justify-content-between"><span>CC Processing:</span>   <span class="fw-bold" id="refCC">3%</span></div>
+                    <div style="font-size:10px; line-height:1.6; letter-spacing:0.5px;">
+                        <div class="d-flex justify-content-between"><span>Body Rate:</span>       <span class="itemized-amount" id="refBody">$0.00</span></div>
+                        <div class="d-flex justify-content-between"><span>Frame Rate:</span>      <span class="itemized-amount" id="refFrame">$0.00</span></div>
+                        <div class="d-flex justify-content-between"><span>Mechanical Rate:</span> <span class="itemized-amount" id="refMech">$0.00</span></div>
+                        <div class="d-flex justify-content-between"><span>Inside CC&amp;P:</span>     <span class="itemized-amount" id="refIn">$0.00</span></div>
+                        <div class="d-flex justify-content-between"><span>Outside CC&amp;P:</span>    <span class="itemized-amount" id="refOut">$0.00</span></div>
+                        <div class="d-flex justify-content-between"><span>Photo Fee (ea):</span>  <span class="itemized-amount" id="refPhoto">$0.00</span></div>
+                        <div class="d-flex justify-content-between"><span>CC Processing:</span>   <span class="itemized-amount" id="refCC">3%</span></div>
                     </div>
                 </div>
 
@@ -739,34 +873,35 @@
                     <div class="bg-black-bar mb-2">ITEMIZED TOTALS</div>
                     <table class="table table-borderless table-sm mb-0">
                         <tr>
-                            <td>Itemized Additional Misc. Charges</td>
-                            <td id="MiscTotal" class="text-end fw-bold">$0.00</td>
+                            <td style="letter-spacing:0.5px;">Itemized Additional Misc. Charges</td>
+                            <td id="MiscTotal" class="itemized-amount">$0.00</td>
                         </tr>
                         <tr>
-                            <td>Total Misc. Markup Amount (25%)</td>
-                            <td id="MarkupTotalAmount" class="text-end fw-bold" style="color:#666;">$0.00</td>
+                            <td style="letter-spacing:0.5px;">Total Misc. Markup Amount (25%)</td>
+                            <td id="MarkupTotalAmount" class="itemized-amount" style="color:#666;">$0.00</td>
                         </tr>
                         <tr>
-                            <td>Itemized Labor Time Totals</td>
-                            <td id="LaborTotal" class="text-end fw-bold">$0.00</td>
+                            <td style="letter-spacing:0.5px;">Itemized Labor Time Totals</td>
+                            <td id="LaborTotal" class="itemized-amount">$0.00</td>
                         </tr>
                         <tr>
-                            <td>Care, Custody and Protection Total Days</td>
-                            <td id="TotalCCDays" class="text-end fw-bold">0 Days</td>
+                            <td style="letter-spacing:0.5px;">Care, Custody and Protection Total Days</td>
+                            <td id="TotalCCDays" class="itemized-amount">0 Days</td>
                         </tr>
                         <tr>
-                            <td>Credit Card Processing Fee</td>
-                            <td id="CCFee" class="text-end fw-bold">$0.00</td>
+                            <td style="letter-spacing:0.5px;">Credit Card Processing Fee</td>
+                            <td id="CCFee" class="itemized-amount">$0.00</td>
                         </tr>
                         <tr style="border-top:1px solid #000;">
-                            <td><strong>Total Amount Due</strong></td>
-                            <td id="GrandSub" class="text-end fw-bold">$0.00</td>
+                            <td style="letter-spacing:0.5px;"><strong>Total Amount Due</strong></td>
+                            <td id="GrandSub" class="itemized-amount">$0.00</td>
                         </tr>
                         <tr>
-                            <td><strong>Total Tax Due</strong></td>
-                            <td id="GrandTax" class="text-end fw-bold">$0.00</td>
+                            <td style="letter-spacing:0.5px;"><strong>Total Tax Due</strong></td>
+                            <td id="GrandTax" class="itemized-amount">$0.00</td>
                         </tr>
-                        <tr class="bg-black-bar" style="font-size:1.2em;">
+                        <!-- #9: grand total row bold, 0.5px letter spacing -->
+                        <tr class="bg-black-bar grand-total-row">
                             <td>TOTAL AMOUNT WITH TAX DUE</td>
                             <td id="GrandTotal" class="text-end pe-2">$0.00</td>
                         </tr>
@@ -780,8 +915,8 @@
                  HTML 6 — NOTES
             ============================================================ -->
             <div class="mt-2">
-                <b>Notes:</b><br>
-                <textarea id="NotesField" class="form-control" style="font-size:10px;"></textarea>
+                <b style="letter-spacing:0.5px;">Notes:</b><br>
+                <textarea id="NotesField" class="form-control" style="font-size:10px; letter-spacing:0.5px;"></textarea>
             </div>
             <!-- /HTML 6 — NOTES -->
 
@@ -791,10 +926,8 @@
             ============================================================ -->
             <div class="legal-acknowledgment">
 
-                <h6 class="text-center" style="font-weight:800;">
-                    TOTAL LOSS RELEASE, TRANSFER OF CUSTODY &amp; DEFENSE AGREEMENT
-                </h6>
-                <div class="text-center fw-bold mb-2">3J's Auto Body – California BAR Registered Facility</div>
+                <!-- #10: replaced title, removed facility line -->
+                <span class="disclaimer-title">TOTAL LOSS DISCLAIMER</span>
 
                 <p><strong>1. Total Loss Determination:</strong> The above vehicle has been declared a Total Loss solely by the identified insurance carrier. 3J's Auto Body did not make this determination and assumes no responsibility for valuation, settlement amount, salvage disposition, or claim resolution.</p>
                 <p><strong>2. BAR Compliance &amp; Teardown:</strong> All inspection, diagnostic procedures, and teardown operations were performed in compliance with California Business &amp; Professions Code §9884.9. The vehicle is released strictly in its present AS-IS condition. Reassembly is not performed on total loss vehicles.</p>
@@ -927,6 +1060,7 @@
        Each row receives a data-svc-index attribute that maps it
        back to its entry in the services array — used by clearForm()
        to reliably reset each row to its original default values.
+       #9: tax checkbox cells use class tax-chk-cell for centering.
     ============================================================ */
     function buildTable() {
         let html = '';
@@ -942,11 +1076,11 @@
                 let label = (s.subtype === 'in') ? 'Inside' : 'Outside';
                 html += `
                 <tr data-svc-index="${idx}">
-                    <td class="no-print"><input type="checkbox" id="${s.subtype}Sel" checked></td>
+                    <td class="no-print tax-chk-cell"><input type="checkbox" id="${s.subtype}Sel" checked></td>
                     <td>
                         <b>${label}</b> CC&amp;P:
-                        <input type="date" class="ccp-input" id="${s.subtype}Start"> to
-                        <input type="date" class="ccp-input" id="${s.subtype}Stop">
+                        <input type="date" class="ccp-input enter-blur" id="${s.subtype}Start"> to
+                        <input type="date" class="ccp-input enter-blur" id="${s.subtype}Stop">
                     </td>
                     <td class="text-center">Storage</td>
                     <td class="text-center">
@@ -955,7 +1089,7 @@
                     </td>
                     <td id="${s.subtype}Total" class="val-out">$0.00</td>
                     <td id="${s.subtype}Tax"   class="val-out">$0.00</td>
-                    <td class="no-print"><input type="checkbox" id="${s.subtype}TaxChk" checked></td>
+                    <td class="no-print tax-chk-cell"><input type="checkbox" id="${s.subtype}TaxChk" checked></td>
                 </tr>`;
 
             // Standard labor / markup / photo rows
@@ -972,7 +1106,7 @@
 
                 html += `
                 <tr class="calc-row" data-type="${s.type}" data-svc-index="${idx}">
-                    <td class="no-print">
+                    <td class="no-print tax-chk-cell">
                         <input type="checkbox" class="sel-chk" ${s.hrs > 0 ? 'checked' : ''}>
                     </td>
                     <td>
@@ -983,14 +1117,14 @@
                     <td class="text-center">
                         <div class="cost-input-container">
                             <span>${isCostMarkup ? '$' : ''}</span>
-                            <input type="number" step="0.1" value="${s.hrs}"
-                                   class="hrs ${isCostMarkup ? 'bg-yellow' : ''}"
+                            <input type="number" step="0.1" value="${parseFloat(s.hrs).toFixed(1)}"
+                                   class="hrs enter-blur ${isCostMarkup ? 'bg-yellow' : ''}"
                                    id="${s.id ? s.id + 'Val' : ''}">
                         </div>
                     </td>
                     <td class="sub val-out">$0.00</td>
                     <td class="tx  val-out">$0.00</td>
-                    <td class="no-print"><input type="checkbox" class="t-chk"></td>
+                    <td class="no-print tax-chk-cell"><input type="checkbox" class="t-chk"></td>
                 </tr>`;
             }
         });
@@ -1014,7 +1148,7 @@
             out:   parseFloat($('#OutRate').val())    || 0,
             photo: parseFloat($('#PhotoRate').val())  || 0
         };
-        const taxR = (parseFloat($('#TaxRate').val()) || 0) / 100;
+        const taxR = 0.105; // fixed at 10.5%
         const ccP  = (parseInt($('#CCRate').val())    || 0) / 100;
 
         // Update applied-rates reference display
@@ -1188,7 +1322,6 @@
         $('#OutRate').val('120.00');
         $('#PhotoRate').val('5.00');
         $('#CCRate').val('3');
-        $('#TaxRate').val('10.5');
 
         // Reset each table row using its data-svc-index to find original defaults
         $('#worksheet-body tr').each(function() {
@@ -1220,6 +1353,10 @@
 
     /* ============================================================
        JS 6 — RECORD MANAGEMENT  (Save / Load / Delete / Export)
+       #4: Every save always overwrites the existing record.
+           No new record is created if a different RO# is entered —
+           the record is always saved/overwritten by RO# match.
+           If no RO# exists yet, a new record is created normally.
     ============================================================ */
 
     /* Returns all saved records from localStorage, or [] on error */
@@ -1232,9 +1369,8 @@
     }
 
     /* Saves the current form state to localStorage.
-       - Stores original invoice date separately from the save date
-       - Prompts before overwriting an existing record with same RO#
-       - Catches localStorage quota errors and alerts the user */
+       Always overwrites an existing record with the same RO#.
+       Never creates a duplicate. */
     function saveRecord() {
         let roNum = $('#WONum').val().trim();
         let owner = $('#Cust').val().trim();
@@ -1278,20 +1414,25 @@
             outRate:      $('#OutRate').val(),
             photoRate:    $('#PhotoRate').val(),
             ccRate:       $('#CCRate').val(),
-            taxRate:      $('#TaxRate').val(),
             rows:         rows
         };
 
         let records     = getRecords();
-        let existingIdx = records.findIndex(function(r) {
-            return r.roNum === roNum && roNum !== '';
-        });
+        let existingIdx = -1;
+
+        // Match on RO# first; fall back to owner name if no RO#
+        if (roNum) {
+            existingIdx = records.findIndex(function(r) { return r.roNum === roNum; });
+        } else {
+            existingIdx = records.findIndex(function(r) { return r.owner === owner && !r.roNum; });
+        }
 
         if (existingIdx >= 0) {
-            if (!confirm('A record with RO# ' + roNum + ' already exists. Overwrite it?')) return;
+            // Always overwrite — preserve original record ID
             record.id = records[existingIdx].id;
             records[existingIdx] = record;
         } else {
+            // New record — add to top of list
             records.unshift(record);
         }
 
@@ -1336,7 +1477,6 @@
         $('#OutRate').val(record.outRate     || '120.00');
         $('#PhotoRate').val(record.photoRate || '5.00');
         $('#CCRate').val(record.ccRate       || '3');
-        $('#TaxRate').val(record.taxRate     || '10.5');
 
         // Restore all table row states
         if (record.rows && record.rows.length) {
@@ -1353,7 +1493,10 @@
                 } else {
                     // Standard rows: restore hours, type, and checkboxes
                     $(this).find('.sel-chk').prop('checked', r.checked);
-                    if (r.hrs  !== null && r.hrs  !== undefined) $(this).find('.hrs').val(r.hrs);
+                    if (r.hrs !== null && r.hrs !== undefined) {
+                        let num = parseFloat(r.hrs);
+                        $(this).find('.hrs').val(!isNaN(num) ? num.toFixed(1) : r.hrs);
+                    }
                     if (r.type !== null && r.type !== undefined) $(this).find('.type-select').val(r.type);
                     $(this).find('.t-chk').prop('checked', r.taxChk);
                 }
@@ -1374,6 +1517,41 @@
         localStorage.setItem('3js_records', JSON.stringify(records));
         renderSidebar();
         showToast('Record deleted.', '');
+    }
+
+    /* Imports records from a user-selected JSON backup file.
+       Merges with existing records — existing RO#s are not overwritten. */
+    function importRecordsBackup() {
+        let input = document.createElement('input');
+        input.type = 'file';
+        input.accept = '.json';
+        input.onchange = function(e) {
+            let file = e.target.files[0];
+            if (!file) return;
+            let reader = new FileReader();
+            reader.onload = function(ev) {
+                try {
+                    let imported = JSON.parse(ev.target.result);
+                    if (!Array.isArray(imported)) throw new Error('Invalid format');
+                    let existing = getRecords();
+                    let existingIds = new Set(existing.map(function(r) { return r.roNum || r.id; }));
+                    let added = 0;
+                    imported.forEach(function(r) {
+                        if (!existingIds.has(r.roNum || r.id)) {
+                            existing.push(r);
+                            added++;
+                        }
+                    });
+                    localStorage.setItem('3js_records', JSON.stringify(existing));
+                    renderSidebar();
+                    showToast('Imported ' + added + ' new record' + (added !== 1 ? 's' : '') + '.', 'success');
+                } catch(err) {
+                    showToast('Import failed — invalid backup file.', 'error');
+                }
+            };
+            reader.readAsText(file);
+        };
+        input.click();
     }
 
     /* Exports all saved records as a downloadable JSON backup file.
@@ -1425,7 +1603,7 @@
 
         let html = '';
         if (filtered.length === 0) {
-            html = '<div style="color:#aaa; font-size:10px; text-align:center; margin-top:6px;">'
+            html = '<div style="color:#aaa; font-size:10px; text-align:center; margin-top:6px; letter-spacing:0.5px;">'
                  + (search ? 'No matching records.' : 'No saved records.')
                  + '</div>';
         } else {
@@ -1463,9 +1641,8 @@
         calculate();
 
         // --------------------------------------------------------
-        // Click-to-clear on focus
-        // Uses .data('prevVal') per element instead of a shared
-        // variable to prevent race conditions when tabbing quickly.
+        // Click-to-clear on focus for rate/number inputs
+        // Uses .data('prevVal') per element to prevent race conditions.
         // --------------------------------------------------------
         $(document).on('focus', '.auto-clear, .hrs', function() {
             $(this).data('prevVal', $(this).val());
@@ -1476,11 +1653,10 @@
             if ($(this).val() === '') {
                 $(this).val($(this).data('prevVal') || '');
             } else {
-                // Labor rows → format to 1 decimal
-                // Rate fields → format to 2 decimals
                 if ($(this).hasClass('hrs')) {
+                    // Always format to exactly 1 decimal place (e.g. 1 → 1.0, .5 → 0.5)
                     let num = parseFloat($(this).val());
-                    $(this).val(!isNaN(num) ? num.toFixed(1) : $(this).data('prevVal'));
+                    $(this).val(!isNaN(num) ? num.toFixed(1) : $(this).data('prevVal') || '0.0');
                 } else if ($(this).hasClass('tax-input') ||
                            ($(this).attr('id') && $(this).attr('id').includes('Rate'))) {
                     let num = parseFloat($(this).val());
@@ -1490,16 +1666,31 @@
             calculate();
         });
 
-        // Enter key triggers blur (submits the field)
-        $(document).on('keydown', '.auto-clear, .hrs', function(e) {
-            if (e.key === 'Enter') $(this).blur();
+        // --------------------------------------------------------
+        // #2 & #4: Enter key blurs ALL typeable inputs and textareas
+        // (except Notes textarea where Enter = new line is expected)
+        // --------------------------------------------------------
+        $(document).on('keydown', 'input.enter-blur, input.auto-clear, input.hrs', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                $(this).blur();
+            }
         });
 
         // --------------------------------------------------------
-        // Proper case: capitalize words on blur for text fields
+        // #6: Proper case on blur — all text inputs except Notes
         // --------------------------------------------------------
-        $(document).on('blur', '.proper-case', function() {
+        $(document).on('blur', 'input.proper-case', function() {
             $(this).val(toProperCase($(this).val()));
+            syncFields();
+        });
+
+        // Auto-capitalize all other plain text inputs (not .proper-case, not Notes)
+        $(document).on('blur', 'input[type="text"]:not(.proper-case)', function() {
+            let val = $(this).val();
+            if (val.length > 0) {
+                $(this).val(toProperCase(val));
+            }
         });
 
         // --------------------------------------------------------
