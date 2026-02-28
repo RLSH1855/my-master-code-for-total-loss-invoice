@@ -1,0 +1,1526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>3J's Auto Body - Total Loss Invoice</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;800&display=swap" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<!--
+================================================================
+  3J'S AUTO BODY & PAINT
+  Total Loss Invoice — Single File Application
+  1855 E 29th Street, Signal Hill, CA 90755
+================================================================
+
+  TABLE OF CONTENTS
+================================================================
+
+  CSS
+  ---------------------------------------------------------------
+  1.  Base & Body
+  2.  Layout
+  3.  Sidebar
+  4.  Toast Notification
+  5.  Focus State
+  6.  Worksheet Card
+  7.  Rates & Customer Info
+  8.  Service Table
+  9.  Summary & Totals
+  10. Legal & Signatures
+  11. Print Styles
+
+  HTML
+  ---------------------------------------------------------------
+  1.  Sidebar
+  2.  Invoice Header
+  3.  Rates & Customer Info
+  4.  Service Table
+  5.  Summary & Totals
+  6.  Notes
+  7.  Legal Agreement & Signatures
+
+  JAVASCRIPT
+  ---------------------------------------------------------------
+  1.  Service Data
+  2.  Table Builder
+  3.  Calculations
+  4.  Field Sync & Helpers
+  5.  Form Actions  (New Form / Clear Form)
+  6.  Record Management  (Save / Load / Delete / Export)
+  7.  Sidebar Rendering
+  8.  Initialization & Event Bindings
+
+================================================================
+-->
+
+    <style>
+
+        /* ============================================================
+           CSS 1 — BASE & BODY
+        ============================================================ */
+        body {
+            background-color: #ffffff;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 11px;
+            font-weight: 500;
+            letter-spacing: 0.05px;
+            padding: 0;
+            margin: 0;
+        }
+
+        /* ============================================================
+           CSS 2 — LAYOUT
+        ============================================================ */
+        .main-layout {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            min-height: 100vh;
+        }
+
+        /* ============================================================
+           CSS 3 — SIDEBAR
+        ============================================================ */
+        .sidebar {
+            background: #2C3E50;
+            color: white;
+            padding: 15px;
+            border-right: 1px solid #1a252f;
+            height: 100vh;
+            position: sticky;
+            top: 0;
+            overflow-y: auto;
+        }
+
+        .sidebar h6 {
+            font-weight: 800;
+            text-transform: uppercase;
+            border-bottom: 1px solid #34495e;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+            letter-spacing: 0.05px;
+        }
+
+        .sidebar-actions .btn {
+            width: 85%;
+            display: block;
+            margin: 0 auto 8px auto;
+            padding-top: 7px;
+            padding-bottom: 7px;
+            font-size: 10px;
+            text-transform: uppercase;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+            transition: all 0.2s ease;
+        }
+
+        .sidebar-actions .btn:hover,
+        .history-item:hover {
+            background-color: #D3D3D3 !important;
+            color: #000000 !important;
+            border-color: #D3D3D3 !important;
+        }
+
+        .btn-wipe {
+            background-color: #8B0000 !important;
+            color: white !important;
+            border: none !important;
+        }
+
+        .search-box {
+            background: #ecf0f1;
+            border: 1px solid #bdc3c7;
+            color: #000;
+            font-size: 11px;
+            padding: 8px;
+            width: 100%;
+            border-radius: 4px;
+            margin-bottom: 6px;
+            font-weight: 500;
+        }
+
+        .record-count {
+            font-size: 9px;
+            color: #aaa;
+            text-align: right;
+            margin-bottom: 10px;
+            letter-spacing: 0.05px;
+        }
+
+        .history-item {
+            background: #3E5871;
+            border-radius: 4px;
+            padding: 10px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.2s ease;
+        }
+
+        .history-item .delete-btn {
+            position: absolute;
+            top: 6px;
+            right: 6px;
+            background: #8B0000;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            font-size: 9px;
+            padding: 2px 5px;
+            cursor: pointer;
+            font-weight: 800;
+            transition: background 0.2s ease;
+        }
+
+        .history-item .delete-btn:hover {
+            background: #ff0000 !important;
+            color: white !important;
+        }
+
+        .history-item .record-ro {
+            font-weight: 800;
+            font-size: 11px;
+            padding-right: 20px;
+        }
+
+        .history-item .record-name {
+            font-size: 10px;
+            color: #ccc;
+        }
+
+        .history-item .record-date {
+            font-size: 9px;
+            color: #aaa;
+            margin-top: 2px;
+        }
+
+        /* ============================================================
+           CSS 4 — TOAST NOTIFICATION
+        ============================================================ */
+        #toast {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #2C3E50;
+            color: white;
+            padding: 8px 20px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 800;
+            font-family: 'Montserrat', sans-serif;
+            z-index: 9999;
+            display: none;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            letter-spacing: 0.05px;
+        }
+
+        /* ============================================================
+           CSS 5 — FOCUS STATE
+        ============================================================ */
+        input:focus, textarea:focus, select:focus {
+            outline: none !important;
+            border: 2px solid #3498db !important;
+            background-color: #f0f7ff !important;
+        }
+
+        /* ============================================================
+           CSS 6 — WORKSHEET CARD
+        ============================================================ */
+        .ws-card {
+            background: white;
+            padding: 15px;
+            border: 1px solid #ccc;
+            max-width: 1000px;
+            margin: 20px auto;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .logo-container {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .business-logo {
+            max-height: 100px;
+            width: auto;
+            margin-bottom: 5px;
+        }
+
+        .business-info {
+            font-size: 12px;
+            font-weight: 800;
+            line-height: 1.4;
+            color: #333;
+        }
+
+        /* ============================================================
+           CSS 7 — RATES & CUSTOMER INFO
+        ============================================================ */
+        .top-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1.2fr;
+            gap: 15px;
+            margin-bottom: 10px;
+            padding: 10px;
+            border: 1px solid #ddd;
+        }
+
+        .rate-field {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 3px;
+        }
+
+        .rate-field label {
+            font-weight: 800;
+            letter-spacing: 0.05px;
+        }
+
+        .rate-field input {
+            width: 70px;
+            text-align: right;
+            border: 1px solid #ccc;
+            font-family: inherit;
+            font-weight: 500;
+        }
+
+        .customer-field {
+            display: flex;
+            align-items: center;
+            margin-bottom: 3px;
+        }
+
+        .customer-field label {
+            width: 110px;
+            font-weight: 800;
+            letter-spacing: 0.05px;
+        }
+
+        .customer-field input {
+            flex-grow: 1;
+            border: 1px solid #ccc;
+            padding: 1px 5px;
+            font-family: inherit;
+            font-weight: 500;
+        }
+
+        .tax-container {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            gap: 5px;
+        }
+
+        .tax-input {
+            width: 50px !important;
+            text-align: left;
+            border: none !important;
+            background: transparent !important;
+            font-weight: 500;
+        }
+
+        #WONum {
+            background-color: #e8f0fe;
+            font-weight: 800;
+        }
+
+        /* ============================================================
+           CSS 8 — SERVICE TABLE
+        ============================================================ */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 5px;
+        }
+
+        th {
+            background: #2C3E50 !important;
+            color: white !important;
+            border: 1px solid #333;
+            padding: 6px;
+            text-align: center;
+            font-weight: 800;
+            text-transform: uppercase;
+            font-size: 10px;
+            letter-spacing: 0.05px;
+        }
+
+        .section-header {
+            background-color: #2C3E50 !important;
+            color: white !important;
+            font-size: 11px;
+            font-weight: 800;
+            padding: 8px !important;
+            text-transform: uppercase;
+            letter-spacing: 0.05px;
+        }
+
+        td {
+            border: 1px solid #ccc;
+            padding: 6px 4px;
+            vertical-align: middle;
+            font-weight: 500;
+            font-size: 11px;
+            letter-spacing: 0.05px;
+        }
+
+        .days-input {
+            width: 55px;
+            text-align: center;
+            background: #fff;
+            border: 1px solid #ddd;
+            font-weight: 800;
+            padding: 2px;
+        }
+
+        .cost-input-container {
+            position: relative;
+            display: inline-block;
+            width: 70px;
+        }
+
+        .cost-input-container span {
+            position: absolute;
+            left: 5px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-weight: 800;
+            pointer-events: none;
+        }
+
+        .cost-input-container input {
+            width: 100%;
+            padding-left: 15px;
+            text-align: right;
+            border: 1px solid #ddd;
+            font-weight: 800;
+        }
+
+        .type-select {
+            font-size: 10px;
+            padding: 2px;
+            border: 1px solid #ddd;
+            width: 100%;
+            text-align: center;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 500;
+        }
+
+        .val-out {
+            text-align: right;
+            font-weight: 500;
+        }
+
+        /* ============================================================
+           CSS 9 — SUMMARY & TOTALS
+        ============================================================ */
+        .bg-black-bar {
+            background: black !important;
+            color: white !important;
+            font-weight: 800;
+            letter-spacing: 0.05px;
+            padding: 6px;
+            text-transform: uppercase;
+        }
+
+        .bg-grey {
+            background: #eeeeee !important;
+            font-weight: 800;
+        }
+
+        .bg-yellow {
+            background: #ffffcc !important;
+        }
+
+        /* ============================================================
+           CSS 10 — LEGAL & SIGNATURES
+        ============================================================ */
+        .legal-acknowledgment {
+            font-size: 10px;
+            color: #444;
+            margin-top: 20px;
+            padding: 12px;
+            border: 1px solid #ccc;
+            line-height: 1.4;
+        }
+
+        .sig-grid {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr 140px;
+            gap: 12px 25px;
+            margin-top: 15px;
+        }
+
+        .sig-item {
+            display: flex;
+            align-items: flex-end;
+        }
+
+        .sig-label {
+            white-space: nowrap;
+            margin-right: 5px;
+            font-weight: 800;
+        }
+
+        .sig-line {
+            border-bottom: 1px solid #666;
+            flex-grow: 1;
+            height: 14px;
+            position: relative;
+        }
+
+        .auto-fill-val {
+            font-weight: 800;
+            color: #000;
+            padding-left: 4px;
+            position: absolute;
+            bottom: 0;
+        }
+
+        /* ============================================================
+           CSS 11 — PRINT STYLES
+        ============================================================ */
+        @media print {
+            .no-print,
+            .sidebar,
+            .type-select-arrow,
+            #toast {
+                display: none !important;
+            }
+
+            .main-layout {
+                display: block;
+            }
+
+            .ws-card {
+                border: none;
+                width: 100%;
+                box-shadow: none;
+                margin: 0;
+                padding: 0;
+            }
+
+            .no-print-rates {
+                display: none !important;
+            }
+
+            input, select {
+                border: none !important;
+                background: transparent !important;
+                appearance: none;
+                -webkit-appearance: none;
+            }
+
+            .bg-yellow {
+                background: transparent !important;
+            }
+
+            .type-select {
+                border: none !important;
+                text-align: center;
+            }
+
+            .section-header, th, .bg-black-bar {
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .cost-input-container {
+                width: auto;
+            }
+
+            .cost-input-container input {
+                padding-left: 0;
+                text-align: right;
+            }
+
+            .cost-input-container span {
+                position: static;
+                transform: none;
+                margin-right: 1px;
+            }
+        }
+
+    </style>
+</head>
+<body>
+
+<!-- Toast notification element -->
+<div id="toast"></div>
+
+<!-- ============================================================
+     MAIN LAYOUT
+============================================================ -->
+<div class="main-layout">
+
+    <!-- ============================================================
+         HTML 1 — SIDEBAR
+    ============================================================ -->
+    <div class="sidebar no-print">
+
+        <h6>ACTIONS</h6>
+        <div class="sidebar-actions mb-4">
+            <button class="btn btn-sm btn-success"           onclick="createNewForm(); this.blur();">+ Create New Form</button>
+            <button class="btn btn-sm btn-warning text-dark" onclick="saveRecord(); this.blur();">Save Record</button>
+            <button class="btn btn-sm btn-wipe"              onclick="clearForm(); this.blur();">Wipe Form Data</button>
+            <button class="btn btn-sm btn-primary"           onclick="window.print(); this.blur();">Print to PDF</button>
+            <button class="btn btn-sm btn-secondary"         onclick="window.print(); this.blur();">Local Printer</button>
+        </div>
+
+        <h6>
+            RECORDS
+            <span id="autoSaveStatus" style="display:none; color:#2ecc71; font-size:10px;">• Saved</span>
+        </h6>
+        <input type="text" id="sidebarSearch" class="search-box" placeholder="Search RO or Name..." onkeyup="filterSidebar()" spellcheck="false">
+        <div id="recordCount" class="record-count"></div>
+        <button class="btn btn-sm btn-info text-dark" onclick="exportRecordsBackup(); this.blur();"
+                style="width:85%; display:block; margin:0 auto 10px auto; padding-top:7px; padding-bottom:7px; font-size:10px; text-transform:uppercase; font-weight:500; letter-spacing:0.5px;">
+            Export Backup
+        </button>
+        <div id="sidebarList"></div>
+
+    </div><!-- /HTML 1 — SIDEBAR -->
+
+
+    <!-- ============================================================
+         WORKSHEET CARD  (contains HTML sections 2 – 7)
+    ============================================================ -->
+    <div class="ws-card">
+        <div id="capture-area">
+
+            <!-- ============================================================
+                 HTML 2 — INVOICE HEADER
+            ============================================================ -->
+            <div class="logo-container">
+                <img src="https://static.wixstatic.com/media/b95bd9_fc4d86d4c40043f5b23fa60f23bdf077~mv2.png"
+                     alt="3J's Auto Body & Paint" class="business-logo">
+                <div class="business-info">
+                    3J's Auto Body &amp; Paint<br>
+                    1855 E 29th Street, Signal Hill, CA 90755<br>
+                    Phone: 562-424-6744 | Email: 3jsautobody@gmail.com
+                </div>
+            </div>
+
+            <h6 class="text-center fw-bold mb-1">TOTAL LOSS INVOICE</h6>
+            <div class="text-end small mb-2" id="currentDate"></div>
+            <!-- /HTML 2 — INVOICE HEADER -->
+
+
+            <!-- ============================================================
+                 HTML 3 — RATES & CUSTOMER INFO
+            ============================================================ -->
+            <div class="top-grid">
+
+                <!-- Column 1: Body / Frame / Mechanical Rates -->
+                <div class="no-print-rates">
+                    <div class="rate-field">
+                        <label>Body Rate</label>
+                        <span>$ <input type="number" id="BodyRate" value="90.00" class="auto-clear"></span>
+                    </div>
+                    <div class="rate-field">
+                        <label>Frame Rate</label>
+                        <span>$ <input type="number" id="FrameRate" value="90.00" class="auto-clear"></span>
+                    </div>
+                    <div class="rate-field">
+                        <label>Mechanical Rate</label>
+                        <span>$ <input type="number" id="MechRate" value="120.00" class="auto-clear"></span>
+                    </div>
+                </div>
+
+                <!-- Column 2: CC&P / Photo / Credit Card Rates -->
+                <div class="no-print-rates">
+                    <div class="rate-field">
+                        <label>Inside CC&amp;P Rate</label>
+                        <span>$ <input type="number" id="InRate" value="150.00" class="auto-clear"></span>
+                    </div>
+                    <div class="rate-field">
+                        <label>Outside CC&amp;P Rate</label>
+                        <span>$ <input type="number" id="OutRate" value="120.00" class="auto-clear"></span>
+                    </div>
+                    <div class="rate-field">
+                        <label>Photo Fee (per pic)</label>
+                        <span>$ <input type="number" id="PhotoRate" value="5.00" class="auto-clear"></span>
+                    </div>
+                    <div class="rate-field">
+                        <label>CC Processing %</label>
+                        <span>
+                            <input type="number" id="CCRate" value="3" step="1" style="width:40px" class="auto-clear"> %
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Column 3: Customer & Vehicle Info -->
+                <div>
+                    <div class="customer-field">
+                        <label>Repair Order #</label>
+                        <input type="text" id="WONum" placeholder="Ex: 12345" spellcheck="false">
+                    </div>
+                    <div class="customer-field">
+                        <label>Vehicle Owner</label>
+                        <input type="text" id="Cust" class="proper-case" oninput="syncFields()">
+                    </div>
+                    <div class="customer-field">
+                        <label>Insurance Co</label>
+                        <input type="text" id="InsCoTop" class="proper-case" oninput="syncFields()">
+                    </div>
+                    <div class="customer-field">
+                        <label>Claim #</label>
+                        <input type="text" id="ClaimNumTop" oninput="syncFields()">
+                    </div>
+                    <div class="customer-field">
+                        <label>Vehicle</label>
+                        <input type="text" id="Veh" class="proper-case">
+                    </div>
+                    <div class="customer-field">
+                        <label>VIN #</label>
+                        <input type="text" id="VIN" maxlength="17" style="text-transform:uppercase;">
+                    </div>
+                    <div class="customer-field">
+                        <label>Tax Rate</label>
+                        <div class="tax-container">
+                            <input type="number" id="TaxRate" value="10.5" class="tax-input auto-clear">
+                            <span>%</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div><!-- /HTML 3 — RATES & CUSTOMER INFO -->
+
+
+            <!-- ============================================================
+                 HTML 4 — SERVICE TABLE
+            ============================================================ -->
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width:30px" class="no-print">Sel</th>
+                        <th>Name</th>
+                        <th style="width:90px">Type</th>
+                        <th style="width:110px">Time / Cost / Days</th>
+                        <th style="width:110px">Subtotal</th>
+                        <th style="width:90px">Tax</th>
+                        <th style="width:40px" class="no-print">Tax?</th>
+                    </tr>
+                </thead>
+                <tbody id="worksheet-body"></tbody>
+            </table>
+            <!-- /HTML 4 — SERVICE TABLE -->
+
+
+            <!-- ============================================================
+                 HTML 5 — SUMMARY & TOTALS
+            ============================================================ -->
+            <div class="mt-3 d-flex gap-3 align-items-stretch">
+
+                <!-- Applied Rates Reference Box -->
+                <div class="p-2 border border-dark" style="min-width:220px;">
+                    <div class="bg-black-bar mb-2">APPLIED RATES</div>
+                    <div style="font-size:10px; line-height:1.6;">
+                        <div class="d-flex justify-content-between"><span>Body Rate:</span>       <span class="fw-bold" id="refBody">$0.00</span></div>
+                        <div class="d-flex justify-content-between"><span>Frame Rate:</span>      <span class="fw-bold" id="refFrame">$0.00</span></div>
+                        <div class="d-flex justify-content-between"><span>Mechanical Rate:</span> <span class="fw-bold" id="refMech">$0.00</span></div>
+                        <div class="d-flex justify-content-between"><span>Inside CC&amp;P:</span>     <span class="fw-bold" id="refIn">$0.00</span></div>
+                        <div class="d-flex justify-content-between"><span>Outside CC&amp;P:</span>    <span class="fw-bold" id="refOut">$0.00</span></div>
+                        <div class="d-flex justify-content-between"><span>Photo Fee (ea):</span>  <span class="fw-bold" id="refPhoto">$0.00</span></div>
+                        <div class="d-flex justify-content-between"><span>CC Processing:</span>   <span class="fw-bold" id="refCC">3%</span></div>
+                    </div>
+                </div>
+
+                <!-- Itemized Totals Box -->
+                <div class="p-2 border border-dark flex-grow-1">
+                    <div class="bg-black-bar mb-2">ITEMIZED TOTALS</div>
+                    <table class="table table-borderless table-sm mb-0">
+                        <tr>
+                            <td>Itemized Additional Misc. Charges</td>
+                            <td id="MiscTotal" class="text-end fw-bold">$0.00</td>
+                        </tr>
+                        <tr>
+                            <td>Total Misc. Markup Amount (25%)</td>
+                            <td id="MarkupTotalAmount" class="text-end fw-bold" style="color:#666;">$0.00</td>
+                        </tr>
+                        <tr>
+                            <td>Itemized Labor Time Totals</td>
+                            <td id="LaborTotal" class="text-end fw-bold">$0.00</td>
+                        </tr>
+                        <tr>
+                            <td>Care, Custody and Protection Total Days</td>
+                            <td id="TotalCCDays" class="text-end fw-bold">0 Days</td>
+                        </tr>
+                        <tr>
+                            <td>Credit Card Processing Fee</td>
+                            <td id="CCFee" class="text-end fw-bold">$0.00</td>
+                        </tr>
+                        <tr style="border-top:1px solid #000;">
+                            <td><strong>Total Amount Due</strong></td>
+                            <td id="GrandSub" class="text-end fw-bold">$0.00</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Total Tax Due</strong></td>
+                            <td id="GrandTax" class="text-end fw-bold">$0.00</td>
+                        </tr>
+                        <tr class="bg-black-bar" style="font-size:1.2em;">
+                            <td>TOTAL AMOUNT WITH TAX DUE</td>
+                            <td id="GrandTotal" class="text-end pe-2">$0.00</td>
+                        </tr>
+                    </table>
+                </div>
+
+            </div><!-- /HTML 5 — SUMMARY & TOTALS -->
+
+
+            <!-- ============================================================
+                 HTML 6 — NOTES
+            ============================================================ -->
+            <div class="mt-2">
+                <b>Notes:</b><br>
+                <textarea id="NotesField" class="form-control" style="font-size:10px;"></textarea>
+            </div>
+            <!-- /HTML 6 — NOTES -->
+
+
+            <!-- ============================================================
+                 HTML 7 — LEGAL AGREEMENT & SIGNATURES
+            ============================================================ -->
+            <div class="legal-acknowledgment">
+
+                <h6 class="text-center" style="font-weight:800;">
+                    TOTAL LOSS RELEASE, TRANSFER OF CUSTODY &amp; DEFENSE AGREEMENT
+                </h6>
+                <div class="text-center fw-bold mb-2">3J's Auto Body – California BAR Registered Facility</div>
+
+                <p><strong>1. Total Loss Determination:</strong> The above vehicle has been declared a Total Loss solely by the identified insurance carrier. 3J's Auto Body did not make this determination and assumes no responsibility for valuation, settlement amount, salvage disposition, or claim resolution.</p>
+                <p><strong>2. BAR Compliance &amp; Teardown:</strong> All inspection, diagnostic procedures, and teardown operations were performed in compliance with California Business &amp; Professions Code §9884.9. The vehicle is released strictly in its present AS-IS condition. Reassembly is not performed on total loss vehicles.</p>
+                <p><strong>3. Transfer of Custody:</strong> Upon release of the vehicle, custody and control immediately transfer to the receiving party. 3J's Auto Body is not responsible for the vehicle condition or any losses after the vehicle leaves the premises.</p>
+                <p><strong>4. Personal Property:</strong> 3J's Auto Body is not responsible for any personal property or contents located inside the vehicle.</p>
+                <p><strong>5. Insurance Carrier Assumption of Risk:</strong> If removed at the carrier's direction, the carrier assumes full custody and agrees to defend and indemnify 3J's Auto Body from all subsequent claims.</p>
+                <p><strong>6. General Release &amp; §1542 Waiver:</strong> The undersigned releases 3J's Auto Body from all claims, known or unknown, and expressly waives the provisions of California Civil Code §1542.</p>
+
+                <div class="sig-grid">
+
+                    <!-- Row 1: Vehicle Owner -->
+                    <div class="sig-item">
+                        <span class="sig-label">Vehicle Owner:</span>
+                        <div class="sig-line"><span id="OwnerMirror" class="auto-fill-val"></span></div>
+                    </div>
+                    <div class="sig-item">
+                        <span class="sig-label">Signature:</span>
+                        <div class="sig-line"></div>
+                    </div>
+                    <div class="sig-item">
+                        <span class="sig-label">Date:</span>
+                        <div class="sig-line"></div>
+                    </div>
+
+                    <!-- Row 2: Insurance -->
+                    <div class="sig-item">
+                        <span class="sig-label">Insurance Co:</span>
+                        <div class="sig-line"><span id="InsMirror" class="auto-fill-val"></span></div>
+                    </div>
+                    <div class="sig-item">
+                        <span class="sig-label">Claim #:</span>
+                        <div class="sig-line"><span id="ClaimMirror" class="auto-fill-val"></span></div>
+                    </div>
+                    <div class="sig-item">
+                        <span class="sig-label">Date:</span>
+                        <div class="sig-line"></div>
+                    </div>
+
+                    <!-- Row 3: Tow Company -->
+                    <div class="sig-item">
+                        <span class="sig-label">Tow Company:</span>
+                        <div class="sig-line"></div>
+                    </div>
+                    <div class="sig-item">
+                        <span class="sig-label">Tow Truck Driver's Signature:</span>
+                        <div class="sig-line"></div>
+                    </div>
+                    <div class="sig-item">
+                        <span class="sig-label">Time:</span>
+                        <div class="sig-line"></div>
+                    </div>
+
+                </div><!-- /sig-grid -->
+
+            </div><!-- /HTML 7 — LEGAL AGREEMENT & SIGNATURES -->
+
+        </div><!-- /capture-area -->
+    </div><!-- /WORKSHEET CARD -->
+
+</div><!-- /MAIN LAYOUT -->
+
+
+<!-- ============================================================
+     JAVASCRIPT
+============================================================ -->
+<script>
+
+    /* ============================================================
+       JS 1 — SERVICE DATA
+       Master list of all service rows rendered into the table.
+       Each entry is one of three types:
+         - header      : a dark section divider row (no inputs)
+         - special_ccp : a Care Custody & Protection date-range row
+         - body / frame / mech / markup / photo_misc : standard rows
+    ============================================================ */
+    const services = [
+        { name: "Initial Contact (Obtain Contact Info)",           hrs: 0.2, type: "body" },
+        { name: "Create Opportunity in Software",                  hrs: 0.2, type: "body" },
+        { name: "Assign Repair Order Number",                      hrs: 0.2, type: "body" },
+        { name: "Create Work Order File",                          hrs: 0.3, type: "body" },
+        { name: "Arrange Move or Travel to Vehicle",               hrs: 0.2, type: "body" },
+        { name: "Identify/Prepay Insurance Charges",               hrs: 0.4, type: "body" },
+        { name: "Prepaid Charges (Towing/Storage)",                hrs: 0,   type: "markup", id: "Prep" },
+        { name: "Create In-House Tow Worksheet",                   hrs: 0.3, type: "body" },
+        { header: "Total Procurement Charges",                               type: "header" },
+        { name: "Update Insurance Info",                           hrs: 0.3, type: "body" },
+        { name: "Pre-Order Parts per Plan",                        hrs: 0.3, type: "body" },
+        { name: "Pre-Wash Vehicle",                                hrs: 0.5, type: "body" },
+        { name: "Move Vehicle to Shop",                            hrs: 0.2, type: "body" },
+        { name: "Setup for Pre-Repair Diagnostic (Labor)",         hrs: 0.5, type: "body" },
+        { name: "Complete Pre-Repair Diagnostic (Sublet Cost)",    hrs: 0,   type: "markup", id: "Scan" },
+        { name: "Save Diagnostic Report",                          hrs: 0.3, type: "body" },
+        { name: "Take Preliminary Photos",                         hrs: 0.9, type: "body" },
+        { name: "Complete Meticulous Disassembly",                 hrs: 0,   type: "body",   id: "Dis" },
+        { name: "Complete Frame Operations",                       hrs: 0,   type: "frame",  id: "Frame" },
+        { name: "Complete Mechanical Operations",                  hrs: 0,   type: "mech",   id: "Mech" },
+        { name: "Setup/Measure Structural Condition",              hrs: 1.5, type: "body" },
+        { name: "Save Measurement Report",                         hrs: 0.3, type: "body" },
+        { name: "Identify All Labor/Parts for Repair",             hrs: 2.2, type: "body" },
+        { name: "Check In Parts/Mirror Match",                     hrs: 1.0, type: "body" },
+        { name: "Line Match Invoices",                             hrs: 0.8, type: "body" },
+        { name: "Transmit Pics/Plan to Insurance",                 hrs: 0.3, type: "body" },
+        { name: "Communicate With Insurance Co",                   hrs: 0.3, type: "body" },
+        { name: "Communicate With Vehicle Owner",                  hrs: 0.2, type: "body" },
+        { name: "Insurance Required Photos (Count)",               hrs: 0,   type: "photo_misc", id: "Photo" },
+        { header: "Return to Storage Area",                                  type: "header" },
+        { name: "Verify Restocking Fees",                          hrs: 0.5, type: "body" },
+        { name: "Secure Damaged Parts",                            hrs: 0.2, type: "body" },
+        { name: "Non-Returnable Parts Costs",                      hrs: 0,   type: "markup", id: "NonRet" },
+        { name: "Place Non-Returnable Parts in Vehicle",           hrs: 0.5, type: "body" },
+        { name: "Labor for Part Handling",                         hrs: 0.3, type: "body" },
+        { name: "Install Weather Tarp/Wrap (Labor)",               hrs: 0.5, type: "body" },
+        { name: "Weather Protection Tarp/Wrap ($)",                hrs: 0,   type: "markup", id: "Wrap" },
+        { name: "Move Vehicle to Protected Area",                  hrs: 0.2, type: "body" },
+        { name: "Initiate CC&P Charges",                           hrs: 0.2, type: "body" },
+        { header: "Care, Custody and Protection",                            type: "header" },
+        { name: "CC&P Inside",  type: "special_ccp", subtype: "in" },
+        { name: "CC&P Outside", type: "special_ccp", subtype: "out" },
+        { name: "Retrieve Personal Items",                         hrs: 0.3, type: "body" },
+        { name: "Purge Computer Data",                             hrs: 1.0, type: "body" },
+        { name: "Complete Total Loss Worksheet",                   hrs: 0.2, type: "body" },
+        { name: "Relay Charges/Salvage Pickup",                    hrs: 0.2, type: "body" },
+        { name: "Receive Payment/Assist Pickup",                   hrs: 0.2, type: "body" }
+    ];
+
+
+    /* ============================================================
+       JS 2 — TABLE BUILDER
+       Dynamically builds all rows from the services array above.
+       Each row receives a data-svc-index attribute that maps it
+       back to its entry in the services array — used by clearForm()
+       to reliably reset each row to its original default values.
+    ============================================================ */
+    function buildTable() {
+        let html = '';
+
+        services.forEach(function(s, idx) {
+
+            // Section header row (dark divider, no inputs)
+            if (s.type === "header") {
+                html += `<tr><td colspan="7" class="section-header ps-2">${s.header}</td></tr>`;
+
+            // CC&P date-range rows (Inside / Outside storage)
+            } else if (s.type === "special_ccp") {
+                let label = (s.subtype === 'in') ? 'Inside' : 'Outside';
+                html += `
+                <tr data-svc-index="${idx}">
+                    <td class="no-print"><input type="checkbox" id="${s.subtype}Sel" checked></td>
+                    <td>
+                        <b>${label}</b> CC&amp;P:
+                        <input type="date" class="ccp-input" id="${s.subtype}Start"> to
+                        <input type="date" class="ccp-input" id="${s.subtype}Stop">
+                    </td>
+                    <td class="text-center">Storage</td>
+                    <td class="text-center">
+                        <span class="small me-1"># Days</span>
+                        <input type="text" id="${s.subtype}DaysDisplay" class="days-input" readonly value="0">
+                    </td>
+                    <td id="${s.subtype}Total" class="val-out">$0.00</td>
+                    <td id="${s.subtype}Tax"   class="val-out">$0.00</td>
+                    <td class="no-print"><input type="checkbox" id="${s.subtype}TaxChk" checked></td>
+                </tr>`;
+
+            // Standard labor / markup / photo rows
+            } else {
+                let isCostMarkup = (s.type === "markup");
+                let isPhotoCount = (s.type === "photo_misc");
+                let typeCell = (isCostMarkup || isPhotoCount)
+                    ? 'Misc'
+                    : `<select class="type-select">
+                           <option value="body"  selected>Body</option>
+                           <option value="frame">Frame</option>
+                           <option value="mech">Mechanical</option>
+                       </select>`;
+
+                html += `
+                <tr class="calc-row" data-type="${s.type}" data-svc-index="${idx}">
+                    <td class="no-print">
+                        <input type="checkbox" class="sel-chk" ${s.hrs > 0 ? 'checked' : ''}>
+                    </td>
+                    <td>
+                        ${s.name}
+                        ${isCostMarkup ? '<span style="font-size:9px; font-style:italic; color:#777;">(cost plus 25% Markup)</span>' : ''}
+                    </td>
+                    <td class="text-center">${typeCell}</td>
+                    <td class="text-center">
+                        <div class="cost-input-container">
+                            <span>${isCostMarkup ? '$' : ''}</span>
+                            <input type="number" step="0.1" value="${s.hrs}"
+                                   class="hrs ${isCostMarkup ? 'bg-yellow' : ''}"
+                                   id="${s.id ? s.id + 'Val' : ''}">
+                        </div>
+                    </td>
+                    <td class="sub val-out">$0.00</td>
+                    <td class="tx  val-out">$0.00</td>
+                    <td class="no-print"><input type="checkbox" class="t-chk"></td>
+                </tr>`;
+            }
+        });
+
+        $('#worksheet-body').html(html);
+    }
+
+
+    /* ============================================================
+       JS 3 — CALCULATIONS
+       Reads all rate inputs and row values, computes subtotals,
+       tax, CC fee, and grand total, then writes results to the
+       summary output fields.
+    ============================================================ */
+    function calculate() {
+        const rates = {
+            body:  parseFloat($('#BodyRate').val())  || 0,
+            frame: parseFloat($('#FrameRate').val()) || 0,
+            mech:  parseFloat($('#MechRate').val())  || 0,
+            in:    parseFloat($('#InRate').val())     || 0,
+            out:   parseFloat($('#OutRate').val())    || 0,
+            photo: parseFloat($('#PhotoRate').val())  || 0
+        };
+        const taxR = (parseFloat($('#TaxRate').val()) || 0) / 100;
+        const ccP  = (parseInt($('#CCRate').val())    || 0) / 100;
+
+        // Update applied-rates reference display
+        $('#refBody').text('$'  + rates.body.toFixed(2));
+        $('#refFrame').text('$' + rates.frame.toFixed(2));
+        $('#refMech').text('$'  + rates.mech.toFixed(2));
+        $('#refIn').text('$'    + rates.in.toFixed(2));
+        $('#refOut').text('$'   + rates.out.toFixed(2));
+        $('#refPhoto').text('$' + rates.photo.toFixed(2));
+        $('#refCC').text((ccP * 100).toFixed(0) + '%');
+
+        let gSub = 0, gTax = 0, miscSub = 0, labSub = 0, totalMarkupAmt = 0;
+
+        // Process all standard calc rows
+        $('.calc-row').each(function() {
+            let isSelected = $(this).find('.sel-chk').is(':checked');
+            let inputVal   = parseFloat($(this).find('.hrs').val()) || 0;
+            let type       = $(this).find('.type-select').val() || $(this).data('type');
+            let sub        = 0;
+
+            if (type === "markup") {
+                let markup = inputVal * 0.25;
+                sub = isSelected ? inputVal + markup : 0;
+                if (isSelected && inputVal > 0) totalMarkupAmt += markup;
+            } else if (type === "photo_misc") {
+                sub = isSelected ? inputVal * rates.photo : 0;
+            } else {
+                sub = isSelected ? inputVal * (rates[type] || 0) : 0;
+            }
+
+            let tax = $(this).find('.t-chk').is(':checked') ? sub * taxR : 0;
+            $(this).find('.sub').text('$' + sub.toFixed(2));
+            $(this).find('.tx').text('$'  + tax.toFixed(2));
+
+            if (isSelected) {
+                gSub += sub;
+                gTax += tax;
+                if (['markup', 'photo_misc'].includes(type)) {
+                    miscSub += sub;
+                } else {
+                    labSub += sub;
+                }
+            }
+        });
+
+        // Process CC&P rows (Inside / Outside)
+        ['in', 'out'].forEach(function(id) {
+            let isSelected = $(`#${id}Sel`).is(':checked');
+            let days = diffDays(id);
+            $(`#${id}DaysDisplay`).val(days);
+            let sub = isSelected ? days * rates[id] : 0;
+            let tax = (isSelected && $(`#${id}TaxChk`).is(':checked')) ? sub * taxR : 0;
+            $(`#${id}Total`).text('$' + sub.toFixed(2));
+            $(`#${id}Tax`).text('$'   + tax.toFixed(2));
+            if (isSelected) {
+                gSub    += sub;
+                gTax    += tax;
+                miscSub += sub;
+            }
+        });
+
+        // CC processing fee is applied on subtotal + tax combined
+        let ccFee = (gSub + gTax) * ccP;
+
+        // Sum all CC&P day inputs for total days display
+        let totalDays = $('.days-input').toArray().reduce(function(acc, el) {
+            return acc + (parseInt(el.value) || 0);
+        }, 0);
+
+        // Write all summary output fields
+        $('#MiscTotal').text('$'         + miscSub.toFixed(2));
+        $('#MarkupTotalAmount').text('$' + totalMarkupAmt.toFixed(2));
+        $('#LaborTotal').text('$'        + labSub.toFixed(2));
+        $('#TotalCCDays').text(totalDays + ' Days');
+        $('#CCFee').text('$'             + ccFee.toFixed(2));
+        $('#GrandSub').text('$'          + gSub.toFixed(2));
+        $('#GrandTax').text('$'          + gTax.toFixed(2));
+        $('#GrandTotal').text('$'        + (gSub + gTax + ccFee).toFixed(2));
+    }
+
+    /* Calculates the number of days between two dates, inclusive */
+    function diffDays(id) {
+        let sVal = $(`#${id}Start`).val();
+        let eVal = $(`#${id}Stop`).val();
+        if (!sVal || !eVal) return 0;
+        let s = new Date(sVal + 'T00:00:00');
+        let e = new Date(eVal + 'T00:00:00');
+        if (isNaN(s.getTime()) || isNaN(e.getTime()) || e < s) return 0;
+        return Math.ceil((e - s) / (1000 * 60 * 60 * 24)) + 1;
+    }
+
+
+    /* ============================================================
+       JS 4 — FIELD SYNC & HELPERS
+    ============================================================ */
+
+    /* Mirrors owner, insurance co, and claim # into the signature section */
+    function syncFields() {
+        document.getElementById('OwnerMirror').innerText = document.getElementById('Cust').value;
+        document.getElementById('InsMirror').innerText   = document.getElementById('InsCoTop').value;
+        document.getElementById('ClaimMirror').innerText = document.getElementById('ClaimNumTop').value;
+    }
+
+    /* Converts a string to Proper Case (first letter of each word capitalized) */
+    function toProperCase(str) {
+        return str.replace(/\w\S*/g, function(word) {
+            return word.charAt(0).toUpperCase() + word.substr(1).toLowerCase();
+        });
+    }
+
+    /* Sets today's date in the invoice header on page load */
+    function setTodayDate() {
+        let now = new Date();
+        let mm  = String(now.getMonth() + 1).padStart(2, '0');
+        let dd  = String(now.getDate()).padStart(2, '0');
+        let yy  = now.getFullYear();
+        $('#currentDate').text(mm + '/' + dd + '/' + yy);
+    }
+
+    /* Returns a date formatted as MM/DD/YYYY */
+    function formatDate(d) {
+        let mm = String(d.getMonth() + 1).padStart(2, '0');
+        let dd = String(d.getDate()).padStart(2, '0');
+        let yy = d.getFullYear();
+        return mm + '/' + dd + '/' + yy;
+    }
+
+    /* Displays a brief toast notification at the bottom of the screen.
+       type: 'success' (green) | 'error' (dark red) | '' (dark/default) */
+    function showToast(msg, type) {
+        let bg = '#2C3E50';
+        if (type === 'success') bg = '#27ae60';
+        if (type === 'error')   bg = '#8B0000';
+        $('#toast').stop(true, true).css({ background: bg, display: 'none' })
+            .text(msg).fadeIn(200);
+        setTimeout(function() { $('#toast').fadeOut(600); }, 2400);
+    }
+
+    /* Briefly shows the "• Saved" indicator in the sidebar Records header */
+    function showAutoSaved() {
+        $('#autoSaveStatus').stop(true, true).fadeIn(200);
+        setTimeout(function() { $('#autoSaveStatus').fadeOut(1000); }, 2500);
+    }
+
+
+    /* ============================================================
+       JS 5 — FORM ACTIONS  (New Form / Clear Form)
+    ============================================================ */
+
+    /* Reloads the page to start a fresh blank form */
+    function createNewForm() {
+        if (confirm("Start a new form? Any unsaved data will be lost.")) {
+            location.reload();
+        }
+    }
+
+    /* Resets all inputs to their default values without reloading.
+       Uses data-svc-index on each row to look up original defaults
+       from the services array, ensuring a reliable and accurate reset. */
+    function clearForm() {
+        if (!confirm("Wipe all form data? This cannot be undone.")) return;
+
+        // Clear all plain text and date fields
+        $('#WONum, #Cust, #InsCoTop, #ClaimNumTop, #Veh, #VIN, #NotesField').val('');
+
+        // Reset all rate inputs to their default values
+        $('#BodyRate').val('90.00');
+        $('#FrameRate').val('90.00');
+        $('#MechRate').val('120.00');
+        $('#InRate').val('150.00');
+        $('#OutRate').val('120.00');
+        $('#PhotoRate').val('5.00');
+        $('#CCRate').val('3');
+        $('#TaxRate').val('10.5');
+
+        // Reset each table row using its data-svc-index to find original defaults
+        $('#worksheet-body tr').each(function() {
+            let idx = parseInt($(this).attr('data-svc-index'));
+            if (isNaN(idx)) return;
+            let s = services[idx];
+            if (!s) return;
+
+            if (s.type === 'special_ccp') {
+                $(`#${s.subtype}Start`).val('');
+                $(`#${s.subtype}Stop`).val('');
+                $(`#${s.subtype}Sel`).prop('checked', true);
+                $(`#${s.subtype}TaxChk`).prop('checked', true);
+                $(`#${s.subtype}DaysDisplay`).val('0');
+            } else {
+                $(this).find('.hrs').val(s.hrs);
+                $(this).find('.sel-chk').prop('checked', s.hrs > 0);
+                $(this).find('.t-chk').prop('checked', false);
+                $(this).find('.type-select').val('body');
+            }
+        });
+
+        syncFields();
+        setTodayDate();
+        calculate();
+        showToast('Form wiped.', '');
+    }
+
+
+    /* ============================================================
+       JS 6 — RECORD MANAGEMENT  (Save / Load / Delete / Export)
+    ============================================================ */
+
+    /* Returns all saved records from localStorage, or [] on error */
+    function getRecords() {
+        try {
+            return JSON.parse(localStorage.getItem('3js_records')) || [];
+        } catch (e) {
+            return [];
+        }
+    }
+
+    /* Saves the current form state to localStorage.
+       - Stores original invoice date separately from the save date
+       - Prompts before overwriting an existing record with same RO#
+       - Catches localStorage quota errors and alerts the user */
+    function saveRecord() {
+        let roNum = $('#WONum').val().trim();
+        let owner = $('#Cust').val().trim();
+
+        if (!roNum && !owner) {
+            showToast('Enter a Repair Order # or Vehicle Owner first.', 'error');
+            return;
+        }
+
+        // Collect all table row states
+        let rows = [];
+        $('#worksheet-body tr').each(function() {
+            rows.push({
+                svcIndex:  $(this).attr('data-svc-index'),
+                checked:   $(this).find('.sel-chk').is(':checked'),
+                hrs:       $(this).find('.hrs').val(),
+                type:      $(this).find('.type-select').val() || null,
+                taxChk:    $(this).find('.t-chk').is(':checked'),
+                ccpStart:  $(this).find('.ccp-input:first').val() || null,
+                ccpStop:   $(this).find('.ccp-input:last').val()  || null,
+                ccpSel:    $(this).find('[id$="Sel"]').is(':checked'),
+                ccpTaxChk: $(this).find('[id$="TaxChk"]').is(':checked')
+            });
+        });
+
+        let record = {
+            id:           Date.now(),
+            invoiceDate:  $('#currentDate').text(),
+            savedOn:      formatDate(new Date()),
+            roNum:        roNum,
+            owner:        owner,
+            ins:          $('#InsCoTop').val(),
+            claim:        $('#ClaimNumTop').val(),
+            veh:          $('#Veh').val(),
+            vin:          $('#VIN').val(),
+            notes:        $('#NotesField').val(),
+            bodyRate:     $('#BodyRate').val(),
+            frameRate:    $('#FrameRate').val(),
+            mechRate:     $('#MechRate').val(),
+            inRate:       $('#InRate').val(),
+            outRate:      $('#OutRate').val(),
+            photoRate:    $('#PhotoRate').val(),
+            ccRate:       $('#CCRate').val(),
+            taxRate:      $('#TaxRate').val(),
+            rows:         rows
+        };
+
+        let records     = getRecords();
+        let existingIdx = records.findIndex(function(r) {
+            return r.roNum === roNum && roNum !== '';
+        });
+
+        if (existingIdx >= 0) {
+            if (!confirm('A record with RO# ' + roNum + ' already exists. Overwrite it?')) return;
+            record.id = records[existingIdx].id;
+            records[existingIdx] = record;
+        } else {
+            records.unshift(record);
+        }
+
+        // Guard against localStorage quota being exceeded
+        try {
+            localStorage.setItem('3js_records', JSON.stringify(records));
+        } catch (e) {
+            showToast('Storage full — delete old records to free space.', 'error');
+            return;
+        }
+
+        showAutoSaved();
+        showToast('Record saved: RO# ' + (roNum || owner), 'success');
+        renderSidebar();
+    }
+
+    /* Loads a saved record back into the form by its ID.
+       Restores the original invoice date, all rates, text fields,
+       and every table row's checked state and values. */
+    function loadRecord(id) {
+        let records = getRecords();
+        let record  = records.find(function(r) { return r.id === id; });
+        if (!record) return;
+
+        // Restore text fields
+        $('#WONum').val(record.roNum       || '');
+        $('#Cust').val(record.owner        || '');
+        $('#InsCoTop').val(record.ins      || '');
+        $('#ClaimNumTop').val(record.claim || '');
+        $('#Veh').val(record.veh           || '');
+        $('#VIN').val(record.vin           || '');
+        $('#NotesField').val(record.notes  || '');
+
+        // Restore original invoice date (not today's date)
+        if (record.invoiceDate) $('#currentDate').text(record.invoiceDate);
+
+        // Restore rates
+        $('#BodyRate').val(record.bodyRate   || '90.00');
+        $('#FrameRate').val(record.frameRate || '90.00');
+        $('#MechRate').val(record.mechRate   || '120.00');
+        $('#InRate').val(record.inRate       || '150.00');
+        $('#OutRate').val(record.outRate     || '120.00');
+        $('#PhotoRate').val(record.photoRate || '5.00');
+        $('#CCRate').val(record.ccRate       || '3');
+        $('#TaxRate').val(record.taxRate     || '10.5');
+
+        // Restore all table row states
+        if (record.rows && record.rows.length) {
+            $('#worksheet-body tr').each(function(i) {
+                let r = record.rows[i];
+                if (!r) return;
+
+                if (r.ccpStart !== null && r.ccpStart !== undefined) {
+                    // CC&P rows: restore dates and checkboxes
+                    $(this).find('.ccp-input:first').val(r.ccpStart || '');
+                    $(this).find('.ccp-input:last').val(r.ccpStop   || '');
+                    $(this).find('[id$="Sel"]').prop('checked', r.ccpSel);
+                    $(this).find('[id$="TaxChk"]').prop('checked', r.ccpTaxChk);
+                } else {
+                    // Standard rows: restore hours, type, and checkboxes
+                    $(this).find('.sel-chk').prop('checked', r.checked);
+                    if (r.hrs  !== null && r.hrs  !== undefined) $(this).find('.hrs').val(r.hrs);
+                    if (r.type !== null && r.type !== undefined) $(this).find('.type-select').val(r.type);
+                    $(this).find('.t-chk').prop('checked', r.taxChk);
+                }
+            });
+        }
+
+        syncFields();
+        calculate();
+        showToast('Loaded: RO# ' + (record.roNum || record.owner), 'success');
+    }
+
+    /* Deletes a single record from localStorage by ID.
+       stopPropagation prevents the click from also firing loadRecord. */
+    function deleteRecord(id, e) {
+        e.stopPropagation();
+        if (!confirm('Delete this record? This cannot be undone.')) return;
+        let records = getRecords().filter(function(r) { return r.id !== id; });
+        localStorage.setItem('3js_records', JSON.stringify(records));
+        renderSidebar();
+        showToast('Record deleted.', '');
+    }
+
+    /* Exports all saved records as a downloadable JSON backup file.
+       Filename includes today's date for easy organization. */
+    function exportRecordsBackup() {
+        let records = getRecords();
+        if (records.length === 0) {
+            showToast('No records to export.', 'error');
+            return;
+        }
+        let blob = new Blob([JSON.stringify(records, null, 2)], { type: 'application/json' });
+        let url  = URL.createObjectURL(blob);
+        let a    = document.createElement('a');
+        let date = formatDate(new Date()).replace(/\//g, '-');
+        a.href     = url;
+        a.download = '3js_records_backup_' + date + '.json';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        showToast('Backup exported (' + records.length + ' records).', 'success');
+    }
+
+
+    /* ============================================================
+       JS 7 — SIDEBAR RENDERING
+    ============================================================ */
+
+    /* Renders the records list in the sidebar.
+       Accepts an optional filter string to search by RO#, owner, or vehicle. */
+    function renderSidebar(filter) {
+        let allRecords = getRecords();
+        let search     = (filter || '').toLowerCase().trim();
+
+        let filtered = search
+            ? allRecords.filter(function(r) {
+                return (r.roNum && r.roNum.toLowerCase().includes(search))
+                    || (r.owner && r.owner.toLowerCase().includes(search))
+                    || (r.veh   && r.veh.toLowerCase().includes(search));
+              })
+            : allRecords;
+
+        // Update record count badge
+        if (search) {
+            $('#recordCount').text(filtered.length + ' of ' + allRecords.length + ' records');
+        } else {
+            $('#recordCount').text(allRecords.length + ' record' + (allRecords.length !== 1 ? 's' : '') + ' saved');
+        }
+
+        let html = '';
+        if (filtered.length === 0) {
+            html = '<div style="color:#aaa; font-size:10px; text-align:center; margin-top:6px;">'
+                 + (search ? 'No matching records.' : 'No saved records.')
+                 + '</div>';
+        } else {
+            filtered.forEach(function(r) {
+                html += `
+                <div class="history-item" onclick="loadRecord(${r.id})">
+                    <button class="delete-btn" onclick="deleteRecord(${r.id}, event)">✕</button>
+                    <div class="record-ro">RO# ${r.roNum || '—'}</div>
+                    <div class="record-name">${r.owner || 'No Owner'}</div>
+                    <div class="record-date">${r.veh || ''}&nbsp;|&nbsp;${r.savedOn}</div>
+                </div>`;
+            });
+        }
+
+        $('#sidebarList').html(html);
+    }
+
+    /* Called on search box keyup to filter the sidebar list */
+    function filterSidebar() {
+        renderSidebar($('#sidebarSearch').val());
+    }
+
+
+    /* ============================================================
+       JS 8 — INITIALIZATION & EVENT BINDINGS
+       All jQuery event listeners are registered here inside
+       document.ready to ensure the DOM is fully built first.
+    ============================================================ */
+    $(document).ready(function() {
+
+        // Build table, set date, load saved records, run initial calculation
+        buildTable();
+        setTodayDate();
+        renderSidebar();
+        calculate();
+
+        // --------------------------------------------------------
+        // Click-to-clear on focus
+        // Uses .data('prevVal') per element instead of a shared
+        // variable to prevent race conditions when tabbing quickly.
+        // --------------------------------------------------------
+        $(document).on('focus', '.auto-clear, .hrs', function() {
+            $(this).data('prevVal', $(this).val());
+            $(this).val('');
+        });
+
+        $(document).on('blur', '.auto-clear, .hrs', function() {
+            if ($(this).val() === '') {
+                $(this).val($(this).data('prevVal') || '');
+            } else {
+                // Labor rows → format to 1 decimal
+                // Rate fields → format to 2 decimals
+                if ($(this).hasClass('hrs')) {
+                    let num = parseFloat($(this).val());
+                    $(this).val(!isNaN(num) ? num.toFixed(1) : $(this).data('prevVal'));
+                } else if ($(this).hasClass('tax-input') ||
+                           ($(this).attr('id') && $(this).attr('id').includes('Rate'))) {
+                    let num = parseFloat($(this).val());
+                    $(this).val(!isNaN(num) ? num.toFixed(2) : $(this).data('prevVal'));
+                }
+            }
+            calculate();
+        });
+
+        // Enter key triggers blur (submits the field)
+        $(document).on('keydown', '.auto-clear, .hrs', function(e) {
+            if (e.key === 'Enter') $(this).blur();
+        });
+
+        // --------------------------------------------------------
+        // Proper case: capitalize words on blur for text fields
+        // --------------------------------------------------------
+        $(document).on('blur', '.proper-case', function() {
+            $(this).val(toProperCase($(this).val()));
+        });
+
+        // --------------------------------------------------------
+        // Recalculate on any interactive change in the table
+        // --------------------------------------------------------
+        $(document).on('change', '.sel-chk, .t-chk, #inSel, #outSel, #inTaxChk, #outTaxChk',
+            function() { calculate(); });
+
+        $(document).on('change', '.type-select',
+            function() { calculate(); });
+
+        $(document).on('change', '.ccp-input',
+            function() { calculate(); });
+
+        // --------------------------------------------------------
+        // Keyboard shortcut: Ctrl+S / Cmd+S → Save Record
+        // --------------------------------------------------------
+        $(document).on('keydown', function(e) {
+            if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+                e.preventDefault();
+                saveRecord();
+            }
+        });
+
+    }); /* /document.ready */
+
+</script>
+</body>
+</html>
