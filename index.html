@@ -129,10 +129,9 @@
 
         /* Hover: light gray with inset white border */
         .sidebar-actions .btn:hover {
-            background-color: #D3D3D3 !important;
-            color: #000000 !important;
-            border-color: #D3D3D3 !important;
-            box-shadow: inset 0 0 0 1px rgba(255,255,255,0.45) !important;
+            box-shadow:
+                inset 0 3px 6px rgba(0,0,0,0.3),
+                inset 0 -3px 6px rgba(0,0,0,0.15) !important;
         }
 
         .btn-wipe {
@@ -173,6 +172,9 @@
             position: relative;
             transition: all 0.2s ease;
             border-left: 3px solid transparent;
+            box-shadow:
+                inset 0 3px 6px rgba(0,0,0,0.3),
+                inset 0 -3px 6px rgba(0,0,0,0.15);
         }
 
         .history-item:hover {
@@ -469,6 +471,12 @@
             vertical-align: middle;
         }
 
+        .ccp-input {
+            width: 115px;
+            min-width: 115px;
+            flex-shrink: 0;
+        }
+
         .days-input {
             width: 55px;
             text-align: center;
@@ -663,6 +671,118 @@
                 print-color-adjust: exact;
             }
 
+            /* Center header text when printing */
+            .ws-card h6,
+            .business-info,
+            #currentDate {
+                text-align: center !important;
+            }
+
+            /* Remove inner cell borders, keep outer table border only */
+            table {
+                border-collapse: collapse;
+                border: 1px solid #ccc;
+            }
+
+            td, th {
+                border: none !important;
+                border-bottom: 1px solid #eee !important;
+            }
+
+            tr:last-child td {
+                border-bottom: none !important;
+            }
+
+            /* Keep section header rows attached to the rows that follow */
+            .section-header {
+                page-break-after: avoid;
+            }
+
+            /* Prevent thead from repeating on every printed page */
+            thead {
+                display: table-row-group;
+            }
+
+            /* On print: use flex ordering to move notes below header, above table */
+            #capture-area {
+                display: flex;
+                flex-direction: column;
+            }
+
+            .invoice-header-block { order: 1; }
+            .top-grid             { order: 2; }
+            .print-notes-area     { order: 3; }
+            .invoice-table-block  { order: 4; }
+            .summary-block        { order: 5; }
+            .legal-page           { order: 6; }
+
+            /* Hide the original notes block in its normal position */
+            .notes-block {
+                display: none !important;
+            }
+
+            /* Show the print-only notes area */
+            .print-notes-area {
+                display: block !important;
+                margin-bottom: 10px;
+                page-break-inside: avoid;
+            }
+
+            .print-notes-area b {
+                font-size: 10px;
+                letter-spacing: 0.05px;
+                font-weight: 700;
+            }
+
+            .print-notes-area .notes-content {
+                font-size: 10px;
+                letter-spacing: 0.05px;
+                line-height: 1.15;
+                white-space: pre-wrap;
+                text-align: left;
+                margin-top: 3px;
+                min-height: 20px;
+            }
+
+            /* Legal/signature section always on its own page, never splits */
+            .legal-page {
+                page-break-before: always;
+                page-break-inside: avoid;
+            }
+
+            /* Legal/signature section always on its own page, never splits */
+            .legal-page {
+                page-break-before: always;
+                page-break-inside: avoid;
+            }
+
+            tr {
+                page-break-inside: avoid;
+            }
+
+            /* Keep entire summary box together — never split across pages */
+            .summary-block {
+                page-break-inside: avoid;
+            }
+
+            /* Hide date picker chrome on CCP rows — show values only */
+            .ccp-input {
+                -webkit-appearance: none;
+                appearance: none;
+                border: none !important;
+                background: transparent !important;
+                font-family: 'Montserrat', sans-serif;
+                font-size: 11px;
+                letter-spacing: 0.5px;
+                width: auto;
+                padding: 0 2px;
+            }
+
+            /* Hide the calendar icon on date inputs */
+            .ccp-input::-webkit-calendar-picker-indicator {
+                display: none !important;
+            }
+
             .cost-input-container {
                 width: auto;
             }
@@ -676,6 +796,21 @@
                 position: static;
                 transform: none;
                 margin-right: 1px;
+            }
+
+            /* 2-column print layout for customer info */
+            .print-customer-grid {
+                display: grid !important;
+                grid-template-columns: 1fr 1fr;
+                gap: 3px 60px;
+                padding: 14px 40px;
+                border: none;
+                margin: 0 auto 12px auto;
+                width: fit-content;
+            }
+
+            .print-customer-grid .customer-field label {
+                width: 100px;
             }
         }
 
@@ -736,6 +871,7 @@
             <!-- ============================================================
                  HTML 2 — INVOICE HEADER
             ============================================================ -->
+            <div class="invoice-header-block">
             <div class="logo-container">
                 <img src="https://static.wixstatic.com/media/b95bd9_fc4d86d4c40043f5b23fa60f23bdf077~mv2.png"
                      alt="3J's Auto Body & Paint" class="business-logo">
@@ -748,7 +884,14 @@
 
             <h6 class="text-center fw-bold mb-1" style="letter-spacing:0.5px;">TOTAL LOSS INVOICE</h6>
             <div class="text-end small mb-2" id="currentDate" style="letter-spacing:0.5px;"></div>
+            </div><!-- /invoice-header-block -->
             <!-- /HTML 2 — INVOICE HEADER -->
+
+            <!-- Print-only notes area — shown between header and table on print -->
+            <div class="print-notes-area" style="display:none;">
+                <b>Notes:</b>
+                <div class="notes-content" id="printNotesDisplay"></div>
+            </div>
 
 
             <!-- ============================================================
@@ -795,7 +938,7 @@
                 </div>
 
                 <!-- Column 3: Customer & Vehicle Info -->
-                <div>
+                <div class="print-customer-grid">
                     <div class="customer-field">
                         <label>Repair Order #</label>
                         <input type="text" id="WONum" placeholder="Ex: 12345" spellcheck="false" class="enter-blur">
@@ -805,7 +948,7 @@
                         <input type="text" id="Cust" class="proper-case enter-blur" oninput="syncFields()">
                     </div>
                     <div class="customer-field">
-                        <label>Insurance Co</label>
+                        <label>Ins. Company</label>
                         <input type="text" id="InsCoTop" class="proper-case enter-blur" oninput="syncFields()">
                     </div>
                     <div class="customer-field">
@@ -832,6 +975,7 @@
             <!-- ============================================================
                  HTML 4 — SERVICE TABLE
             ============================================================ -->
+            <div class="invoice-table-block">
             <table>
                 <thead>
                     <tr>
@@ -846,13 +990,14 @@
                 </thead>
                 <tbody id="worksheet-body"></tbody>
             </table>
+            </div><!-- /invoice-table-block -->
             <!-- /HTML 4 — SERVICE TABLE -->
 
 
             <!-- ============================================================
                  HTML 5 — SUMMARY & TOTALS
             ============================================================ -->
-            <div class="mt-3 d-flex gap-3 align-items-stretch">
+            <div class="summary-block mt-3 d-flex gap-3 align-items-stretch">
 
                 <!-- Applied Rates Reference Box -->
                 <div class="p-2 border border-dark" style="min-width:220px;">
@@ -914,7 +1059,7 @@
             <!-- ============================================================
                  HTML 6 — NOTES
             ============================================================ -->
-            <div class="mt-2">
+            <div class="mt-2 notes-block">
                 <b style="letter-spacing:0.5px;">Notes:</b><br>
                 <textarea id="NotesField" class="form-control" style="font-size:10px; letter-spacing:0.5px;"></textarea>
             </div>
@@ -923,18 +1068,23 @@
 
             <!-- ============================================================
                  HTML 7 — LEGAL AGREEMENT & SIGNATURES
+                 page-break-before: always ensures this always starts on
+                 its own page and page-break-inside: avoid keeps it together.
             ============================================================ -->
-            <div class="legal-acknowledgment">
+            <div class="legal-acknowledgment legal-page">
 
-                <!-- #10: replaced title, removed facility line -->
-                <span class="disclaimer-title">TOTAL LOSS DISCLAIMER</span>
+                <span class="disclaimer-title">TOTAL LOSS VEHICLE RELEASE &amp; LIABILITY WAIVER DISCLAIMER</span>
 
-                <p><strong>1. Total Loss Determination:</strong> The above vehicle has been declared a Total Loss solely by the identified insurance carrier. 3J's Auto Body did not make this determination and assumes no responsibility for valuation, settlement amount, salvage disposition, or claim resolution.</p>
-                <p><strong>2. BAR Compliance &amp; Teardown:</strong> All inspection, diagnostic procedures, and teardown operations were performed in compliance with California Business &amp; Professions Code §9884.9. The vehicle is released strictly in its present AS-IS condition. Reassembly is not performed on total loss vehicles.</p>
-                <p><strong>3. Transfer of Custody:</strong> Upon release of the vehicle, custody and control immediately transfer to the receiving party. 3J's Auto Body is not responsible for the vehicle condition or any losses after the vehicle leaves the premises.</p>
-                <p><strong>4. Personal Property:</strong> 3J's Auto Body is not responsible for any personal property or contents located inside the vehicle.</p>
-                <p><strong>5. Insurance Carrier Assumption of Risk:</strong> If removed at the carrier's direction, the carrier assumes full custody and agrees to defend and indemnify 3J's Auto Body from all subsequent claims.</p>
-                <p><strong>6. General Release &amp; §1542 Waiver:</strong> The undersigned releases 3J's Auto Body from all claims, known or unknown, and expressly waives the provisions of California Civil Code §1542.</p>
+                <p><strong>1. Total Loss Determination:</strong> This vehicle has been declared a total loss solely by the insurance carrier. 3J's Auto Body did not make this determination and assumes no responsibility for valuation, settlement, salvage handling, title processing, or claim resolution.</p>
+                <p><strong>2. BAR Compliance &amp; Teardown:</strong> All inspections, diagnostics, and teardown procedures were performed with proper authorization and in compliance with California Business &amp; Professions Code §9884.9 and applicable Bureau of Automotive Repair regulations. The vehicle may be partially dismantled as a result of damage analysis. <strong>Reassembly is not performed on total loss vehicles.</strong> Vehicle released AS-IS without warranty or representation.</p>
+                <p><strong>3. Transfer of Custody to Carrier or Agent:</strong> Upon release to the insurance carrier, salvage vendor, or tow provider acting on the carrier's behalf, custody, possession, and control transfer from 3J's Auto Body. After release, 3J's Auto Body is not responsible for: vehicle condition or safety; missing or non-reinstalled parts; transport or storage damage; theft, fire, vandalism, or environmental exposure; salvage processing, resale, or disposal; valuation or claim disputes; title or ownership transfer; or post-release costs or obligations.</p>
+                <p><strong>4. Storage Charges (Notice to Carrier):</strong> Storage charges begin after teardown and documentation are completed in accordance with BAR requirements and applicable law. Storage charges continue to accrue until the vehicle is removed from the premises. A total loss determination does not stop or waive storage charges.</p>
+                <p><strong>5. Diagnostic &amp; Teardown Labor:</strong> Inspection and damage analysis require labor to evaluate and document the vehicle condition. Diagnostic time and teardown labor remain payable regardless of repair outcome.</p>
+                <p><strong>6. Carrier Assumption of Risk &amp; Indemnification:</strong> Upon pickup, the insurance carrier assumes full responsibility for the vehicle and agrees to defend, indemnify, and hold harmless 3J's Auto Body from any claims, damages, or expenses, including attorney's fees, arising from post-release handling, transport, storage, salvage processing, or claim disputes.</p>
+                <p><strong>7. Personal Property:</strong> The carrier and/or vehicle owner assumes responsibility for any contents remaining in the vehicle.</p>
+                <p><strong>8. General Release &amp; California Civil Code §1542 Waiver:</strong> The undersigned releases 3J's Auto Body from all claims arising after release and expressly waives California Civil Code §1542.</p>
+
+                <p style="margin-top:8px;"><input type="checkbox" style="margin-right:6px;">I acknowledge receipt of the Total Loss Vehicle Release &amp; Liability Waiver and understand fully.</p>
 
                 <div class="sig-grid">
 
@@ -954,7 +1104,7 @@
 
                     <!-- Row 2: Insurance -->
                     <div class="sig-item">
-                        <span class="sig-label">Insurance Co:</span>
+                        <span class="sig-label">Ins. Company:</span>
                         <div class="sig-line"><span id="InsMirror" class="auto-fill-val"></span></div>
                     </div>
                     <div class="sig-item">
@@ -1078,9 +1228,12 @@
                 <tr data-svc-index="${idx}">
                     <td class="no-print tax-chk-cell"><input type="checkbox" id="${s.subtype}Sel" checked></td>
                     <td>
-                        <b>${label}</b> CC&amp;P:
-                        <input type="date" class="ccp-input enter-blur" id="${s.subtype}Start"> to
-                        <input type="date" class="ccp-input enter-blur" id="${s.subtype}Stop">
+                        <div style="display:flex; align-items:center; gap:4px; flex-wrap:nowrap; white-space:nowrap;">
+                            <b>${label}</b><span>CC&amp;P:</span>
+                            <input type="date" class="ccp-input enter-blur" id="${s.subtype}Start">
+                            <span>to</span>
+                            <input type="date" class="ccp-input enter-blur" id="${s.subtype}Stop">
+                        </div>
                     </td>
                     <td class="text-center">Storage</td>
                     <td class="text-center">
@@ -1117,7 +1270,7 @@
                     <td class="text-center">
                         <div class="cost-input-container">
                             <span>${isCostMarkup ? '$' : ''}</span>
-                            <input type="number" step="0.1" value="${parseFloat(s.hrs).toFixed(1)}"
+                            <input type="number" step="0.1" value="${isCostMarkup ? parseFloat(s.hrs).toFixed(2) : parseFloat(s.hrs).toFixed(1)}"
                                    class="hrs enter-blur ${isCostMarkup ? 'bg-yellow' : ''}"
                                    id="${s.id ? s.id + 'Val' : ''}">
                         </div>
@@ -1130,6 +1283,11 @@
         });
 
         $('#worksheet-body').html(html);
+        // Format all markup (yellow) fields to $X.XX on initial render
+        $('.bg-yellow').each(function() {
+            let num = parseFloat($(this).val());
+            $(this).val(!isNaN(num) ? num.toFixed(2) : '0.00');
+        });
     }
 
 
@@ -1649,11 +1807,23 @@
             $(this).val('');
         });
 
+        // After buildTable, format all markup fields as $X.XX immediately
+        $(document).on('buildComplete', function() {
+            $('.bg-yellow').each(function() {
+                let num = parseFloat($(this).val());
+                $(this).val(!isNaN(num) ? num.toFixed(2) : '0.00');
+            });
+        });
+
         $(document).on('blur', '.auto-clear, .hrs', function() {
             if ($(this).val() === '') {
                 $(this).val($(this).data('prevVal') || '');
             } else {
-                if ($(this).hasClass('hrs')) {
+                if ($(this).hasClass('bg-yellow')) {
+                    // Markup fields always display as $X.XX
+                    let num = parseFloat($(this).val());
+                    $(this).val(!isNaN(num) ? num.toFixed(2) : $(this).data('prevVal') || '0.00');
+                } else if ($(this).hasClass('hrs')) {
                     // Always format to exactly 1 decimal place (e.g. 1 → 1.0, .5 → 0.5)
                     let num = parseFloat($(this).val());
                     $(this).val(!isNaN(num) ? num.toFixed(1) : $(this).data('prevVal') || '0.0');
@@ -1713,6 +1883,12 @@
                 e.preventDefault();
                 saveRecord();
             }
+        });
+
+        // Sync notes textarea content into print-only display div before printing
+        window.addEventListener('beforeprint', function() {
+            var val = document.getElementById('NotesField').value;
+            document.getElementById('printNotesDisplay').textContent = val;
         });
 
     }); /* /document.ready */
