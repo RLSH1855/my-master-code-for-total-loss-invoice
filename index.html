@@ -5,24 +5,39 @@
     <title>3J's Auto Body - Total Loss Invoice</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;800&display=swap" rel="stylesheet">
     <style>
-        /* Force Montserrat embed for PDF — overrides system font fallback */
+        /* Force Montserrat embed for PDF — loads from Google CDN with local fallback.
+           woff2 URL ensures correct font even if Montserrat is not installed locally. */
         @font-face {
             font-family: 'Montserrat';
             font-style: normal;
             font-weight: 400;
-            src: local('Montserrat Regular'), local('Montserrat-Regular');
+            font-display: swap;
+            src: local('Montserrat Regular'), local('Montserrat-Regular'),
+                 url('https://fonts.gstatic.com/s/montserrat/v26/JTUHjIg1_i6t8kCHKm4532VJOt5-QNFgpCtr6Hw5aXo.woff2') format('woff2');
+        }
+        @font-face {
+            font-family: 'Montserrat';
+            font-style: normal;
+            font-weight: 500;
+            font-display: swap;
+            src: local('Montserrat Medium'), local('Montserrat-Medium'),
+                 url('https://fonts.gstatic.com/s/montserrat/v26/JTUHjIg1_i6t8kCHKm4532VJOt5-QNFgpCtZ6Hw5aXo.woff2') format('woff2');
         }
         @font-face {
             font-family: 'Montserrat';
             font-style: normal;
             font-weight: 600;
-            src: local('Montserrat SemiBold'), local('Montserrat-SemiBold');
+            font-display: swap;
+            src: local('Montserrat SemiBold'), local('Montserrat-SemiBold'),
+                 url('https://fonts.gstatic.com/s/montserrat/v26/JTUHjIg1_i6t8kCHKm4532VJOt5-QNFgpCu173w5aXo.woff2') format('woff2');
         }
         @font-face {
             font-family: 'Montserrat';
             font-style: normal;
             font-weight: 800;
-            src: local('Montserrat ExtraBold'), local('Montserrat-ExtraBold');
+            font-display: swap;
+            src: local('Montserrat ExtraBold'), local('Montserrat-ExtraBold'),
+                 url('https://fonts.gstatic.com/s/montserrat/v26/JTUHjIg1_i6t8kCHKm4532VJOt5-QNFgpCvr73w5aXo.woff2') format('woff2');
         }
     </style>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -328,6 +343,33 @@
             max-width: 1000px;
             margin: 20px auto;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+
+        /* Top strip — thin */
+        .ws-card::before {
+            content: '';
+            display: block;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: #2C3E50;
+            border-radius: 2px 2px 0 0;
+        }
+
+        /* Bottom strip — slightly thicker */
+        .ws-card::after {
+            content: '';
+            display: block;
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 8px;
+            background: #2C3E50;
+            border-radius: 0 0 2px 2px;
         }
 
         .logo-container {
@@ -826,6 +868,12 @@
                 padding: 0;
             }
 
+            /* Hide screen strips on print — use @page border instead */
+            .ws-card::before,
+            .ws-card::after {
+                display: none !important;
+            }
+
             .no-print-rates {
                 display: none !important;
             }
@@ -876,6 +924,11 @@
             /* Keep section header rows attached to the rows that follow */
             .section-header {
                 page-break-after: avoid;
+            }
+
+            /* Force new page before flagged section headers */
+            tr.section-page-break {
+                page-break-before: always;
             }
 
             /* Prevent thead from repeating on every printed page */
@@ -1007,6 +1060,78 @@
             .print-customer-grid .customer-field label {
                 width: 100px;
             }
+
+            /* ── PRINT SPACING TIGHTENING ──────────────────────────────
+               All rules below affect print/PDF only.
+               Screen layout is completely unchanged.
+            ────────────────────────────────────────────────────────── */
+
+            /* Tighten logo area */
+            .logo-container {
+                margin-bottom: 6px !important;
+            }
+
+            .business-logo {
+                max-height: 72px !important;
+                margin-bottom: 2px !important;
+            }
+
+            .business-info {
+                font-size: 11px !important;
+                line-height: 1.2 !important;
+            }
+
+            /* Tighten invoice title and date */
+            .ws-card h6 {
+                margin-bottom: 1px !important;
+                margin-top: 0 !important;
+                font-size: 13px !important;
+            }
+
+            #currentDate {
+                margin-bottom: 4px !important;
+                font-size: 10px !important;
+            }
+
+            /* Customer info grid — compact internally, roomy gap below */
+            .top-grid {
+                gap: 6px !important;
+                margin-bottom: 18px !important;
+                padding: 4px 10px !important;
+            }
+
+            .customer-field {
+                margin-bottom: 1px !important;
+            }
+
+            /* Notes area — roomy gap above AND below */
+            .print-notes-area {
+                margin-top: 0px !important;
+                margin-bottom: 18px !important;
+            }
+
+            .print-notes-area b {
+                display: block;
+                margin-bottom: 4px !important;
+            }
+
+            .print-notes-area .notes-content {
+                line-height: 1.4 !important;
+            }
+
+            /* Tighten table row heights */
+            td {
+                padding: 5px 4px !important;
+            }
+
+            th {
+                padding: 4px 6px !important;
+            }
+
+            /* Invoice header block — tight below so customer box sits close */
+            .invoice-header-block {
+                margin-bottom: 4px !important;
+            }
         }
 
         /* Force font embedding for PDF export */
@@ -1014,6 +1139,22 @@
             * {
                 -webkit-print-color-adjust: exact !important;
                 print-color-adjust: exact !important;
+            }
+        }
+
+        /* Page numbers + full-bleed color strips on every printed page */
+        @page {
+            margin-top: 8mm;
+            margin-bottom: 16mm;
+            border-top: 3.5pt solid #2C3E50;
+            border-bottom: 7pt solid #2C3E50;
+            @bottom-right {
+                content: "Page " counter(page) " of 4";
+                font-family: 'Montserrat', sans-serif;
+                font-size: 8pt;
+                color: #aaaaaa;
+                letter-spacing: 0.9px;
+                font-weight: 400;
             }
         }
     </style>
@@ -1088,7 +1229,7 @@
                 <div class="business-info">
                     3J's Auto Body &amp; Paint<br>
                     1855 E 29th Street, Signal Hill, CA 90755<br>
-                    Phone: 562-424-6744 | Email: <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="86b5ecf5e7f3f2e9e4e9e2ffc6e1ebe7efeaa8e5e9eb">[email&#160;protected]</a>
+                    Phone: 562-424-6744 | Email: info@3jsautobody.com
                 </div>
             </div>
 
@@ -1357,7 +1498,7 @@
 <!-- ============================================================
      JAVASCRIPT
 ============================================================ -->
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+<script>
 
     /* ============================================================
        JS 1 — SERVICE DATA
@@ -1376,7 +1517,7 @@
         { name: "Identify/Prepay Insurance Charges",               hrs: 0.4, type: "body" },
         { name: "Prepaid Charges (Towing/Storage)",                hrs: 0,   type: "markup", id: "Prep" },
         { name: "Create In-House Tow Worksheet",                   hrs: 0.3, type: "body" },
-        { header: "Total Procurement Charges",                               type: "header" },
+        { header: "Total Procurement Charges",                               type: "header", pageBreak: true },
         { name: "Update Insurance Info",                           hrs: 0.3, type: "body" },
         { name: "Pre-Order Parts per Plan",                        hrs: 0.3, type: "body" },
         { name: "Pre-Wash Vehicle",                                hrs: 0.5, type: "body" },
@@ -1407,7 +1548,7 @@
         { name: "Weather Protection Tarp/Wrap ($)",                hrs: 0,   type: "markup", id: "Wrap" },
         { name: "Move Vehicle to Protected Area",                  hrs: 0.2, type: "body" },
         { name: "Initiate CC&P Charges",                           hrs: 0.2, type: "body" },
-        { header: "Care, Custody and Protection",                            type: "header" },
+        { header: "Care, Custody and Protection",                            type: "header", pageBreak: true },
         { name: "CC&P Inside",  type: "special_ccp", subtype: "in" },
         { name: "CC&P Outside", type: "special_ccp", subtype: "out" },
         { name: "Retrieve Personal Items",                         hrs: 0.3, type: "body" },
@@ -1433,7 +1574,8 @@
 
             // Section header row (dark divider, no inputs)
             if (s.type === "header") {
-                html += `<tr><td colspan="7" class="section-header ps-2">${s.header}</td></tr>`;
+                let pbClass = s.pageBreak ? " section-page-break" : "";
+                html += `<tr class="${pbClass}"><td colspan="7" class="section-header ps-2">${s.header}</td></tr>`;
 
             // CC&P date-range rows (Inside / Outside storage)
             } else if (s.type === "special_ccp") {
@@ -1489,8 +1631,10 @@
                     <td class="text-center">
                         <div class="cost-input-container">
                             <span>${isCostMarkup ? '$' : ''}</span>
-                            <input type="number" step="0.1" value="${isCostMarkup ? parseFloat(s.hrs).toFixed(2) : parseFloat(s.hrs).toFixed(1)}"
-                                   class="hrs enter-blur ${isCostMarkup ? 'bg-yellow' : ''}"
+                            <input type="number"
+                                   step="${isPhotoCount ? '1' : (isCostMarkup ? '0.01' : '0.1')}"
+                                   value="${isPhotoCount ? '0' : (isCostMarkup ? parseFloat(s.hrs).toFixed(2) : parseFloat(s.hrs).toFixed(1))}"
+                                   class="hrs enter-blur ${isCostMarkup ? 'bg-yellow' : ''} ${isPhotoCount ? 'photo-int' : ''}"
                                    id="${s.id ? s.id + 'Val' : ''}">
                         </div>
                     </td>
@@ -1551,6 +1695,7 @@
                 sub = isSelected ? inputVal + markup : 0;
                 if (isSelected && inputVal > 0) totalMarkupAmt += markup;
             } else if (type === "photo_misc") {
+                inputVal = Math.round(inputVal); // whole photos only
                 sub = isSelected ? inputVal * rates.photo : 0;
             } else {
                 sub = isSelected ? inputVal * (rates[type] || 0) : 0;
@@ -2096,6 +2241,10 @@
                     // Markup fields always display as $X.XX
                     let num = parseFloat($(this).val());
                     $(this).val(!isNaN(num) ? num.toFixed(2) : $(this).data('prevVal') || '0.00');
+                } else if ($(this).hasClass('photo-int')) {
+                    // Photo count — whole numbers only, no decimal
+                    let num = parseInt($(this).val(), 10);
+                    $(this).val(!isNaN(num) ? Math.max(0, num).toString() : $(this).data('prevVal') || '0');
                 } else if ($(this).hasClass('hrs')) {
                     // Always format to exactly 1 decimal place (e.g. 1 → 1.0, .5 → 0.5)
                     let num = parseFloat($(this).val());
