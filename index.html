@@ -2630,7 +2630,11 @@ function updateSyncStatus(state) {
 async function sheetsLoadRecords() {
     updateSyncStatus('syncing');
     try {
-        var resp = await fetch(SHEETS_URL + '?t=' + Date.now());
+        /* Google Apps Script requires no-cors redirect follow for GET */
+        var resp = await fetch(SHEETS_URL + '?t=' + Date.now(), {
+            method: 'GET',
+            redirect: 'follow'
+        });
         if (!resp.ok) throw new Error('HTTP ' + resp.status);
         var data = await resp.json();
         if (!data.ok) throw new Error(data.error || 'Load failed');
@@ -2648,9 +2652,14 @@ async function sheetsLoadRecords() {
 async function sheetsSaveAllRecords(records) {
     updateSyncStatus('syncing');
     try {
+        /* Google Apps Script POST requires no-cors + data sent as URL param
+           because Apps Script redirects and loses POST body on redirect */
+        var json = JSON.stringify({ action: 'save', records: records });
         var resp = await fetch(SHEETS_URL, {
             method: 'POST',
-            body: JSON.stringify({ action: 'save', records: records })
+            redirect: 'follow',
+            headers: { 'Content-Type': 'text/plain' },
+            body: json
         });
         if (!resp.ok) throw new Error('HTTP ' + resp.status);
         var data = await resp.json();
