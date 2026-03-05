@@ -162,7 +162,7 @@
       {
         "svcIndex": "13",
         "checked": true,
-        "hrs": "0.5",
+        "hrs": "1.0",
         "type": "mech",
         "taxChk": false,
         "ccpStart": null,
@@ -173,7 +173,7 @@
       {
         "svcIndex": "14",
         "checked": true,
-        "hrs": "60.0",
+        "hrs": "",
         "type": null,
         "taxChk": false,
         "ccpStart": null,
