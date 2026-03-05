@@ -54,7 +54,7 @@
       {
         "svcIndex": "3",
         "checked": true,
-        "hrs": "0.3",
+        "hrs": "",
         "type": "body",
         "taxChk": false,
         "ccpStart": null,
@@ -98,7 +98,7 @@
       {
         "svcIndex": "7",
         "checked": true,
-        "hrs": "",
+        "hrs": "0.3",
         "type": "body",
         "taxChk": false,
         "ccpStart": null,
