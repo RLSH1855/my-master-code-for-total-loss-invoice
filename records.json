@@ -457,8 +457,8 @@
         "checked": false,
         "type": null,
         "taxChk": false,
-        "ccpStart": null,
-        "ccpStop": null,
+        "ccpStart": "2026-01-29",
+        "ccpStop": "2026-03-09",
         "ccpSel": true,
         "ccpTaxChk": true
       },
