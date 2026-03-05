@@ -954,6 +954,62 @@
                 page-break-inside: avoid;
             }
 
+            /* Force Montserrat throughout legal page on print */
+            .legal-acknowledgment,
+            .legal-acknowledgment p,
+            .legal-acknowledgment strong,
+            .disclaimer-title,
+            .sig-label,
+            .sig-grid,
+            .sig-item,
+            .sig-driver-time,
+            .sig-col3 {
+                font-family: 'Montserrat', sans-serif !important;
+            }
+
+            /* Tighten legal text for print */
+            .legal-acknowledgment {
+                font-size: 9px !important;
+                line-height: 1.45 !important;
+                padding: 8px !important;
+                border: none !important;
+                margin-top: 0 !important;
+            }
+
+            .legal-acknowledgment p {
+                margin-bottom: 5px !important;
+                font-size: 9px !important;
+            }
+
+            .disclaimer-title {
+                font-size: 11px !important;
+                margin-bottom: 10px !important;
+            }
+
+            /* Signature grid — fixed column widths prevent label wrapping */
+            .sig-grid {
+                grid-template-columns: 120px 1fr 90px !important;
+                gap: 12px 14px !important;
+                margin-top: 24px !important;
+            }
+
+            /* All sig labels — no wrap on print */
+            .sig-label {
+                font-size: 9px !important;
+                white-space: nowrap !important;
+                letter-spacing: 0.3px !important;
+                flex-shrink: 0 !important;
+            }
+
+            /* Driver row — slightly smaller label to fit on one line */
+            .sig-driver-time {
+                gap: 8px !important;
+            }
+
+            .sig-driver-time .sig-label {
+                font-size: 8px !important;
+            }
+
             tr {
                 page-break-inside: avoid;
             }
