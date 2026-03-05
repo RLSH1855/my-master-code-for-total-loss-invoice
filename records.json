@@ -283,7 +283,7 @@
       {
         "svcIndex": "24",
         "checked": true,
-        "hrs": "0.8",
+        "hrs": "0.5",
         "type": "body",
         "taxChk": false,
         "ccpStart": null,
