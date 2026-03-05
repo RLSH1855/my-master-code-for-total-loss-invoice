@@ -4,6 +4,27 @@
     <meta charset="utf-8" />
     <title>3J's Auto Body - Total Loss Invoice</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;800&display=swap" rel="stylesheet">
+    <style>
+        /* Force Montserrat embed for PDF — overrides system font fallback */
+        @font-face {
+            font-family: 'Montserrat';
+            font-style: normal;
+            font-weight: 400;
+            src: local('Montserrat Regular'), local('Montserrat-Regular');
+        }
+        @font-face {
+            font-family: 'Montserrat';
+            font-style: normal;
+            font-weight: 600;
+            src: local('Montserrat SemiBold'), local('Montserrat-SemiBold');
+        }
+        @font-face {
+            font-family: 'Montserrat';
+            font-style: normal;
+            font-weight: 800;
+            src: local('Montserrat ExtraBold'), local('Montserrat-ExtraBold');
+        }
+    </style>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
 
@@ -339,7 +360,7 @@
             grid-template-columns: 1fr 1fr 1.2fr;
             gap: 15px;
             margin-bottom: 10px;
-            padding: 10px;
+            padding: 6px 10px;
             border: 1px solid #ddd;
         }
 
@@ -383,6 +404,81 @@
             font-family: inherit;
             font-weight: 600;
             letter-spacing: 0.5px;
+        }
+
+        /* VIN validation states */
+        .vin-input.vin-invalid {
+            border-color: #cc0000 !important;
+            box-shadow: 0 0 0 3px rgba(204, 0, 0, 0.25) !important;
+            background: #fff5f5 !important;
+        }
+
+        .vin-input.vin-valid {
+            border-color: #27ae60 !important;
+            box-shadow: 0 0 0 3px rgba(39, 174, 96, 0.2) !important;
+        }
+
+        /* VIN popup toast */
+        #vinPopup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #fff;
+            border: 2px solid #cc0000;
+            border-radius: 6px;
+            padding: 20px 28px;
+            z-index: 9999;
+            text-align: center;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+            font-family: 'Montserrat', sans-serif;
+            min-width: 280px;
+        }
+
+        #vinPopup .vin-popup-title {
+            font-weight: 800;
+            font-size: 12px;
+            color: #cc0000;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        #vinPopup .vin-popup-msg {
+            font-size: 11px;
+            font-weight: 500;
+            color: #333;
+            letter-spacing: 0.3px;
+            margin-bottom: 14px;
+            line-height: 1.4;
+        }
+
+        #vinPopup .vin-popup-close {
+            background: #cc0000;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 6px 18px;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            cursor: pointer;
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        #vinPopup .vin-popup-close:hover {
+            background: #aa0000;
+        }
+
+        #vinOverlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.35);
+            z-index: 9998;
         }
 
         .tax-container {
@@ -472,40 +568,42 @@
         }
 
         .ccp-input {
-            width: 115px;
-            min-width: 115px;
+            width: 94px;
+            min-width: 94px;
+            max-width: 94px;
             flex-shrink: 0;
         }
 
         .days-input {
-            width: 55px;
-            text-align: center;
+            width: 52px;
+            text-align: right;
             background: #fff;
             border: 1px solid #ddd;
             font-weight: 400;
-            padding: 2px;
+            padding: 5px 4px;
             letter-spacing: 0.5px;
+            font-family: inherit;
+            font-size: 11px;
         }
 
         .cost-input-container {
-            position: relative;
-            display: inline-block;
-            width: 58px;
+            display: inline-flex;
+            align-items: center;
+            gap: 2px;
+            white-space: nowrap;
         }
 
         .cost-input-container span {
-            position: absolute;
-            left: 5px;
-            top: 50%;
-            transform: translateY(-50%);
             font-weight: 400;
             pointer-events: none;
+            flex-shrink: 0;
+            font-size: 11px;
         }
 
         /* #7: table inputs normal weight, taller with padding */
         .cost-input-container input {
-            width: 100%;
-            padding: 5px 4px 5px 14px;
+            width: 52px;
+            padding: 5px 4px;
             text-align: right;
             border: 1px solid #ddd;
             font-weight: 400;
@@ -575,25 +673,34 @@
             margin-top: 20px;
             padding: 12px;
             border: 1px solid #ccc;
-            line-height: 1.4;
-            letter-spacing: 0.5px;
+            line-height: 1.5;
+            letter-spacing: 0.09px;
         }
 
-        /* #10: disclaimer title semi-bold */
+        .legal-acknowledgment p {
+            line-height: 1.5;
+            letter-spacing: 0.09px;
+            margin-bottom: 7px;
+        }
+
         .disclaimer-title {
-            font-weight: 600;
-            font-size: inherit;
+            font-weight: 800;
+            font-size: 13px;
             text-align: center;
             display: block;
-            margin-bottom: 12px;
+            margin-bottom: 18px;
             letter-spacing: 0.5px;
+            line-height: 1.3;
+            color: #000;
         }
 
+        /* 3-col sig grid: col1=labels, col2=sig/claim/driver+time, col3=date */
         .sig-grid {
             display: grid;
-            grid-template-columns: 1.2fr 1fr 140px;
-            gap: 12px 25px;
-            margin-top: 15px;
+            grid-template-columns: 1fr 2.2fr 110px;
+            gap: 16px 20px;
+            margin-top: 48px;
+            align-items: end;
         }
 
         .sig-item {
@@ -603,16 +710,55 @@
 
         .sig-label {
             white-space: nowrap;
-            margin-right: 5px;
+            margin-right: 6px;
             font-weight: 800;
+            font-size: 10px;
             letter-spacing: 0.5px;
         }
 
         .sig-line {
-            border-bottom: 1px solid #666;
+            border-bottom: 1px solid #555;
             flex-grow: 1;
-            height: 14px;
+            height: 16px;
             position: relative;
+        }
+
+        /* Col 3: Date left-aligned */
+        .sig-col3 {
+            display: flex;
+            align-items: flex-end;
+            justify-content: flex-start;
+        }
+
+        .sig-line-date {
+            border-bottom: 1px solid #555;
+            flex-grow: 1;
+            height: 16px;
+        }
+
+        /* Row 3 col 2: Driver sig + Time on same line */
+        .sig-driver-time {
+            display: flex;
+            align-items: flex-end;
+            gap: 14px;
+        }
+
+        .sig-driver-time .driver-part {
+            display: flex;
+            align-items: flex-end;
+            flex: 2;
+        }
+
+        .sig-driver-time .time-part {
+            display: flex;
+            align-items: flex-end;
+            flex-shrink: 0;
+        }
+
+        .sig-line-short {
+            border-bottom: 1px solid #555;
+            width: 60px;
+            height: 16px;
         }
 
         .auto-fill-val {
@@ -631,6 +777,11 @@
             .sidebar,
             .type-select-arrow,
             #toast {
+                display: none !important;
+            }
+
+            /* Hide rows whose selection checkbox is unchecked */
+            tr.row-print-hide {
                 display: none !important;
             }
 
@@ -712,8 +863,9 @@
             .invoice-header-block { order: 1; }
             .top-grid             { order: 2; }
             .print-notes-area     { order: 3; }
-            .invoice-table-block  { order: 4; }
-            .summary-block        { order: 5; }
+            .table-summary-unit   { order: 4; display: flex; flex-direction: column; }
+            .invoice-table-block  { order: 1; }
+            .summary-block        { order: 2; }
             .legal-page           { order: 6; }
 
             /* Hide the original notes block in its normal position */
@@ -750,20 +902,33 @@
                 page-break-inside: avoid;
             }
 
-            /* Legal/signature section always on its own page, never splits */
-            .legal-page {
-                page-break-before: always;
-                page-break-inside: avoid;
-            }
-
             tr {
                 page-break-inside: avoid;
             }
 
-            /* Keep entire summary box together — never split across pages */
+            /* Table + summary always travel together as one unit */
+            .table-summary-unit {
+                page-break-inside: auto;
+            }
+
+            /* Summary box always glued to last service row — never orphaned */
             .summary-block {
                 page-break-inside: avoid;
+                page-break-before: avoid;
             }
+
+            /* Keep notes block together */
+            .notes-block {
+                page-break-inside: avoid;
+            }
+
+            /* Hide VIN glow and popup on print */
+            .vin-invalid, .vin-valid {
+                box-shadow: none !important;
+                border-color: #ccc !important;
+                background: transparent !important;
+            }
+            #vinPopup, #vinOverlay { display: none !important; }
 
             /* Hide date picker chrome on CCP rows — show values only */
             .ccp-input {
@@ -784,18 +949,19 @@
             }
 
             .cost-input-container {
-                width: auto;
+                display: inline-flex;
+                align-items: center;
+                gap: 2px;
             }
 
             .cost-input-container input {
-                padding-left: 0;
+                width: 46px;
+                padding: 2px 4px;
                 text-align: right;
             }
 
             .cost-input-container span {
-                position: static;
-                transform: none;
-                margin-right: 1px;
+                flex-shrink: 0;
             }
 
             /* 2-column print layout for customer info */
@@ -803,9 +969,9 @@
                 display: grid !important;
                 grid-template-columns: 1fr 1fr;
                 gap: 3px 60px;
-                padding: 14px 40px;
+                padding: 6px 40px;
                 border: none;
-                margin: 0 auto 12px auto;
+                margin: 0 auto 8px auto;
                 width: fit-content;
             }
 
@@ -814,12 +980,27 @@
             }
         }
 
+        /* Force font embedding for PDF export */
+        @media print {
+            * {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+        }
     </style>
 </head>
 <body>
 
 <!-- Toast notification element -->
 <div id="toast"></div>
+
+<!-- VIN validation popup -->
+<div id="vinOverlay" onclick="closeVinPopup()"></div>
+<div id="vinPopup">
+    <div class="vin-popup-title">&#9888; VIN Number Error</div>
+    <div class="vin-popup-msg" id="vinPopupMsg">VIN must be exactly 17 characters.<br>Please check and re-enter.</div>
+    <button class="vin-popup-close" onclick="closeVinPopup()">OK — Fix It</button>
+</div>
 
 <!-- ============================================================
      MAIN LAYOUT
@@ -845,7 +1026,7 @@
 
             <h6>
                 RECORDS
-                <span id="autoSaveStatus" style="display:none; color:#2ecc71; font-size:10px;">&#8226; Saved</span>
+                <span id="autoSaveStatus" style="display:none; color:#2ecc71; font-size:9px; font-weight:600; letter-spacing:0.5px;">&#10003; AUTO-SAVED</span>
             </h6>
             <input type="text" id="sidebarSearch" class="search-box" placeholder="Search RO or Name..." onkeyup="filterSidebar()" spellcheck="false">
             <div id="recordCount" class="record-count"></div>
@@ -878,7 +1059,7 @@
                 <div class="business-info">
                     3J's Auto Body &amp; Paint<br>
                     1855 E 29th Street, Signal Hill, CA 90755<br>
-                    Phone: 562-424-6744 | Email: 3jsautobody@gmail.com
+                    Phone: 562-424-6744 | Email: <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="86b5ecf5e7f3f2e9e4e9e2ffc6e1ebe7efeaa8e5e9eb">[email&#160;protected]</a>
                 </div>
             </div>
 
@@ -961,7 +1142,7 @@
                     </div>
                     <div class="customer-field">
                         <label>VIN #</label>
-                        <input type="text" id="VIN" maxlength="17" style="text-transform:uppercase;" class="enter-blur">
+                        <input type="text" id="VIN" maxlength="17" style="text-transform:uppercase;" class="enter-blur vin-input" placeholder="17 digits">
                     </div>
                     <div class="customer-field">
                         <label>Tax Rate</label>
@@ -975,6 +1156,7 @@
             <!-- ============================================================
                  HTML 4 — SERVICE TABLE
             ============================================================ -->
+            <div class="table-summary-unit">
             <div class="invoice-table-block">
             <table>
                 <thead>
@@ -1054,6 +1236,7 @@
                 </div>
 
             </div><!-- /HTML 5 — SUMMARY & TOTALS -->
+            </div><!-- /table-summary-unit -->
 
 
             <!-- ============================================================
@@ -1068,8 +1251,7 @@
 
             <!-- ============================================================
                  HTML 7 — LEGAL AGREEMENT & SIGNATURES
-                 page-break-before: always ensures this always starts on
-                 its own page and page-break-inside: avoid keeps it together.
+                 Always starts on its own page, never splits across pages.
             ============================================================ -->
             <div class="legal-acknowledgment legal-page">
 
@@ -1084,11 +1266,13 @@
                 <p><strong>7. Personal Property:</strong> The carrier and/or vehicle owner assumes responsibility for any contents remaining in the vehicle.</p>
                 <p><strong>8. General Release &amp; California Civil Code §1542 Waiver:</strong> The undersigned releases 3J's Auto Body from all claims arising after release and expressly waives California Civil Code §1542.</p>
 
-                <p style="margin-top:8px;"><input type="checkbox" style="margin-right:6px;">I acknowledge receipt of the Total Loss Vehicle Release &amp; Liability Waiver and understand fully.</p>
+                <p style="margin-top:12px; letter-spacing:0.09px;">
+                    <input type="checkbox" style="margin-right:6px;">I acknowledge receipt of the Total Loss Vehicle Release &amp; Liability Waiver and understand fully.
+                </p>
 
                 <div class="sig-grid">
 
-                    <!-- Row 1: Vehicle Owner -->
+                    <!-- Row 1: Vehicle Owner / Signature / Date -->
                     <div class="sig-item">
                         <span class="sig-label">Vehicle Owner:</span>
                         <div class="sig-line"><span id="OwnerMirror" class="auto-fill-val"></span></div>
@@ -1097,12 +1281,12 @@
                         <span class="sig-label">Signature:</span>
                         <div class="sig-line"></div>
                     </div>
-                    <div class="sig-item">
+                    <div class="sig-col3">
                         <span class="sig-label">Date:</span>
-                        <div class="sig-line"></div>
+                        <div class="sig-line-date"></div>
                     </div>
 
-                    <!-- Row 2: Insurance -->
+                    <!-- Row 2: Ins. Company / Claim # / empty (Date removed) -->
                     <div class="sig-item">
                         <span class="sig-label">Ins. Company:</span>
                         <div class="sig-line"><span id="InsMirror" class="auto-fill-val"></span></div>
@@ -1111,24 +1295,24 @@
                         <span class="sig-label">Claim #:</span>
                         <div class="sig-line"><span id="ClaimMirror" class="auto-fill-val"></span></div>
                     </div>
-                    <div class="sig-item">
-                        <span class="sig-label">Date:</span>
-                        <div class="sig-line"></div>
-                    </div>
+                    <div></div>
 
-                    <!-- Row 3: Tow Company -->
+                    <!-- Row 3: Tow Company / Driver Sig + Time on same line / empty -->
                     <div class="sig-item">
                         <span class="sig-label">Tow Company:</span>
                         <div class="sig-line"></div>
                     </div>
-                    <div class="sig-item">
-                        <span class="sig-label">Tow Truck Driver's Signature:</span>
-                        <div class="sig-line"></div>
+                    <div class="sig-driver-time">
+                        <div class="driver-part">
+                            <span class="sig-label">Tow Truck Driver's Signature:</span>
+                            <div class="sig-line"></div>
+                        </div>
+                        <div class="time-part">
+                            <span class="sig-label">Time:</span>
+                            <div class="sig-line-short"></div>
+                        </div>
                     </div>
-                    <div class="sig-item">
-                        <span class="sig-label">Time:</span>
-                        <div class="sig-line"></div>
-                    </div>
+                    <div></div>
 
                 </div><!-- /sig-grid -->
 
@@ -1143,7 +1327,7 @@
 <!-- ============================================================
      JAVASCRIPT
 ============================================================ -->
-<script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 
     /* ============================================================
        JS 1 — SERVICE DATA
@@ -1228,17 +1412,21 @@
                 <tr data-svc-index="${idx}">
                     <td class="no-print tax-chk-cell"><input type="checkbox" id="${s.subtype}Sel" checked></td>
                     <td>
-                        <div style="display:flex; align-items:center; gap:4px; flex-wrap:nowrap; white-space:nowrap;">
-                            <b>${label}</b><span>CC&amp;P:</span>
-                            <input type="date" class="ccp-input enter-blur" id="${s.subtype}Start">
-                            <span>to</span>
-                            <input type="date" class="ccp-input enter-blur" id="${s.subtype}Stop">
+                        <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:nowrap; white-space:nowrap; width:100%;">
+                            <span style="font-weight:700; flex-shrink:0;">${label} CC&amp;P:</span>
+                            <div style="display:flex; align-items:center; gap:0; flex-shrink:0;">
+                                <input type="date" class="ccp-input enter-blur" id="${s.subtype}Start" style="width:92px; min-width:92px; max-width:92px;">
+                                <span style="flex-shrink:0; width:22px; text-align:center; font-size:10px; font-weight:500;">to</span>
+                                <input type="date" class="ccp-input enter-blur" id="${s.subtype}Stop" style="width:92px; min-width:92px; max-width:92px;">
+                            </div>
                         </div>
                     </td>
                     <td class="text-center">Storage</td>
-                    <td class="text-center">
-                        <span class="small me-1"># Days</span>
-                        <input type="text" id="${s.subtype}DaysDisplay" class="days-input" readonly value="0">
+                    <td style="text-align:center; padding:4px;">
+                        <div style="display:inline-flex; align-items:center; gap:4px; white-space:nowrap;">
+                            <span style="font-size:9px; color:#888; flex-shrink:0;"># Days</span>
+                            <input type="text" id="${s.subtype}DaysDisplay" class="days-input" readonly value="0">
+                        </div>
                     </td>
                     <td id="${s.subtype}Total" class="val-out">$0.00</td>
                     <td id="${s.subtype}Tax"   class="val-out">$0.00</td>
@@ -1263,7 +1451,8 @@
                         <input type="checkbox" class="sel-chk" ${s.hrs > 0 ? 'checked' : ''}>
                     </td>
                     <td>
-                        ${s.name}
+                        ${s.name.replace(/\s*\(([^)]+)\)\s*$/, '')}
+                        ${s.name.match(/\(([^)]+)\)$/) && !isCostMarkup ? '<span style="font-size:9px; font-style:italic; color:#777;">(' + s.name.match(/\(([^)]+)\)$/)[1] + ')</span>' : ''}
                         ${isCostMarkup ? '<span style="font-size:9px; font-style:italic; color:#777;">(cost plus 25% Markup)</span>' : ''}
                     </td>
                     <td class="text-center">${typeCell}</td>
@@ -1356,7 +1545,7 @@
         ['in', 'out'].forEach(function(id) {
             let isSelected = $(`#${id}Sel`).is(':checked');
             let days = diffDays(id);
-            $(`#${id}DaysDisplay`).val(days);
+            $(`#${id}DaysDisplay`).val(Math.round(days));
             let sub = isSelected ? days * rates[id] : 0;
             let tax = (isSelected && $(`#${id}TaxChk`).is(':checked')) ? sub * taxR : 0;
             $(`#${id}Total`).text('$' + sub.toFixed(2));
@@ -1384,7 +1573,9 @@
         $('#CCFee').text('$'             + ccFee.toFixed(2));
         $('#GrandSub').text('$'          + gSub.toFixed(2));
         $('#GrandTax').text('$'          + gTax.toFixed(2));
-        $('#GrandTotal').text('$'        + (gSub + gTax + ccFee).toFixed(2));
+        var grandTotalVal = gSub + gTax + ccFee;
+        var grandFormatted = '$' + grandTotalVal.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
+        $('#GrandTotal').text(grandFormatted);
     }
 
     /* Calculates the number of days between two dates, inclusive */
@@ -1408,6 +1599,35 @@
         document.getElementById('OwnerMirror').innerText = document.getElementById('Cust').value;
         document.getElementById('InsMirror').innerText   = document.getElementById('InsCoTop').value;
         document.getElementById('ClaimMirror').innerText = document.getElementById('ClaimNumTop').value;
+    }
+
+    /* VIN validation — checks for exactly 17 characters on blur */
+    function validateVIN() {
+        var val = $('#VIN').val().trim();
+        if (val.length === 0) {
+            // Empty — neutral state
+            $('#VIN').removeClass('vin-invalid vin-valid');
+            return;
+        }
+        if (val.length === 17) {
+            $('#VIN').removeClass('vin-invalid').addClass('vin-valid');
+        } else {
+            $('#VIN').removeClass('vin-valid').addClass('vin-invalid');
+            var entered = val.length;
+            var diff    = 17 - entered;
+            var msg     = entered < 17
+                ? 'You entered ' + entered + ' digit' + (entered !== 1 ? 's' : '') + '. VIN requires exactly 17. You need ' + Math.abs(diff) + ' more.'
+                : 'You entered ' + entered + ' digit' + (entered !== 1 ? 's' : '') + '. VIN requires exactly 17. Please remove ' + Math.abs(diff) + '.';
+            $('#vinPopupMsg').html('&#9888;&nbsp;' + msg + '<br>Please re-enter the correct VIN.');
+            $('#vinOverlay').fadeIn(150);
+            $('#vinPopup').fadeIn(150);
+        }
+    }
+
+    function closeVinPopup() {
+        $('#vinOverlay').fadeOut(150);
+        $('#vinPopup').fadeOut(150);
+        $('#VIN').focus();
     }
 
     /* Converts a string to Proper Case (first letter of each word capitalized) */
@@ -1746,9 +1966,19 @@
 
         let filtered = search
             ? allRecords.filter(function(r) {
-                return (r.roNum && r.roNum.toLowerCase().includes(search))
-                    || (r.owner && r.owner.toLowerCase().includes(search))
-                    || (r.veh   && r.veh.toLowerCase().includes(search));
+                var ro    = (r.roNum  || '').toLowerCase();
+                var owner = (r.owner  || '').toLowerCase();
+                var claim = (r.claim  || '').toLowerCase();
+                var vin   = (r.vin    || '').toLowerCase();
+                var last6vin = vin.length >= 6 ? vin.slice(-6) : vin;
+                // Split owner into words for first/last name matching
+                var nameParts = owner.split(/\s+/);
+                var nameMatch = nameParts.some(function(p) { return p.includes(search); });
+                return ro.includes(search)
+                    || nameMatch
+                    || claim.includes(search)
+                    || (vin.length >= 6 && last6vin.includes(search))
+                    || vin.includes(search);
               })
             : allRecords;
 
@@ -1772,6 +2002,7 @@
                     <div class="record-ro">RO# ${r.roNum || '—'}</div>
                     <div class="record-name">${r.owner || 'No Owner'}</div>
                     <div class="record-date">${r.veh || ''}&nbsp;|&nbsp;${r.savedOn}</div>
+                    ${r.claim ? '<div class="record-date">Claim: ' + r.claim + '</div>' : ''}
                 </div>`;
             });
         }
@@ -1855,6 +2086,22 @@
             syncFields();
         });
 
+        // VIN validation on blur and input
+        $(document).on('blur', '#VIN', function() {
+            validateVIN();
+        });
+        $(document).on('input', '#VIN', function() {
+            var val = $(this).val().trim();
+            // Live feedback: remove invalid state while typing, show valid when at 17
+            if (val.length === 17) {
+                $(this).removeClass('vin-invalid').addClass('vin-valid');
+            } else if (val.length === 0) {
+                $(this).removeClass('vin-invalid vin-valid');
+            } else {
+                $(this).removeClass('vin-valid').addClass('vin-invalid');
+            }
+        });
+
         // Auto-capitalize all other plain text inputs (not .proper-case, not Notes)
         $(document).on('blur', 'input[type="text"]:not(.proper-case)', function() {
             let val = $(this).val();
@@ -1886,12 +2133,72 @@
         });
 
         // Sync notes textarea content into print-only display div before printing
-        window.addEventListener('beforeprint', function() {
-            var val = document.getElementById('NotesField').value;
-            document.getElementById('printNotesDisplay').textContent = val;
+        // Update document.title used as PDF filename
+        function updatePdfTitle() {
+            var ro    = ($('#WONum').val() || 'RO').trim().replace(/\s/g, '_');
+            var owner = ($('#Cust').val()  || '').trim();
+            var parts = owner.split(/\s+/).filter(Boolean);
+            var lastName = parts.length > 0 ? parts[parts.length - 1] : 'Unknown';
+            // Proper-case each word
+            function cap(s) { return s.charAt(0).toUpperCase() + s.slice(1).toLowerCase(); }
+            lastName = cap(lastName);
+            ro = ro.split('_').map(cap).join('_');
+            document.title = ro + '_' + lastName + '_Total_Loss_Invoice';
+        }
+
+        // Set title on load and keep it live
+        updatePdfTitle();
+        $(document).on('input blur change', '#WONum, #Cust', function() {
+            updatePdfTitle();
         });
 
-    }); /* /document.ready */
+        window.addEventListener('beforeprint', function() {
+            // Sync notes display
+            var val = document.getElementById('NotesField').value;
+            document.getElementById('printNotesDisplay').textContent = val;
+            updatePdfTitle();
+
+            // Hide unchecked service rows on print
+            $('#worksheet-body tr').each(function() {
+                var chk = $(this).find('.sel-chk');
+                if (chk.length && !chk.is(':checked')) {
+                    $(this).addClass('row-print-hide');
+                }
+                // Also handle CC&P rows
+                var ccpChk = $(this).find('[id$="Sel"]');
+                if (ccpChk.length && !ccpChk.is(':checked')) {
+                    $(this).addClass('row-print-hide');
+                }
+            });
+        });
+
+        window.addEventListener('afterprint', function() {
+            // Restore all hidden rows after printing
+            $('#worksheet-body tr').removeClass('row-print-hide');
+        });
+
+        // Auto-save: save record automatically whenever a field changes
+        var autoSaveTimer = null;
+        function triggerAutoSave() {
+            clearTimeout(autoSaveTimer);
+            autoSaveTimer = setTimeout(function() {
+                var roNum = $('#WONum').val().trim();
+                var owner = $('#Cust').val().trim();
+                if (roNum || owner) {
+                    saveRecord();
+                }
+            }, 2000); // 2-second debounce
+        }
+
+        // Bind auto-save to all relevant inputs
+        $(document).on('change blur', '#WONum, #Cust, #InsCoTop, #ClaimNumTop, #Veh, #VIN, .sel-chk, .t-chk, .type-select, .hrs, .auto-clear, .ccp-input, #inSel, #outSel, #inTaxChk, #outTaxChk, #BodyRate, #FrameRate, #MechRate, #InRate, #OutRate, #PhotoRate, #CCRate', function() {
+            triggerAutoSave();
+        });
+        $(document).on('input', '#NotesField', function() {
+            triggerAutoSave();
+        });
+
+    });
 
 </script>
 </body>
