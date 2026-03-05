@@ -346,31 +346,6 @@
             position: relative;
         }
 
-        /* Top strip — thin */
-        .ws-card::before {
-            content: '';
-            display: block;
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: #2C3E50;
-            border-radius: 2px 2px 0 0;
-        }
-
-        /* Bottom strip — slightly thicker */
-        .ws-card::after {
-            content: '';
-            display: block;
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 8px;
-            background: #2C3E50;
-            border-radius: 0 0 2px 2px;
-        }
 
         .logo-container {
             text-align: center;
@@ -868,11 +843,6 @@
                 padding: 0;
             }
 
-            /* Hide screen strips on print — use @page border instead */
-            .ws-card::before,
-            .ws-card::after {
-                display: none !important;
-            }
 
             .no-print-rates {
                 display: none !important;
@@ -1146,8 +1116,6 @@
         @page {
             margin-top: 8mm;
             margin-bottom: 16mm;
-            border-top: 3.5pt solid #2C3E50;
-            border-bottom: 7pt solid #2C3E50;
             @bottom-right {
                 content: "Page " counter(page) " of 4";
                 font-family: 'Montserrat', sans-serif;
