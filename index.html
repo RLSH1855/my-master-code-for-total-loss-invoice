@@ -1744,6 +1744,12 @@
             }
         });
 
+        // Reset VIN validation state — remove glow, hide icon, clear decoded data
+        $('#VIN').removeClass('vin-invalid vin-valid');
+        var vinIconClr = document.getElementById('VinIcon');
+        if (vinIconClr) { vinIconClr.innerHTML = ''; vinIconClr.style.display = 'none'; }
+        if (typeof lastDecodedRow !== 'undefined') lastDecodedRow = null;
+
         syncFields();
         setTodayDate();
         calculate();
