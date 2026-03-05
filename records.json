@@ -172,8 +172,8 @@
       },
       {
         "svcIndex": "14",
-        "checked": true,
-        "hrs": "",
+        "checked": false,
+        "hrs": "0.00",
         "type": null,
         "taxChk": false,
         "ccpStart": null,
