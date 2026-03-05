@@ -1162,9 +1162,15 @@
                 <button class="btn btn-sm btn-secondary"         onclick="window.print(); this.blur();">Local Printer</button>
             </div>
 
-            <h6>
-                RECORDS
-                <span id="autoSaveStatus" style="display:none; color:#2ecc71; font-size:9px; font-weight:600; letter-spacing:0.5px;">&#10003; AUTO-SAVED</span>
+            <h6 style="display:flex; align-items:center; justify-content:space-between;">
+                <span>
+                    RECORDS
+                    <span id="autoSaveStatus" style="display:none; color:#2ecc71; font-size:9px; font-weight:600; letter-spacing:0.5px;">&#10003; AUTO-SAVED</span>
+                </span>
+                <span style="display:flex; align-items:center; gap:5px;">
+                    <span id="syncStatus" title="GitHub sync status" style="font-size:11px; cursor:default;">&#128993;</span>
+                    <button id="ghSettingsBtn" title="GitHub Settings" onclick="openGhSetup()" style="background:none; border:none; cursor:pointer; font-size:13px; padding:0; color:#aaa; line-height:1;">&#9881;</button>
+                </span>
             </h6>
             <input type="text" id="sidebarSearch" class="search-box" placeholder="Search RO or Name..." onkeyup="filterSidebar()" spellcheck="false">
             <div id="recordCount" class="record-count"></div>
@@ -1179,6 +1185,27 @@
         </div>
 
     </div><!-- /HTML 1 — SIDEBAR -->
+
+    <!-- ============================================================
+         GITHUB SETUP MODAL
+    ============================================================ -->
+    <div id="ghSetupOverlay" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.55); z-index:99998;" onclick="closeGhSetup()"></div>
+    <div id="ghSetupModal" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); background:white; border-radius:8px; padding:22px 24px; width:360px; max-width:94vw; z-index:99999; box-shadow:0 12px 40px rgba(0,0,0,0.3); font-family:inherit;">
+        <h6 style="margin:0 0 6px 0; font-weight:800; font-size:14px; letter-spacing:0.5px;">GitHub Sync Setup</h6>
+        <p style="font-size:11px; color:#555; margin-bottom:14px; line-height:1.5;">
+            Enter your GitHub Personal Access Token to sync records across all devices automatically.
+            The token is stored only on this device — never in the code.
+        </p>
+        <label style="font-size:11px; font-weight:700; letter-spacing:0.5px; display:block; margin-bottom:4px;">Personal Access Token</label>
+        <input id="ghTokenInput" type="password" placeholder="ghp_..." autocomplete="off" spellcheck="false"
+               style="width:100%; border:1px solid #ccc; border-radius:4px; padding:7px 10px; font-size:12px; font-family:monospace; margin-bottom:12px; box-sizing:border-box;">
+        <div style="display:flex; gap:8px; justify-content:flex-end;">
+            <button onclick="saveGhToken()" style="background:#2C3E50; color:white; border:none; padding:7px 14px; border-radius:4px; cursor:pointer; font-size:11px; font-weight:700; letter-spacing:0.5px;">Connect</button>
+            <button onclick="closeGhSetup()" style="background:#eee; border:none; padding:7px 14px; border-radius:4px; cursor:pointer; font-size:11px; font-weight:600;">Cancel</button>
+            <button onclick="clearGhToken()" style="background:none; border:none; color:#c0392b; cursor:pointer; font-size:11px; padding:7px 4px;">Disconnect</button>
+        </div>
+        <p id="ghSetupStatus" style="font-size:10px; color:#888; margin-top:10px; min-height:14px; letter-spacing:0.3px;"></p>
+    </div>
 
 
     <!-- ============================================================
@@ -1969,7 +1996,7 @@
             records.unshift(record);
         }
 
-        // Guard against localStorage quota being exceeded
+        // Always write to localStorage cache immediately
         try {
             localStorage.setItem('3js_records', JSON.stringify(records));
         } catch (e) {
@@ -1978,8 +2005,18 @@
         }
 
         showAutoSaved();
-        showToast('Record saved: RO# ' + (roNum || owner), 'success');
         renderSidebar();
+
+        // Async GitHub sync — show result via toast
+        githubSaveAllRecords(records).then(function(synced) {
+            if (synced) {
+                showToast('Record saved: RO# ' + (roNum || owner), 'success');
+            } else {
+                showToast('Saved locally (GitHub offline).', '');
+            }
+        }).catch(function(err) {
+            showToast('Local save OK — GitHub error: ' + err.message, 'error');
+        });
     }
 
     /* Loads a saved record back into the form by its ID.
@@ -2049,7 +2086,11 @@
         let records = getRecords().filter(function(r) { return r.id !== id; });
         localStorage.setItem('3js_records', JSON.stringify(records));
         renderSidebar();
-        showToast('Record deleted.', '');
+        githubSaveAllRecords(records).then(function(synced) {
+            showToast(synced ? 'Record deleted.' : 'Deleted locally (GitHub offline).', '');
+        }).catch(function() {
+            showToast('Deleted locally — GitHub sync failed.', 'error');
+        });
     }
 
     /* Imports records from a user-selected JSON backup file.
@@ -2077,6 +2118,7 @@
                     });
                     localStorage.setItem('3js_records', JSON.stringify(existing));
                     renderSidebar();
+                    githubSaveAllRecords(existing).catch(function() {});
                     showToast('Imported ' + added + ' new record' + (added !== 1 ? 's' : '') + '.', 'success');
                 } catch(err) {
                     showToast('Import failed — invalid backup file.', 'error');
@@ -2178,11 +2220,16 @@
     ============================================================ */
     $(document).ready(function() {
 
-        // Build table, set date, load saved records, run initial calculation
+        // Build table, set date, run initial calculation
         buildTable();
         setTodayDate();
-        renderSidebar();
         calculate();
+
+        // Load records from localStorage immediately (instant display)
+        renderSidebar();
+
+        // Then async-load from GitHub and refresh sidebar
+        initGitHubSync();
 
         // --------------------------------------------------------
         // Click-to-clear on focus for rate/number inputs
@@ -2542,6 +2589,192 @@ window.applyLastDecodedToVehicle = function() {
     setVehicleText(composeVehicleText(window.lastDecodedRow));
     return true;
 };
+</script>
+
+<!-- ============================================================
+     GITHUB SYNC — API functions, setup modal, token management
+     Token is stored only in localStorage — never in source code.
+============================================================ -->
+<script>
+/* ── Config (not sensitive — just your GitHub username + repo) ── */
+var GH_OWNER = 'RLSH1855';
+var GH_REPO  = 'my-master-code-for-total-loss-invoice';
+var GH_FILE  = 'records.json';
+var GH_API   = 'https://api.github.com/repos/' + GH_OWNER + '/' + GH_REPO + '/contents/' + GH_FILE;
+
+/* Track the file SHA — required by GitHub API to update existing files */
+window.ghSha = null;
+
+/* ── Token helpers — stored in localStorage, never in source ── */
+function getGhToken()  { return localStorage.getItem('3js_gh_token') || ''; }
+function setGhToken(t) { localStorage.setItem('3js_gh_token', t.trim()); }
+
+/* ── Sync status icon in sidebar ── */
+function updateSyncStatus(state) {
+    var el = document.getElementById('syncStatus');
+    if (!el) return;
+    if      (state === 'connected') { el.textContent = '☁';  el.style.color = '#27ae60'; el.title = 'GitHub: Connected'; }
+    else if (state === 'syncing')   { el.textContent = '⟳';  el.style.color = '#f39c12'; el.title = 'GitHub: Syncing...'; }
+    else if (state === 'error')     { el.textContent = '☁';  el.style.color = '#e74c3c'; el.title = 'GitHub: Error'; }
+    else                            { el.textContent = '💻'; el.style.color = '#aaa';    el.title = 'Local only (no GitHub token)'; }
+}
+
+/* ── Load all records from GitHub, cache to localStorage ── */
+async function githubLoadRecords() {
+    var token = getGhToken();
+    if (!token) { updateSyncStatus('local'); return null; }
+    updateSyncStatus('syncing');
+    try {
+        var resp = await fetch(GH_API + '?t=' + Date.now(), {
+            headers: { 'Authorization': 'token ' + token, 'Accept': 'application/vnd.github.v3+json' }
+        });
+        if (resp.status === 401 || resp.status === 403) {
+            updateSyncStatus('error');
+            showToast('GitHub token invalid — tap ⚙ to update it.', 'error');
+            return null;
+        }
+        if (resp.status === 404) {
+            window.ghSha = null;
+            localStorage.removeItem('3js_gh_sha');
+            updateSyncStatus('connected');
+            return [];
+        }
+        if (!resp.ok) throw new Error('HTTP ' + resp.status);
+        var data    = await resp.json();
+        window.ghSha = data.sha;
+        localStorage.setItem('3js_gh_sha', data.sha);
+        var raw     = atob(data.content.replace(/[\n\r]/g, ''));
+        var decoded = decodeURIComponent(Array.from(raw).map(function(c) {
+            return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+        }).join(''));
+        var records = JSON.parse(decoded);
+        localStorage.setItem('3js_records', JSON.stringify(records));
+        updateSyncStatus('connected');
+        return records;
+    } catch(err) {
+        console.error('GitHub load error:', err);
+        updateSyncStatus('error');
+        return null;
+    }
+}
+
+/* ── Save all records to GitHub, update SHA ── */
+async function githubSaveAllRecords(records) {
+    var token = getGhToken();
+    if (!token) { updateSyncStatus('local'); return false; }
+    if (!window.ghSha) {
+        var cached = localStorage.getItem('3js_gh_sha');
+        if (cached) window.ghSha = cached;
+    }
+    updateSyncStatus('syncing');
+    var json    = JSON.stringify(records, null, 2);
+    var encoded = btoa(unescape(encodeURIComponent(json)));
+    var body    = { message: 'Update records — ' + new Date().toISOString().split('T')[0], content: encoded };
+    if (window.ghSha) body.sha = window.ghSha;
+    try {
+        var resp = await fetch(GH_API, {
+            method: 'PUT',
+            headers: {
+                'Authorization': 'token ' + token,
+                'Accept': 'application/vnd.github.v3+json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(body)
+        });
+        /* SHA conflict — re-fetch and retry once */
+        if (resp.status === 409 || resp.status === 422) {
+            var fresh = await fetch(GH_API + '?t=' + Date.now(), {
+                headers: { 'Authorization': 'token ' + token, 'Accept': 'application/vnd.github.v3+json' }
+            });
+            if (fresh.ok) {
+                var fd = await fresh.json();
+                window.ghSha = fd.sha;
+                localStorage.setItem('3js_gh_sha', fd.sha);
+                body.sha = window.ghSha;
+                resp = await fetch(GH_API, {
+                    method: 'PUT',
+                    headers: { 'Authorization': 'token ' + token, 'Accept': 'application/vnd.github.v3+json', 'Content-Type': 'application/json' },
+                    body: JSON.stringify(body)
+                });
+            }
+        }
+        if (!resp.ok) {
+            var errData = await resp.json().catch(function() { return {}; });
+            throw new Error(errData.message || 'HTTP ' + resp.status);
+        }
+        var result  = await resp.json();
+        window.ghSha = result.content.sha;
+        localStorage.setItem('3js_gh_sha', result.content.sha);
+        updateSyncStatus('connected');
+        return true;
+    } catch(err) {
+        console.error('GitHub save error:', err);
+        updateSyncStatus('error');
+        throw err;
+    }
+}
+
+/* ── Called once on page load ── */
+async function initGitHubSync() {
+    var token = getGhToken();
+    if (!token) {
+        updateSyncStatus('local');
+        setTimeout(function() { if (!getGhToken()) openGhSetup(); }, 1400);
+        return;
+    }
+    var records = await githubLoadRecords();
+    if (records !== null && typeof renderSidebar === 'function') renderSidebar();
+}
+
+/* ── Setup modal ── */
+function openGhSetup() {
+    document.getElementById('ghSetupOverlay').style.display = 'block';
+    document.getElementById('ghSetupModal').style.display   = 'block';
+    var inp = document.getElementById('ghTokenInput');
+    inp.value = getGhToken();
+    document.getElementById('ghSetupStatus').textContent = getGhToken() ? 'Token loaded from this device.' : '';
+    setTimeout(function() { inp.focus(); }, 100);
+}
+function closeGhSetup() {
+    document.getElementById('ghSetupOverlay').style.display = 'none';
+    document.getElementById('ghSetupModal').style.display   = 'none';
+}
+function clearGhToken() {
+    if (!confirm('Disconnect GitHub? Records stay local on this device.')) return;
+    localStorage.removeItem('3js_gh_token');
+    localStorage.removeItem('3js_gh_sha');
+    window.ghSha = null;
+    updateSyncStatus('local');
+    closeGhSetup();
+    showToast('GitHub disconnected — using local storage.', '');
+}
+async function saveGhToken() {
+    var token = document.getElementById('ghTokenInput').value.trim();
+    if (!token) { document.getElementById('ghSetupStatus').textContent = 'Please enter a token.'; return; }
+    document.getElementById('ghSetupStatus').textContent = 'Testing connection...';
+    setGhToken(token);
+    var records = await githubLoadRecords();
+    if (records !== null) {
+        if (records.length > 0) {
+            var local  = JSON.parse(localStorage.getItem('3js_records') || '[]');
+            var merged = records.slice();
+            local.forEach(function(lr) {
+                var exists = merged.find(function(r) { return r.id === lr.id || (r.roNum && r.roNum === lr.roNum); });
+                if (!exists) merged.unshift(lr);
+            });
+            localStorage.setItem('3js_records', JSON.stringify(merged));
+        }
+        if (typeof renderSidebar === 'function') renderSidebar();
+        document.getElementById('ghSetupStatus').textContent = '✓ Connected — ' + (records.length || 0) + ' records loaded.';
+        setTimeout(closeGhSetup, 1500);
+    } else {
+        document.getElementById('ghSetupStatus').textContent = '✗ Failed — check your token and try again.';
+        localStorage.removeItem('3js_gh_token');
+    }
+}
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && document.getElementById('ghSetupModal') && document.getElementById('ghSetupModal').style.display === 'block') closeGhSetup();
+});
 </script>
 </body>
 </html>
