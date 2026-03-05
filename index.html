@@ -532,6 +532,14 @@
             color: #aaa;
         }
 
+        /* VIN placeholder matches WONum placeholder style */
+        #VIN::placeholder {
+            font-weight: 400;
+            letter-spacing: 0.5px;
+            color: #aaa;
+            text-transform: none;
+        }
+
         /* ============================================================
            CSS 8 — SERVICE TABLE
            #7: TIME/COST/DAYS column wider to prevent wrapping
@@ -1745,10 +1753,16 @@
         });
 
         // Reset VIN validation state — remove glow, hide icon, clear decoded data
-        $('#VIN').removeClass('vin-invalid vin-valid');
+        var vinEl = document.getElementById('VIN');
+        if (vinEl) {
+            vinEl.classList.remove('vin-invalid', 'vin-valid');
+            vinEl.style.borderColor = '';
+            vinEl.style.boxShadow = '';
+            vinEl.style.background = '';
+        }
         var vinIconClr = document.getElementById('VinIcon');
         if (vinIconClr) { vinIconClr.innerHTML = ''; vinIconClr.style.display = 'none'; }
-        if (typeof lastDecodedRow !== 'undefined') lastDecodedRow = null;
+        window.lastDecodedRow = null;
 
         syncFields();
         setTodayDate();
@@ -2352,7 +2366,7 @@ function setVehicleText(text) {
     el.dispatchEvent(new Event('change', { bubbles:true }));
 }
 
-let lastDecodedRow = null;
+window.lastDecodedRow = null;
 
 async function handleDecodeFlow(vin) {
     if (!vin || vin.length < 11) return;
@@ -2363,7 +2377,7 @@ async function handleDecodeFlow(vin) {
 
     try {
         const row = await decodeVin(vin);
-        lastDecodedRow = row;
+        window.lastDecodedRow = row;
         renderModalFromRow(row);
         openVinModal();
         if (vinIconEl) { vinIconEl.innerHTML = svgCheck; vinIconEl.style.display = 'block'; }
@@ -2397,8 +2411,8 @@ if (vinInputEl) {
 }
 
 vinApplyBtn.addEventListener('click', function() {
-    if (!lastDecodedRow) { alert('No decoded data available.'); return; }
-    setVehicleText(composeVehicleText(lastDecodedRow));
+    if (!window.lastDecodedRow) { alert('No decoded data available.'); return; }
+    setVehicleText(composeVehicleText(window.lastDecodedRow));
     closeVinModal();
 });
 
@@ -2407,8 +2421,8 @@ window.triggerVinDecodeAndShow = function(vin) {
     return handleDecodeFlow(String(vin || '').trim().toUpperCase());
 };
 window.applyLastDecodedToVehicle = function() {
-    if (!lastDecodedRow) return false;
-    setVehicleText(composeVehicleText(lastDecodedRow));
+    if (!window.lastDecodedRow) return false;
+    setVehicleText(composeVehicleText(window.lastDecodedRow));
     return true;
 };
 </script>
