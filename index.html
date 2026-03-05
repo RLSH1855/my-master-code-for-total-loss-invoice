@@ -740,85 +740,60 @@
             color: #000;
         }
 
-        /* 3-col sig grid: col1=labels, col2=sig/claim/driver+time, col3=date */
-        .sig-grid {
-            display: grid;
-            grid-template-columns: 1fr 2.2fr 110px;
-            gap: 16px 20px;
-            margin-top: 48px;
-            align-items: end;
+        /* ── Signature table ── */
+        .sig-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 32px;
+            table-layout: fixed;
         }
 
-        .sig-item {
-            display: flex;
-            align-items: flex-end;
+        .sig-table tr {
+            border: none !important;
         }
 
-        .sig-label {
-            white-space: nowrap;
-            margin-right: 6px;
+        .sig-table td {
+            border: none !important;
+            padding: 10px 12px 0 0 !important;
+            vertical-align: bottom;
+        }
+
+        .sig-cell-date {
+            width: 100px;
+        }
+
+        .sig-lbl {
+            font-size: 9px;
             font-weight: 800;
-            font-size: 10px;
             letter-spacing: 0.5px;
+            white-space: nowrap;
+            margin-bottom: 3px;
+            color: #333;
         }
 
-        .sig-line {
+        .sig-ln {
             border-bottom: 1px solid #555;
-            flex-grow: 1;
-            height: 16px;
-            position: relative;
-        }
-
-        /* Col 3: Date left-aligned */
-        .sig-col3 {
-            display: flex;
-            align-items: flex-end;
-            justify-content: flex-start;
-        }
-
-        .sig-line-date {
-            border-bottom: 1px solid #555;
-            flex-grow: 1;
-            height: 16px;
-        }
-
-        /* Row 3 col 2: Driver sig + Time on same line */
-        .sig-driver-time {
-            display: flex;
-            align-items: flex-end;
-            gap: 14px;
-        }
-
-        .sig-driver-time .driver-part {
-            display: flex;
-            align-items: flex-end;
-            flex: 2;
-        }
-
-        .sig-driver-time .time-part {
-            display: flex;
-            align-items: flex-end;
-            flex-shrink: 0;
-        }
-
-        .sig-line-short {
-            border-bottom: 1px solid #555;
-            width: 60px;
-            height: 16px;
+            min-height: 18px;
+            width: 100%;
         }
 
         .auto-fill-val {
+            font-size: 10px;
             font-weight: 800;
             color: #000;
-            padding-left: 4px;
-            position: absolute;
-            bottom: 0;
+            white-space: nowrap;
+            display: inline-block;
         }
 
         /* ============================================================
            CSS 11 — PRINT STYLES
         ============================================================ */
         @media print {
+            /* Override Bootstrap font-family on every single element */
+            *, *::before, *::after {
+                font-family: 'Montserrat', sans-serif !important;
+            }
+
             .no-print,
             .sidebar,
             .type-select-arrow,
@@ -954,18 +929,7 @@
                 page-break-inside: avoid;
             }
 
-            /* Force Montserrat throughout legal page on print */
-            .legal-acknowledgment,
-            .legal-acknowledgment p,
-            .legal-acknowledgment strong,
-            .disclaimer-title,
-            .sig-label,
-            .sig-grid,
-            .sig-item,
-            .sig-driver-time,
-            .sig-col3 {
-                font-family: 'Montserrat', sans-serif !important;
-            }
+            /* Montserrat forced globally via * selector above */
 
             /* Tighten legal text for print */
             .legal-acknowledgment {
@@ -986,28 +950,27 @@
                 margin-bottom: 10px !important;
             }
 
-            /* Signature grid — fixed column widths prevent label wrapping */
-            .sig-grid {
-                grid-template-columns: 120px 1fr 90px !important;
-                gap: 12px 14px !important;
-                margin-top: 24px !important;
+            /* Signature table — print specific tightening */
+            .sig-table {
+                margin-top: 20px !important;
             }
 
-            /* All sig labels — no wrap on print */
-            .sig-label {
+            .sig-table td {
+                padding: 8px 10px 0 0 !important;
+            }
+
+            .sig-lbl {
+                font-size: 8px !important;
+                margin-bottom: 2px !important;
+            }
+
+            .sig-ln {
+                min-height: 14px !important;
+            }
+
+            .auto-fill-val {
                 font-size: 9px !important;
                 white-space: nowrap !important;
-                letter-spacing: 0.3px !important;
-                flex-shrink: 0 !important;
-            }
-
-            /* Driver row — slightly smaller label to fit on one line */
-            .sig-driver-time {
-                gap: 8px !important;
-            }
-
-            .sig-driver-time .sig-label {
-                font-size: 8px !important;
             }
 
             tr {
@@ -1492,51 +1455,50 @@
                     <input type="checkbox" style="margin-right:6px;">I acknowledge receipt of the Total Loss Vehicle Release &amp; Liability Waiver and understand fully.
                 </p>
 
-                <div class="sig-grid">
-
-                    <!-- Row 1: Vehicle Owner / Signature / Date -->
-                    <div class="sig-item">
-                        <span class="sig-label">Vehicle Owner:</span>
-                        <div class="sig-line"><span id="OwnerMirror" class="auto-fill-val"></span></div>
-                    </div>
-                    <div class="sig-item">
-                        <span class="sig-label">Signature:</span>
-                        <div class="sig-line"></div>
-                    </div>
-                    <div class="sig-col3">
-                        <span class="sig-label">Date:</span>
-                        <div class="sig-line-date"></div>
-                    </div>
-
-                    <!-- Row 2: Ins. Company / Claim # / empty (Date removed) -->
-                    <div class="sig-item">
-                        <span class="sig-label">Ins. Company:</span>
-                        <div class="sig-line"><span id="InsMirror" class="auto-fill-val"></span></div>
-                    </div>
-                    <div class="sig-item">
-                        <span class="sig-label">Claim #:</span>
-                        <div class="sig-line"><span id="ClaimMirror" class="auto-fill-val"></span></div>
-                    </div>
-                    <div></div>
-
-                    <!-- Row 3: Tow Company / Driver Sig + Time on same line / empty -->
-                    <div class="sig-item">
-                        <span class="sig-label">Tow Company:</span>
-                        <div class="sig-line"></div>
-                    </div>
-                    <div class="sig-driver-time">
-                        <div class="driver-part">
-                            <span class="sig-label">Tow Truck Driver's Signature:</span>
-                            <div class="sig-line"></div>
-                        </div>
-                        <div class="time-part">
-                            <span class="sig-label">Time:</span>
-                            <div class="sig-line-short"></div>
-                        </div>
-                    </div>
-                    <div></div>
-
-                </div><!-- /sig-grid -->
+                <table class="sig-table">
+                    <!-- Row 1: Vehicle Owner | Signature | Date -->
+                    <tr>
+                        <td class="sig-cell">
+                            <div class="sig-lbl">Vehicle Owner:</div>
+                            <div class="sig-ln"><span id="OwnerMirror" class="auto-fill-val"></span></div>
+                        </td>
+                        <td class="sig-cell">
+                            <div class="sig-lbl">Signature:</div>
+                            <div class="sig-ln"></div>
+                        </td>
+                        <td class="sig-cell sig-cell-date">
+                            <div class="sig-lbl">Date:</div>
+                            <div class="sig-ln"></div>
+                        </td>
+                    </tr>
+                    <!-- Row 2: Ins. Company | Claim # | blank -->
+                    <tr>
+                        <td class="sig-cell">
+                            <div class="sig-lbl">Ins. Company:</div>
+                            <div class="sig-ln"><span id="InsMirror" class="auto-fill-val"></span></div>
+                        </td>
+                        <td class="sig-cell">
+                            <div class="sig-lbl">Claim #:</div>
+                            <div class="sig-ln"><span id="ClaimMirror" class="auto-fill-val"></span></div>
+                        </td>
+                        <td class="sig-cell"></td>
+                    </tr>
+                    <!-- Row 3: Tow Company | Driver Sig + Time | blank -->
+                    <tr>
+                        <td class="sig-cell">
+                            <div class="sig-lbl">Tow Company:</div>
+                            <div class="sig-ln"></div>
+                        </td>
+                        <td class="sig-cell" colspan="1">
+                            <div class="sig-lbl">Tow Driver's Signature:</div>
+                            <div class="sig-ln"></div>
+                        </td>
+                        <td class="sig-cell sig-cell-date">
+                            <div class="sig-lbl">Time:</div>
+                            <div class="sig-ln"></div>
+                        </td>
+                    </tr>
+                </table><!-- /sig-table -->
 
             </div><!-- /HTML 7 — LEGAL AGREEMENT & SIGNATURES -->
 
@@ -1771,1066 +1733,4 @@
         ['in', 'out'].forEach(function(id) {
             let isSelected = $(`#${id}Sel`).is(':checked');
             let days = diffDays(id);
-            $(`#${id}DaysDisplay`).val(Math.round(days));
-            let sub = isSelected ? days * rates[id] : 0;
-            let tax = (isSelected && $(`#${id}TaxChk`).is(':checked')) ? sub * taxR : 0;
-            $(`#${id}Total`).text('$' + sub.toFixed(2));
-            $(`#${id}Tax`).text('$'   + tax.toFixed(2));
-            if (isSelected) {
-                gSub    += sub;
-                gTax    += tax;
-                miscSub += sub;
-            }
-        });
-
-        // CC processing fee is applied on subtotal + tax combined
-        let ccFee = (gSub + gTax) * ccP;
-
-        // Sum all CC&P day inputs for total days display
-        let totalDays = $('.days-input').toArray().reduce(function(acc, el) {
-            return acc + (parseInt(el.value) || 0);
-        }, 0);
-
-        // Write all summary output fields
-        $('#MiscTotal').text('$'         + miscSub.toFixed(2));
-        $('#MarkupTotalAmount').text('$' + totalMarkupAmt.toFixed(2));
-        $('#LaborTotal').text('$'        + labSub.toFixed(2));
-        $('#TotalCCDays').text(totalDays + ' Days');
-        $('#CCFee').text('$'             + ccFee.toFixed(2));
-        $('#GrandSub').text('$'          + gSub.toFixed(2));
-        $('#GrandTax').text('$'          + gTax.toFixed(2));
-        var grandTotalVal = gSub + gTax + ccFee;
-        var grandFormatted = '$' + grandTotalVal.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
-        $('#GrandTotal').text(grandFormatted);
-    }
-
-    /* Calculates the number of days between two dates, inclusive */
-    function diffDays(id) {
-        let sVal = $(`#${id}Start`).val();
-        let eVal = $(`#${id}Stop`).val();
-        if (!sVal || !eVal) return 0;
-        let s = new Date(sVal + 'T00:00:00');
-        let e = new Date(eVal + 'T00:00:00');
-        if (isNaN(s.getTime()) || isNaN(e.getTime()) || e < s) return 0;
-        return Math.ceil((e - s) / (1000 * 60 * 60 * 24)) + 1;
-    }
-
-
-    /* ============================================================
-       JS 4 — FIELD SYNC & HELPERS
-    ============================================================ */
-
-    /* Mirrors owner, insurance co, and claim # into the signature section */
-    function syncFields() {
-        document.getElementById('OwnerMirror').innerText = document.getElementById('Cust').value;
-        document.getElementById('InsMirror').innerText   = document.getElementById('InsCoTop').value;
-        document.getElementById('ClaimMirror').innerText = document.getElementById('ClaimNumTop').value;
-    }
-
-    /* VIN validation — checks for exactly 17 characters on blur */
-    function validateVIN() {
-        var val = $('#VIN').val().trim();
-        if (val.length === 0) {
-            // Empty — neutral state
-            $('#VIN').removeClass('vin-invalid vin-valid');
-            return;
-        }
-        if (val.length === 17) {
-            $('#VIN').removeClass('vin-invalid').addClass('vin-valid');
-        } else {
-            $('#VIN').removeClass('vin-valid').addClass('vin-invalid');
-            var entered = val.length;
-            var diff    = 17 - entered;
-            var msg     = entered < 17
-                ? 'You entered ' + entered + ' digit' + (entered !== 1 ? 's' : '') + '. VIN requires exactly 17. You need ' + Math.abs(diff) + ' more.'
-                : 'You entered ' + entered + ' digit' + (entered !== 1 ? 's' : '') + '. VIN requires exactly 17. Please remove ' + Math.abs(diff) + '.';
-            $('#vinPopupMsg').html('&#9888;&nbsp;' + msg + '<br>Please re-enter the correct VIN.');
-            $('#vinOverlay').fadeIn(150);
-            $('#vinPopup').fadeIn(150);
-        }
-    }
-
-    function closeVinPopup() {
-        $('#vinOverlay').fadeOut(150);
-        $('#vinPopup').fadeOut(150);
-        $('#VIN').focus();
-    }
-
-    /* Converts a string to Proper Case (first letter of each word capitalized) */
-    function toProperCase(str) {
-        return str.replace(/\w\S*/g, function(word) {
-            return word.charAt(0).toUpperCase() + word.substr(1).toLowerCase();
-        });
-    }
-
-    /* Sets today's date in the invoice header on page load */
-    function setTodayDate() {
-        let now = new Date();
-        let mm  = String(now.getMonth() + 1).padStart(2, '0');
-        let dd  = String(now.getDate()).padStart(2, '0');
-        let yy  = now.getFullYear();
-        $('#currentDate').text(mm + '/' + dd + '/' + yy);
-    }
-
-    /* Returns a date formatted as MM/DD/YYYY */
-    function formatDate(d) {
-        let mm = String(d.getMonth() + 1).padStart(2, '0');
-        let dd = String(d.getDate()).padStart(2, '0');
-        let yy = d.getFullYear();
-        return mm + '/' + dd + '/' + yy;
-    }
-
-    /* Displays a brief toast notification at the bottom of the screen.
-       type: 'success' (green) | 'error' (dark red) | '' (dark/default) */
-    function showToast(msg, type) {
-        let bg = '#2C3E50';
-        if (type === 'success') bg = '#27ae60';
-        if (type === 'error')   bg = '#8B0000';
-        $('#toast').stop(true, true).css({ background: bg, display: 'none' })
-            .text(msg).fadeIn(200);
-        setTimeout(function() { $('#toast').fadeOut(600); }, 2400);
-    }
-
-    /* Briefly shows the "• Saved" indicator in the sidebar Records header */
-    function showAutoSaved() {
-        $('#autoSaveStatus').stop(true, true).fadeIn(200);
-        setTimeout(function() { $('#autoSaveStatus').fadeOut(1000); }, 2500);
-    }
-
-
-    /* ============================================================
-       JS 5 — FORM ACTIONS  (New Form / Clear Form)
-    ============================================================ */
-
-    /* Reloads the page to start a fresh blank form */
-    function createNewForm() {
-        if (confirm("Start a new form? Any unsaved data will be lost.")) {
-            location.reload();
-        }
-    }
-
-    /* Resets all inputs to their default values without reloading.
-       Uses data-svc-index on each row to look up original defaults
-       from the services array, ensuring a reliable and accurate reset. */
-    function clearForm() {
-        if (!confirm("Wipe all form data? This cannot be undone.")) return;
-
-        // Clear all plain text and date fields
-        $('#WONum, #Cust, #InsCoTop, #ClaimNumTop, #Veh, #VIN, #NotesField').val('');
-
-        // Reset all rate inputs to their default values
-        $('#BodyRate').val('90.00');
-        $('#FrameRate').val('90.00');
-        $('#MechRate').val('120.00');
-        $('#InRate').val('150.00');
-        $('#OutRate').val('120.00');
-        $('#PhotoRate').val('5.00');
-        $('#CCRate').val('3');
-
-        // Reset each table row using its data-svc-index to find original defaults
-        $('#worksheet-body tr').each(function() {
-            let idx = parseInt($(this).attr('data-svc-index'));
-            if (isNaN(idx)) return;
-            let s = services[idx];
-            if (!s) return;
-
-            if (s.type === 'special_ccp') {
-                $(`#${s.subtype}Start`).val('');
-                $(`#${s.subtype}Stop`).val('');
-                $(`#${s.subtype}Sel`).prop('checked', true);
-                $(`#${s.subtype}TaxChk`).prop('checked', true);
-                $(`#${s.subtype}DaysDisplay`).val('0');
-            } else {
-                $(this).find('.hrs').val(s.hrs);
-                $(this).find('.sel-chk').prop('checked', s.hrs > 0);
-                $(this).find('.t-chk').prop('checked', false);
-                $(this).find('.type-select').val('body');
-            }
-        });
-
-        // Reset VIN validation state — remove glow, hide icon, clear decoded data
-        var vinEl = document.getElementById('VIN');
-        if (vinEl) {
-            vinEl.classList.remove('vin-invalid', 'vin-valid');
-            vinEl.style.borderColor = '';
-            vinEl.style.boxShadow = '';
-            vinEl.style.background = '';
-        }
-        var vinIconClr = document.getElementById('VinIcon');
-        if (vinIconClr) { vinIconClr.innerHTML = ''; vinIconClr.style.display = 'none'; }
-        window.lastDecodedRow = null;
-
-        syncFields();
-        setTodayDate();
-        calculate();
-        showToast('Form wiped.', '');
-    }
-
-
-    /* ============================================================
-       JS 6 — RECORD MANAGEMENT  (Save / Load / Delete / Export)
-       #4: Every save always overwrites the existing record.
-           No new record is created if a different RO# is entered —
-           the record is always saved/overwritten by RO# match.
-           If no RO# exists yet, a new record is created normally.
-    ============================================================ */
-
-    /* Returns all saved records from localStorage, or [] on error */
-    function getRecords() {
-        try {
-            return JSON.parse(localStorage.getItem('3js_records')) || [];
-        } catch (e) {
-            return [];
-        }
-    }
-
-    /* Saves the current form state to localStorage.
-       Always overwrites an existing record with the same RO#.
-       Never creates a duplicate. */
-    function saveRecord() {
-        let roNum = $('#WONum').val().trim();
-        let owner = $('#Cust').val().trim();
-
-        if (!roNum && !owner) {
-            showToast('Enter a Repair Order # or Vehicle Owner first.', 'error');
-            return;
-        }
-
-        // Collect all table row states
-        let rows = [];
-        $('#worksheet-body tr').each(function() {
-            rows.push({
-                svcIndex:  $(this).attr('data-svc-index'),
-                checked:   $(this).find('.sel-chk').is(':checked'),
-                hrs:       $(this).find('.hrs').val(),
-                type:      $(this).find('.type-select').val() || null,
-                taxChk:    $(this).find('.t-chk').is(':checked'),
-                ccpStart:  $(this).find('.ccp-input:first').val() || null,
-                ccpStop:   $(this).find('.ccp-input:last').val()  || null,
-                ccpSel:    $(this).find('[id$="Sel"]').is(':checked'),
-                ccpTaxChk: $(this).find('[id$="TaxChk"]').is(':checked')
-            });
-        });
-
-        let record = {
-            id:           Date.now(),
-            invoiceDate:  $('#currentDate').text(),
-            savedOn:      formatDate(new Date()),
-            roNum:        roNum,
-            owner:        owner,
-            ins:          $('#InsCoTop').val(),
-            claim:        $('#ClaimNumTop').val(),
-            veh:          $('#Veh').val(),
-            vin:          $('#VIN').val(),
-            notes:        $('#NotesField').val(),
-            bodyRate:     $('#BodyRate').val(),
-            frameRate:    $('#FrameRate').val(),
-            mechRate:     $('#MechRate').val(),
-            inRate:       $('#InRate').val(),
-            outRate:      $('#OutRate').val(),
-            photoRate:    $('#PhotoRate').val(),
-            ccRate:       $('#CCRate').val(),
-            rows:         rows
-        };
-
-        let records     = getRecords();
-        let existingIdx = -1;
-
-        // Match on RO# first; fall back to owner name if no RO#
-        if (roNum) {
-            existingIdx = records.findIndex(function(r) { return r.roNum === roNum; });
-        } else {
-            existingIdx = records.findIndex(function(r) { return r.owner === owner && !r.roNum; });
-        }
-
-        if (existingIdx >= 0) {
-            // Always overwrite — preserve original record ID
-            record.id = records[existingIdx].id;
-            records[existingIdx] = record;
-        } else {
-            // New record — add to top of list
-            records.unshift(record);
-        }
-
-        // Always write to localStorage cache immediately
-        try {
-            localStorage.setItem('3js_records', JSON.stringify(records));
-        } catch (e) {
-            showToast('Storage full — delete old records to free space.', 'error');
-            return;
-        }
-
-        showAutoSaved();
-        renderSidebar();
-
-        // Async GitHub sync — show result via toast
-        githubSaveAllRecords(records).then(function(synced) {
-            if (synced) {
-                showToast('Record saved: RO# ' + (roNum || owner), 'success');
-            } else {
-                showToast('Saved locally (GitHub offline).', '');
-            }
-        }).catch(function(err) {
-            showToast('Local save OK — GitHub error: ' + err.message, 'error');
-        });
-    }
-
-    /* Loads a saved record back into the form by its ID.
-       Restores the original invoice date, all rates, text fields,
-       and every table row's checked state and values. */
-    function loadRecord(id) {
-        let records = getRecords();
-        let record  = records.find(function(r) { return r.id === id; });
-        if (!record) return;
-
-        // Restore text fields
-        $('#WONum').val(record.roNum       || '');
-        $('#Cust').val(record.owner        || '');
-        $('#InsCoTop').val(record.ins      || '');
-        $('#ClaimNumTop').val(record.claim || '');
-        $('#Veh').val(record.veh           || '');
-        $('#VIN').val(record.vin           || '');
-        $('#NotesField').val(record.notes  || '');
-
-        // Restore original invoice date (not today's date)
-        if (record.invoiceDate) $('#currentDate').text(record.invoiceDate);
-
-        // Restore rates
-        $('#BodyRate').val(record.bodyRate   || '90.00');
-        $('#FrameRate').val(record.frameRate || '90.00');
-        $('#MechRate').val(record.mechRate   || '120.00');
-        $('#InRate').val(record.inRate       || '150.00');
-        $('#OutRate').val(record.outRate     || '120.00');
-        $('#PhotoRate').val(record.photoRate || '5.00');
-        $('#CCRate').val(record.ccRate       || '3');
-
-        // Restore all table row states
-        if (record.rows && record.rows.length) {
-            $('#worksheet-body tr').each(function(i) {
-                let r = record.rows[i];
-                if (!r) return;
-
-                if (r.ccpStart !== null && r.ccpStart !== undefined) {
-                    // CC&P rows: restore dates and checkboxes
-                    $(this).find('.ccp-input:first').val(r.ccpStart || '');
-                    $(this).find('.ccp-input:last').val(r.ccpStop   || '');
-                    $(this).find('[id$="Sel"]').prop('checked', r.ccpSel);
-                    $(this).find('[id$="TaxChk"]').prop('checked', r.ccpTaxChk);
-                } else {
-                    // Standard rows: restore hours, type, and checkboxes
-                    $(this).find('.sel-chk').prop('checked', r.checked);
-                    if (r.hrs !== null && r.hrs !== undefined) {
-                        let num = parseFloat(r.hrs);
-                        $(this).find('.hrs').val(!isNaN(num) ? num.toFixed(1) : r.hrs);
-                    }
-                    if (r.type !== null && r.type !== undefined) $(this).find('.type-select').val(r.type);
-                    $(this).find('.t-chk').prop('checked', r.taxChk);
-                }
-            });
-        }
-
-        syncFields();
-        calculate();
-        showToast('Loaded: RO# ' + (record.roNum || record.owner), 'success');
-    }
-
-    /* Deletes a single record from localStorage by ID.
-       stopPropagation prevents the click from also firing loadRecord. */
-    function deleteRecord(id, e) {
-        e.stopPropagation();
-        if (!confirm('Delete this record? This cannot be undone.')) return;
-        let records = getRecords().filter(function(r) { return r.id !== id; });
-        localStorage.setItem('3js_records', JSON.stringify(records));
-        renderSidebar();
-        githubSaveAllRecords(records).then(function(synced) {
-            showToast(synced ? 'Record deleted.' : 'Deleted locally (GitHub offline).', '');
-        }).catch(function() {
-            showToast('Deleted locally — GitHub sync failed.', 'error');
-        });
-    }
-
-    /* Imports records from a user-selected JSON backup file.
-       Merges with existing records — existing RO#s are not overwritten. */
-    function importRecordsBackup() {
-        let input = document.createElement('input');
-        input.type = 'file';
-        input.accept = '.json';
-        input.onchange = function(e) {
-            let file = e.target.files[0];
-            if (!file) return;
-            let reader = new FileReader();
-            reader.onload = function(ev) {
-                try {
-                    let imported = JSON.parse(ev.target.result);
-                    if (!Array.isArray(imported)) throw new Error('Invalid format');
-                    let existing = getRecords();
-                    let existingIds = new Set(existing.map(function(r) { return r.roNum || r.id; }));
-                    let added = 0;
-                    imported.forEach(function(r) {
-                        if (!existingIds.has(r.roNum || r.id)) {
-                            existing.push(r);
-                            added++;
-                        }
-                    });
-                    localStorage.setItem('3js_records', JSON.stringify(existing));
-                    renderSidebar();
-                    githubSaveAllRecords(existing).catch(function() {});
-                    showToast('Imported ' + added + ' new record' + (added !== 1 ? 's' : '') + '.', 'success');
-                } catch(err) {
-                    showToast('Import failed — invalid backup file.', 'error');
-                }
-            };
-            reader.readAsText(file);
-        };
-        input.click();
-    }
-
-    /* Exports all saved records as a downloadable JSON backup file.
-       Filename includes today's date for easy organization. */
-    function exportRecordsBackup() {
-        let records = getRecords();
-        if (records.length === 0) {
-            showToast('No records to export.', 'error');
-            return;
-        }
-        let blob = new Blob([JSON.stringify(records, null, 2)], { type: 'application/json' });
-        let url  = URL.createObjectURL(blob);
-        let a    = document.createElement('a');
-        let date = formatDate(new Date()).replace(/\//g, '-');
-        a.href     = url;
-        a.download = '3js_records_backup_' + date + '.json';
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-        showToast('Backup exported (' + records.length + ' records).', 'success');
-    }
-
-
-    /* ============================================================
-       JS 7 — SIDEBAR RENDERING
-    ============================================================ */
-
-    /* Renders the records list in the sidebar.
-       Accepts an optional filter string to search by RO#, owner, or vehicle. */
-    function renderSidebar(filter) {
-        let allRecords = getRecords();
-        let search     = (filter || '').toLowerCase().trim();
-
-        let filtered = search
-            ? allRecords.filter(function(r) {
-                var ro    = (r.roNum  || '').toLowerCase();
-                var owner = (r.owner  || '').toLowerCase();
-                var claim = (r.claim  || '').toLowerCase();
-                var vin   = (r.vin    || '').toLowerCase();
-                var last6vin = vin.length >= 6 ? vin.slice(-6) : vin;
-                // Split owner into words for first/last name matching
-                var nameParts = owner.split(/\s+/);
-                var nameMatch = nameParts.some(function(p) { return p.includes(search); });
-                return ro.includes(search)
-                    || nameMatch
-                    || claim.includes(search)
-                    || (vin.length >= 6 && last6vin.includes(search))
-                    || vin.includes(search);
-              })
-            : allRecords;
-
-        // Update record count badge
-        if (search) {
-            $('#recordCount').text(filtered.length + ' of ' + allRecords.length + ' records');
-        } else {
-            $('#recordCount').text(allRecords.length + ' record' + (allRecords.length !== 1 ? 's' : '') + ' saved');
-        }
-
-        let html = '';
-        if (filtered.length === 0) {
-            html = '<div style="color:#aaa; font-size:10px; text-align:center; margin-top:6px; letter-spacing:0.5px;">'
-                 + (search ? 'No matching records.' : 'No saved records.')
-                 + '</div>';
-        } else {
-            filtered.forEach(function(r) {
-                html += `
-                <div class="history-item" onclick="loadRecord(${r.id})">
-                    <button class="delete-btn" onclick="deleteRecord(${r.id}, event)">✕</button>
-                    <div class="record-ro">RO# ${r.roNum || '—'}</div>
-                    <div class="record-name">${r.owner || 'No Owner'}</div>
-                    <div class="record-date">${r.veh || ''}&nbsp;|&nbsp;${r.savedOn}</div>
-                    ${r.claim ? '<div class="record-date">Claim: ' + r.claim + '</div>' : ''}
-                </div>`;
-            });
-        }
-
-        $('#sidebarList').html(html);
-    }
-
-    /* Called on search box keyup to filter the sidebar list */
-    function filterSidebar() {
-        renderSidebar($('#sidebarSearch').val());
-    }
-
-
-    /* ============================================================
-       JS 8 — INITIALIZATION & EVENT BINDINGS
-       All jQuery event listeners are registered here inside
-       document.ready to ensure the DOM is fully built first.
-    ============================================================ */
-    $(document).ready(function() {
-
-        // Build table, set date, run initial calculation
-        buildTable();
-        setTodayDate();
-        calculate();
-
-        // Load records from localStorage immediately (instant display)
-        renderSidebar();
-
-        // Then async-load from GitHub and refresh sidebar
-        initGitHubSync();
-
-        // --------------------------------------------------------
-        // Click-to-clear on focus for rate/number inputs
-        // Uses .data('prevVal') per element to prevent race conditions.
-        // --------------------------------------------------------
-        $(document).on('focus', '.auto-clear, .hrs', function() {
-            $(this).data('prevVal', $(this).val());
-            $(this).val('');
-        });
-
-        // After buildTable, format all markup fields as $X.XX immediately
-        $(document).on('buildComplete', function() {
-            $('.bg-yellow').each(function() {
-                let num = parseFloat($(this).val());
-                $(this).val(!isNaN(num) ? num.toFixed(2) : '0.00');
-            });
-        });
-
-        $(document).on('blur', '.auto-clear, .hrs', function() {
-            if ($(this).val() === '') {
-                $(this).val($(this).data('prevVal') || '');
-            } else {
-                if ($(this).hasClass('bg-yellow')) {
-                    // Markup fields always display as $X.XX
-                    let num = parseFloat($(this).val());
-                    $(this).val(!isNaN(num) ? num.toFixed(2) : $(this).data('prevVal') || '0.00');
-                } else if ($(this).hasClass('photo-int')) {
-                    // Photo count — whole numbers only, no decimal
-                    let num = parseInt($(this).val(), 10);
-                    $(this).val(!isNaN(num) ? Math.max(0, num).toString() : $(this).data('prevVal') || '0');
-                } else if ($(this).hasClass('hrs')) {
-                    // Always format to exactly 1 decimal place (e.g. 1 → 1.0, .5 → 0.5)
-                    let num = parseFloat($(this).val());
-                    $(this).val(!isNaN(num) ? num.toFixed(1) : $(this).data('prevVal') || '0.0');
-                } else if ($(this).hasClass('tax-input') ||
-                           ($(this).attr('id') && $(this).attr('id').includes('Rate'))) {
-                    let num = parseFloat($(this).val());
-                    $(this).val(!isNaN(num) ? num.toFixed(2) : $(this).data('prevVal'));
-                }
-            }
-            calculate();
-        });
-
-        // --------------------------------------------------------
-        // #2 & #4: Enter key blurs ALL typeable inputs and textareas
-        // (except Notes textarea where Enter = new line is expected)
-        // --------------------------------------------------------
-        $(document).on('keydown', 'input.enter-blur, input.auto-clear, input.hrs', function(e) {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                $(this).blur();
-            }
-        });
-
-        // --------------------------------------------------------
-        // #6: Proper case on blur — all text inputs except Notes
-        // --------------------------------------------------------
-        $(document).on('blur', 'input.proper-case', function() {
-            $(this).val(toProperCase($(this).val()));
-            syncFields();
-        });
-
-        // VIN validation on blur and input
-        $(document).on('blur', '#VIN', function() {
-            validateVIN();
-        });
-        $(document).on('input', '#VIN', function() {
-            var val = $(this).val().trim();
-            // Live feedback: remove invalid state while typing, show valid when at 17
-            if (val.length === 17) {
-                $(this).removeClass('vin-invalid').addClass('vin-valid');
-            } else if (val.length === 0) {
-                $(this).removeClass('vin-invalid vin-valid');
-            } else {
-                $(this).removeClass('vin-valid').addClass('vin-invalid');
-            }
-        });
-
-        // Auto-capitalize all other plain text inputs (not .proper-case, not Notes)
-        $(document).on('blur', 'input[type="text"]:not(.proper-case)', function() {
-            let val = $(this).val();
-            if (val.length > 0) {
-                $(this).val(toProperCase(val));
-            }
-        });
-
-        // --------------------------------------------------------
-        // Recalculate on any interactive change in the table
-        // --------------------------------------------------------
-        $(document).on('change', '.sel-chk, .t-chk, #inSel, #outSel, #inTaxChk, #outTaxChk',
-            function() { calculate(); });
-
-        $(document).on('change', '.type-select',
-            function() { calculate(); });
-
-        $(document).on('change', '.ccp-input',
-            function() { calculate(); });
-
-        // --------------------------------------------------------
-        // Keyboard shortcut: Ctrl+S / Cmd+S → Save Record
-        // --------------------------------------------------------
-        $(document).on('keydown', function(e) {
-            if ((e.ctrlKey || e.metaKey) && e.key === 's') {
-                e.preventDefault();
-                saveRecord();
-            }
-        });
-
-        // Sync notes textarea content into print-only display div before printing
-        // Update document.title used as PDF filename
-        function updatePdfTitle() {
-            var ro    = ($('#WONum').val() || 'RO').trim().replace(/\s/g, '_');
-            var owner = ($('#Cust').val()  || '').trim();
-            var parts = owner.split(/\s+/).filter(Boolean);
-            var lastName = parts.length > 0 ? parts[parts.length - 1] : 'Unknown';
-            // Proper-case each word
-            function cap(s) { return s.charAt(0).toUpperCase() + s.slice(1).toLowerCase(); }
-            lastName = cap(lastName);
-            ro = ro.split('_').map(cap).join('_');
-            document.title = ro + '_' + lastName + '_Total_Loss_Invoice';
-        }
-
-        // Set title on load and keep it live
-        updatePdfTitle();
-        $(document).on('input blur change', '#WONum, #Cust', function() {
-            updatePdfTitle();
-        });
-
-        window.addEventListener('beforeprint', function() {
-            // Sync notes display
-            var val = document.getElementById('NotesField').value;
-            document.getElementById('printNotesDisplay').textContent = val;
-            updatePdfTitle();
-
-            // Hide unchecked service rows on print
-            $('#worksheet-body tr').each(function() {
-                var chk = $(this).find('.sel-chk');
-                if (chk.length && !chk.is(':checked')) {
-                    $(this).addClass('row-print-hide');
-                }
-                // Also handle CC&P rows
-                var ccpChk = $(this).find('[id$="Sel"]');
-                if (ccpChk.length && !ccpChk.is(':checked')) {
-                    $(this).addClass('row-print-hide');
-                }
-            });
-        });
-
-        window.addEventListener('afterprint', function() {
-            // Restore all hidden rows after printing
-            $('#worksheet-body tr').removeClass('row-print-hide');
-        });
-
-        // Auto-save: save record automatically whenever a field changes
-        var autoSaveTimer = null;
-        function triggerAutoSave() {
-            clearTimeout(autoSaveTimer);
-            autoSaveTimer = setTimeout(function() {
-                var roNum = $('#WONum').val().trim();
-                var owner = $('#Cust').val().trim();
-                if (roNum || owner) {
-                    saveRecord();
-                }
-            }, 2000); // 2-second debounce
-        }
-
-        // Bind auto-save to all relevant inputs
-        $(document).on('change blur', '#WONum, #Cust, #InsCoTop, #ClaimNumTop, #Veh, #VIN, .sel-chk, .t-chk, .type-select, .hrs, .auto-clear, .ccp-input, #inSel, #outSel, #inTaxChk, #outTaxChk, #BodyRate, #FrameRate, #MechRate, #InRate, #OutRate, #PhotoRate, #CCRate', function() {
-            triggerAutoSave();
-        });
-        $(document).on('input', '#NotesField', function() {
-            triggerAutoSave();
-        });
-
-    });
-
-</script>
-
-<!-- ============================================================
-     VIN DECODE MODAL — styles, markup, and script
-============================================================ -->
-<style>
-  #vinModalBackdrop { position:fixed; inset:0; background:rgba(0,0,0,0.45); display:none; align-items:center; justify-content:center; z-index:99999; }
-  #vinModal { background:#fff; border-radius:8px; max-width:820px; width:94%; padding:16px; box-shadow:0 12px 40px rgba(0,0,0,0.28); font-family:inherit; color:inherit; }
-  #vinModal header { display:flex; justify-content:space-between; align-items:center; gap:12px; }
-  #vinModal h3 { margin:0; font-size:16px; }
-  .vin-close { background:#eee; border:0; padding:6px 10px; border-radius:6px; cursor:pointer; }
-  #vinModal .grid { display:grid; grid-template-columns:repeat(2,1fr); gap:10px; margin-top:12px; }
-  .vin-label { color:#666; font-size:12px; }
-  .vin-value { font-weight:600; font-size:14px; }
-  #vinModal pre { background:#f7f7f7; padding:10px; border-radius:6px; max-height:260px; overflow:auto; margin-top:10px; font-family:monospace; font-size:12px; }
-  #vinModal .actions { margin-top:12px; display:flex; gap:8px; justify-content:flex-end; }
-  #vinModalSummary { margin-top:8px; font-size:14px; color:#222; }
-</style>
-
-<div id="vinModalBackdrop" aria-hidden="true">
-  <div id="vinModal" role="dialog" aria-modal="true" aria-labelledby="vinModalTitle">
-    <header>
-      <h3 id="vinModalTitle">VIN Decode Results</h3>
-      <button class="vin-close" id="vinModalClose">Close</button>
-    </header>
-    <div id="vinModalSummary"></div>
-    <div class="grid" id="vinModalFields"></div>
-    <details style="margin-top:10px">
-      <summary style="cursor:pointer">Show raw response</summary>
-      <pre id="vinModalRaw"></pre>
-    </details>
-    <div class="actions">
-      <button id="vinModalApply" style="background:#0b66c3;color:#fff;border:0;padding:8px 12px;border-radius:6px;cursor:pointer">Apply to Form</button>
-      <button id="vinModalClose2" class="vin-close">Close</button>
-    </div>
-  </div>
-</div>
-
-<script>
-/* ============================================================
-   VIN DECODE — NHTSA vPIC API
-   Enter key on VIN field → decode → show modal → Apply fills #Veh
-============================================================ */
-const VIN_INPUT_SELECTOR  = '#VIN';
-const VEHICLE_INPUT_SELECTOR = '#Veh';
-
-function buildDecodeUrl(vin) {
-    return 'https://vpic.nhtsa.dot.gov/api/vehicles/DecodeVinValuesExtended/' + encodeURIComponent(vin) + '?format=json';
-}
-
-function escapeHtml(s) {
-    return String(s || '').replace(/[&<>"']/g, function(m) {
-        return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m];
-    });
-}
-
-async function decodeVin(vin) {
-    const url = buildDecodeUrl(vin);
-    const resp = await fetch(url, { method:'GET', cache:'no-store' });
-    if (!resp.ok) throw new Error('Network error: ' + resp.status);
-    const json = await resp.json();
-    if (!json || !Array.isArray(json.Results) || json.Results.length === 0) throw new Error('Unexpected response format');
-    const row = json.Results[0];
-    if (!row || !row.ErrorCode || !String(row.ErrorCode).trim().startsWith("0")) throw new Error("VIN decode failed");
-    return row;
-}
-
-/* Modal element refs */
-const vinBackdrop    = document.getElementById('vinModalBackdrop');
-const vinModalFields = document.getElementById('vinModalFields');
-const vinModalSum    = document.getElementById('vinModalSummary');
-const vinModalRaw    = document.getElementById('vinModalRaw');
-const vinApplyBtn    = document.getElementById('vinModalApply');
-const vinCloseBtn1   = document.getElementById('vinModalClose');
-const vinCloseBtn2   = document.getElementById('vinModalClose2');
-const vinIconEl      = document.getElementById('VinIcon');
-
-const svgCheck = '<svg viewBox="0 0 24 24"><path fill="#27ae60" d="M20.285 6.709a1 1 0 0 0-1.414-1.414L9 15.167l-3.871-3.87a1 1 0 1 0-1.414 1.414l4.578 4.578a1.2 1.2 0 0 0 1.697 0l10.295-10.57z"/></svg>';
-const svgX     = '<svg viewBox="0 0 24 24"><path fill="#e74c3c" d="M18.364 5.636a1 1 0 0 0-1.414 0L12 10.586 7.05 5.636a1 1 0 1 0-1.414 1.414L10.586 12l-4.95 4.95a1 1 0 1 0 1.414 1.414L12 13.414l4.95 4.95a1 1 0 0 0 1.414-1.414L13.414 12l4.95-4.95a1 1 0 0 0 0-1.414z"/></svg>';
-
-function openVinModal()  { vinBackdrop.style.display = 'flex'; vinBackdrop.setAttribute('aria-hidden','false'); }
-function closeVinModal() { vinBackdrop.style.display = 'none';  vinBackdrop.setAttribute('aria-hidden','true'); }
-
-if (vinCloseBtn1) vinCloseBtn1.addEventListener('click', closeVinModal);
-if (vinCloseBtn2) vinCloseBtn2.addEventListener('click', closeVinModal);
-vinBackdrop.addEventListener('click', function(e) { if (e.target === vinBackdrop) closeVinModal(); });
-document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape' && vinBackdrop.style.display === 'flex') closeVinModal();
-});
-
-function renderModalFromRow(row) {
-    vinModalFields.innerHTML = '';
-    const displayKeys = ['ModelYear','Make','Model','Trim','Series','BodyClass','Manufacturer','EngineModel','EngineCylinders','PlantCountry','PlantCity'];
-    const summaryParts = [];
-    if (row.ModelYear) summaryParts.push(escapeHtml(row.ModelYear));
-    if (row.Make)      summaryParts.push(escapeHtml(row.Make));
-    if (row.Model)     summaryParts.push(escapeHtml(row.Model));
-    vinModalSum.innerHTML = summaryParts.length ? '<strong>Summary:</strong> ' + summaryParts.join(' ') : '<em>No summary available</em>';
-    displayKeys.forEach(function(k) {
-        if (row[k] && String(row[k]).trim() !== '') {
-            const cell = document.createElement('div');
-            cell.innerHTML = '<div class="vin-label">' + escapeHtml(k) + '</div><div class="vin-value">' + escapeHtml(String(row[k])) + '</div>';
-            vinModalFields.appendChild(cell);
-        }
-    });
-    vinModalRaw.textContent = JSON.stringify(row, null, 2);
-}
-
-function composeVehicleText(row) {
-    const year  = row.ModelYear || '';
-    const make  = row.Make  || '';
-    const model = row.Model || '';
-    const sub   = row.Trim  || row.Series || '';
-    return [year, make, model, sub].filter(Boolean).join(' ').trim();
-}
-
-function setVehicleText(text) {
-    const el = document.querySelector(VEHICLE_INPUT_SELECTOR);
-    if (!el) return;
-    el.value = text;
-    el.dispatchEvent(new Event('input',  { bubbles:true }));
-    el.dispatchEvent(new Event('change', { bubbles:true }));
-}
-
-window.lastDecodedRow = null;
-
-async function handleDecodeFlow(vin) {
-    if (!vin || vin.length < 11) return;
-    if (vinIconEl) { vinIconEl.style.display = 'none'; }
-
-    // Show loading toast so user knows decode is running
-    if (typeof showToast === 'function') showToast('Decoding VIN...', '');
-
-    try {
-        const row = await decodeVin(vin);
-        window.lastDecodedRow = row;
-        renderModalFromRow(row);
-        openVinModal();
-        if (vinIconEl) { vinIconEl.innerHTML = svgCheck; vinIconEl.style.display = 'block'; }
-    } catch(err) {
-        // Surface the actual error so we can diagnose it
-        var msg = err.message || 'Unknown error';
-        if (msg.toLowerCase().includes('failed to fetch') || msg.toLowerCase().includes('networkerror') || msg.toLowerCase().includes('network')) {
-            msg = 'Network blocked — open via a web server or GitHub Pages, not a local file.';
-        }
-        if (typeof showToast === 'function') showToast('VIN decode: ' + msg, 'error');
-        if (vinIconEl) { vinIconEl.innerHTML = svgX; vinIconEl.style.display = 'block'; }
-        console.warn('VIN decode error:', err.message);
-    }
-}
-
-/* Trigger decode on blur when VIN is exactly 17 chars.
-   This avoids conflict with the existing enter-blur keydown handler
-   which blurs the field before keyup can reliably fire. */
-const vinInputEl = document.querySelector(VIN_INPUT_SELECTOR);
-if (vinInputEl) {
-    vinInputEl.addEventListener('blur', function() {
-        var vin = (vinInputEl.value || '').trim().toUpperCase();
-        if (vin.length === 17) {
-            handleDecodeFlow(vin);
-        }
-    });
-    /* Hide icon whenever VIN is edited */
-    vinInputEl.addEventListener('input', function() {
-        if (vinIconEl) vinIconEl.style.display = 'none';
-    });
-}
-
-vinApplyBtn.addEventListener('click', function() {
-    if (!window.lastDecodedRow) { alert('No decoded data available.'); return; }
-    setVehicleText(composeVehicleText(window.lastDecodedRow));
-    closeVinModal();
-});
-
-/* Global hooks for external use */
-window.triggerVinDecodeAndShow = function(vin) {
-    return handleDecodeFlow(String(vin || '').trim().toUpperCase());
-};
-window.applyLastDecodedToVehicle = function() {
-    if (!window.lastDecodedRow) return false;
-    setVehicleText(composeVehicleText(window.lastDecodedRow));
-    return true;
-};
-</script>
-
-<!-- ============================================================
-     GITHUB SYNC — API functions, setup modal, token management
-     Token is stored only in localStorage — never in source code.
-============================================================ -->
-<script>
-/* ── Config (not sensitive — just your GitHub username + repo) ── */
-var GH_OWNER = 'RLSH1855';
-var GH_REPO  = 'my-master-code-for-total-loss-invoice';
-var GH_FILE  = 'records.json';
-var GH_API   = 'https://api.github.com/repos/' + GH_OWNER + '/' + GH_REPO + '/contents/' + GH_FILE;
-
-/* Track the file SHA — required by GitHub API to update existing files */
-window.ghSha = null;
-
-/* ── Token helpers — stored in localStorage, never in source ── */
-function getGhToken()  { return localStorage.getItem('3js_gh_token') || ''; }
-function setGhToken(t) { localStorage.setItem('3js_gh_token', t.trim()); }
-
-/* ── Sync status icon in sidebar ── */
-function updateSyncStatus(state) {
-    var el = document.getElementById('syncStatus');
-    if (!el) return;
-    if      (state === 'connected') { el.textContent = '☁';  el.style.color = '#27ae60'; el.title = 'GitHub: Connected'; }
-    else if (state === 'syncing')   { el.textContent = '⟳';  el.style.color = '#f39c12'; el.title = 'GitHub: Syncing...'; }
-    else if (state === 'error')     { el.textContent = '☁';  el.style.color = '#e74c3c'; el.title = 'GitHub: Error'; }
-    else                            { el.textContent = '💻'; el.style.color = '#aaa';    el.title = 'Local only (no GitHub token)'; }
-}
-
-/* ── Load all records from GitHub, cache to localStorage ── */
-async function githubLoadRecords() {
-    var token = getGhToken();
-    if (!token) { updateSyncStatus('local'); return null; }
-    updateSyncStatus('syncing');
-    try {
-        var resp = await fetch(GH_API + '?t=' + Date.now(), {
-            headers: { 'Authorization': 'token ' + token, 'Accept': 'application/vnd.github.v3+json' }
-        });
-        if (resp.status === 401 || resp.status === 403) {
-            updateSyncStatus('error');
-            showToast('GitHub token invalid — tap ⚙ to update it.', 'error');
-            return null;
-        }
-        if (resp.status === 404) {
-            window.ghSha = null;
-            localStorage.removeItem('3js_gh_sha');
-            updateSyncStatus('connected');
-            return [];
-        }
-        if (!resp.ok) throw new Error('HTTP ' + resp.status);
-        var data    = await resp.json();
-        window.ghSha = data.sha;
-        localStorage.setItem('3js_gh_sha', data.sha);
-        var raw     = atob(data.content.replace(/[\n\r]/g, ''));
-        var decoded = decodeURIComponent(Array.from(raw).map(function(c) {
-            return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-        }).join(''));
-        var records = JSON.parse(decoded);
-        localStorage.setItem('3js_records', JSON.stringify(records));
-        updateSyncStatus('connected');
-        return records;
-    } catch(err) {
-        console.error('GitHub load error:', err);
-        updateSyncStatus('error');
-        return null;
-    }
-}
-
-/* ── Save all records to GitHub, update SHA ── */
-async function githubSaveAllRecords(records) {
-    var token = getGhToken();
-    if (!token) { updateSyncStatus('local'); return false; }
-    if (!window.ghSha) {
-        var cached = localStorage.getItem('3js_gh_sha');
-        if (cached) window.ghSha = cached;
-    }
-    updateSyncStatus('syncing');
-    var json    = JSON.stringify(records, null, 2);
-    var encoded = btoa(unescape(encodeURIComponent(json)));
-    var body    = { message: 'Update records — ' + new Date().toISOString().split('T')[0], content: encoded };
-    if (window.ghSha) body.sha = window.ghSha;
-    try {
-        var resp = await fetch(GH_API, {
-            method: 'PUT',
-            headers: {
-                'Authorization': 'token ' + token,
-                'Accept': 'application/vnd.github.v3+json',
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(body)
-        });
-        /* SHA conflict — re-fetch and retry once */
-        if (resp.status === 409 || resp.status === 422) {
-            var fresh = await fetch(GH_API + '?t=' + Date.now(), {
-                headers: { 'Authorization': 'token ' + token, 'Accept': 'application/vnd.github.v3+json' }
-            });
-            if (fresh.ok) {
-                var fd = await fresh.json();
-                window.ghSha = fd.sha;
-                localStorage.setItem('3js_gh_sha', fd.sha);
-                body.sha = window.ghSha;
-                resp = await fetch(GH_API, {
-                    method: 'PUT',
-                    headers: { 'Authorization': 'token ' + token, 'Accept': 'application/vnd.github.v3+json', 'Content-Type': 'application/json' },
-                    body: JSON.stringify(body)
-                });
-            }
-        }
-        if (!resp.ok) {
-            var errData = await resp.json().catch(function() { return {}; });
-            throw new Error(errData.message || 'HTTP ' + resp.status);
-        }
-        var result  = await resp.json();
-        window.ghSha = result.content.sha;
-        localStorage.setItem('3js_gh_sha', result.content.sha);
-        updateSyncStatus('connected');
-        return true;
-    } catch(err) {
-        console.error('GitHub save error:', err);
-        updateSyncStatus('error');
-        throw err;
-    }
-}
-
-/* ── Called once on page load ── */
-async function initGitHubSync() {
-    var token = getGhToken();
-    if (!token) {
-        updateSyncStatus('local');
-        setTimeout(function() { if (!getGhToken()) openGhSetup(); }, 1400);
-        return;
-    }
-    var records = await githubLoadRecords();
-    if (records !== null && typeof renderSidebar === 'function') renderSidebar();
-}
-
-/* ── Setup modal ── */
-function openGhSetup() {
-    document.getElementById('ghSetupOverlay').style.display = 'block';
-    document.getElementById('ghSetupModal').style.display   = 'block';
-    var inp = document.getElementById('ghTokenInput');
-    inp.value = getGhToken();
-    document.getElementById('ghSetupStatus').textContent = getGhToken() ? 'Token loaded from this device.' : '';
-    setTimeout(function() { inp.focus(); }, 100);
-}
-function closeGhSetup() {
-    document.getElementById('ghSetupOverlay').style.display = 'none';
-    document.getElementById('ghSetupModal').style.display   = 'none';
-}
-function clearGhToken() {
-    if (!confirm('Disconnect GitHub? Records stay local on this device.')) return;
-    localStorage.removeItem('3js_gh_token');
-    localStorage.removeItem('3js_gh_sha');
-    window.ghSha = null;
-    updateSyncStatus('local');
-    closeGhSetup();
-    showToast('GitHub disconnected — using local storage.', '');
-}
-async function saveGhToken() {
-    var token = document.getElementById('ghTokenInput').value.trim();
-    if (!token) { document.getElementById('ghSetupStatus').textContent = 'Please enter a token.'; return; }
-    document.getElementById('ghSetupStatus').textContent = 'Testing connection...';
-    setGhToken(token);
-    var records = await githubLoadRecords();
-    if (records !== null) {
-        if (records.length > 0) {
-            var local  = JSON.parse(localStorage.getItem('3js_records') || '[]');
-            var merged = records.slice();
-            local.forEach(function(lr) {
-                var exists = merged.find(function(r) { return r.id === lr.id || (r.roNum && r.roNum === lr.roNum); });
-                if (!exists) merged.unshift(lr);
-            });
-            localStorage.setItem('3js_records', JSON.stringify(merged));
-        }
-        if (typeof renderSidebar === 'function') renderSidebar();
-        document.getElementById('ghSetupStatus').textContent = '✓ Connected — ' + (records.length || 0) + ' records loaded.';
-        setTimeout(closeGhSetup, 1500);
-    } else {
-        document.getElementById('ghSetupStatus').textContent = '✗ Failed — check your token and try again.';
-        localStorage.removeItem('3js_gh_token');
-    }
-}
-document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape' && document.getElementById('ghSetupModal') && document.getElementById('ghSetupModal').style.display === 'block') closeGhSetup();
-});
-</script>
-</body>
-</html>
+            $(`#${id}DaysDisp
