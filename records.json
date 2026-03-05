@@ -469,7 +469,7 @@
         "taxChk": false,
         "ccpStart": null,
         "ccpStop": null,
-        "ccpSel": true,
+        "ccpSel": false,
         "ccpTaxChk": true
       },
       {
