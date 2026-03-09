@@ -1564,11 +1564,11 @@
         { header: "Care, Custody and Protection",                            type: "header", pageBreak: true },
         { name: "CC&P Inside",  type: "special_ccp", subtype: "in" },
         { name: "CC&P Outside", type: "special_ccp", subtype: "out" },
-        { name: "Retrieve Personal Items",                         hrs: 0.3, type: "body" },
+        { name: "Assist Customer in Retrieving Personal Items & Removing Plates", hrs: 0.3, type: "body" },
         { name: "Purge Computer Data",                             hrs: 1.0, type: "body" },
         { name: "Complete Total Loss Worksheet",                   hrs: 0.2, type: "body" },
         { name: "Relay Charges/Salvage Pickup",                    hrs: 0.2, type: "body" },
-        { name: "Receive Payment/Assist Pickup",                   hrs: 0.2, type: "body" }
+        { name: "Receive/Process Payment & Assist at Vehicle Pickup", hrs: 0.2, type: "body" }
     ];
 
 
@@ -1937,10 +1937,29 @@
            If no RO# exists yet, a new record is created normally.
     ============================================================ */
 
-    /* Returns all saved records from localStorage, or [] on error */
+    /* Returns all saved records from localStorage, or [] on error.
+       Automatically deduplicates by RO# — keeps the most recently saved version. */
     function getRecords() {
         try {
-            return JSON.parse(localStorage.getItem('3js_records')) || [];
+            var raw = JSON.parse(localStorage.getItem('3js_records')) || [];
+            // Deduplicate by RO# — last one saved wins (highest id)
+            var seen = {};
+            var deduped = [];
+            raw.forEach(function(r) {
+                var key = r.roNum ? String(r.roNum).trim() : ('owner_' + (r.owner || r.id));
+                if (!seen[key] || r.id > seen[key].id) {
+                    seen[key] = r;
+                }
+            });
+            // Rebuild in original order
+            raw.forEach(function(r) {
+                var key = r.roNum ? String(r.roNum).trim() : ('owner_' + (r.owner || r.id));
+                if (seen[key] && seen[key].id === r.id) {
+                    deduped.push(r);
+                    seen[key] = null; // prevent adding again
+                }
+            });
+            return deduped;
         } catch (e) {
             return [];
         }
@@ -1998,11 +2017,15 @@
         let records     = getRecords();
         let existingIdx = -1;
 
-        // Match on RO# first; fall back to owner name if no RO#
+        // Match strictly on RO# only — trim + stringify both sides to prevent duplicates
         if (roNum) {
-            existingIdx = records.findIndex(function(r) { return r.roNum === roNum; });
+            existingIdx = records.findIndex(function(r) {
+                return String(r.roNum).trim() === String(roNum).trim();
+            });
         } else {
-            existingIdx = records.findIndex(function(r) { return r.owner === owner && !r.roNum; });
+            existingIdx = records.findIndex(function(r) {
+                return r.owner === owner && !r.roNum;
+            });
         }
 
         if (existingIdx >= 0) {
@@ -2246,7 +2269,7 @@
         // Load records from localStorage immediately (instant display)
         renderSidebar();
 
-        // Then async-load from GitHub and refresh sidebar
+        // Then async-load from Google Sheets and refresh sidebar
         initGitHubSync();
 
         // --------------------------------------------------------
