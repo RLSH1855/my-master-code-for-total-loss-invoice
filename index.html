@@ -3639,89 +3639,195 @@ window.applyLastDecodedToVehicle = function() {
 </script>
 
 <!-- ============================================================
-     GOOGLE SHEETS SYNC
-     Permanent URL — never expires, no tokens needed.
-============================================================ -->
-<script>
-var SHEETS_URL = 'https://script.google.com/macros/s/AKfycbwLTdd4HtAIrFlWgOlTgFSAjG6ZShT7aEsEqc6xZANBHQOtm39kXtcvJ3EtWdkJzqUlKA/exec';
+    // ============================================================
+//  3J's Auto Body — Google Apps Script
+//  Saves full data to "Raw Records"
+//  Mirrors 7 key fields to "Records" (clean view)
+// ============================================================
 
-/* ── Sync status icon ── */
-function updateSyncStatus(state) {
-    var el = document.getElementById('syncStatus');
-    if (!el) return;
-    if      (state === 'connected') { el.textContent = '☁';  el.style.color = '#27ae60'; el.title = 'Google Sheets: Connected'; }
-    else if (state === 'syncing')   { el.textContent = '⟳';  el.style.color = '#f39c12'; el.title = 'Syncing...'; }
-    else if (state === 'error')     { el.textContent = '☁';  el.style.color = '#e74c3c'; el.title = 'Sync error'; }
-    else                            { el.textContent = '💻'; el.style.color = '#aaa';    el.title = 'Local only'; }
-}
+var SS            = SpreadsheetApp.getActiveSpreadsheet();
+var RAW_SHEET     = 'Raw Records';   // full data — never changes
+var CLEAN_SHEET   = 'Records';       // simplified view — auto-synced
 
-/* ── Load all records from Google Sheets ── */
-async function sheetsLoadRecords() {
-    updateSyncStatus('syncing');
-    try {
-        /* Google Apps Script requires no-cors redirect follow for GET */
-        var resp = await fetch(SHEETS_URL + '?t=' + Date.now(), {
-            method: 'GET',
-            redirect: 'follow'
+// Raw Records headers (must match exactly)
+var RAW_HEADERS = [
+  'ID','Saved On','Invoice Date','RO#','Vehicle Owner',
+  'Insurance Co','Claim #','Vehicle','VIN','Notes',
+  'Body Rate','Frame Rate','Mech Rate','Inside Rate',
+  'Outside Rate','Photo Rate','CC Rate','Row Data'
+];
+
+// Records (clean) headers — matches your existing sheet
+var CLEAN_HEADERS = [
+  'DATE','REPAIR ORDER#','CUSTOMER','INSURANCE','CLAIM#','VEHICLE','VIN#'
+];
+
+// ── GET — load all records ──────────────────────────────────
+function doGet(e) {
+  try {
+    var sheet = SS.getSheetByName(RAW_SHEET);
+    if (!sheet) return jsonResp({ ok: true, records: [] });
+
+    var data = sheet.getDataRange().getValues();
+    if (data.length <= 1) return jsonResp({ ok: true, records: [] });
+
+    var headers = data[0];
+    var records = [];
+
+    for (var i = 1; i < data.length; i++) {
+      var row = data[i];
+      if (!row[0]) continue; // skip empty rows
+
+      var rec = {};
+      headers.forEach(function(h, idx) {
+        rec[h] = row[idx];
+      });
+
+      // Parse Row Data JSON back into the record
+      try {
+        var rowData = JSON.parse(rec['Row Data'] || '{}');
+        Object.keys(rowData).forEach(function(k) {
+          if (rec[k] === undefined || rec[k] === '') rec[k] = rowData[k];
         });
-        if (!resp.ok) throw new Error('HTTP ' + resp.status);
-        var data = await resp.json();
-        if (!data.ok) throw new Error(data.error || 'Load failed');
-        localStorage.setItem('3js_records', JSON.stringify(data.records));
-        updateSyncStatus('connected');
-        return data.records;
-    } catch(err) {
-        console.error('Sheets load error:', err);
-        updateSyncStatus('error');
-        return null;
+        rec.rowData = rowData;
+      } catch(e) {}
+
+      // Map to JS record shape that the form expects
+      records.push({
+        id:          rec['ID'],
+        savedOn:     rec['Saved On'],
+        invoiceDate: rec['Invoice Date'],
+        roNum:       rec['RO#'],
+        owner:       rec['Vehicle Owner'],
+        ins:         rec['Insurance Co'],
+        claim:       rec['Claim #'],
+        veh:         rec['Vehicle'],
+        vin:         rec['VIN'],
+        notes:       rec['Notes'],
+        bodyRate:    rec['Body Rate'],
+        frameRate:   rec['Frame Rate'],
+        mechRate:    rec['Mech Rate'],
+        insideRate:  rec['Inside Rate'],
+        outsideRate: rec['Outside Rate'],
+        photoRate:   rec['Photo Rate'],
+        ccRate:      rec['CC Rate'],
+        rowData:     rec.rowData || {}
+      });
     }
+
+    return jsonResp({ ok: true, records: records });
+
+  } catch(err) {
+    return jsonResp({ ok: false, error: err.message });
+  }
 }
 
-/* ── Save all records to Google Sheets ── */
-async function sheetsSaveAllRecords(records) {
-    updateSyncStatus('syncing');
-    try {
-        /* Google Apps Script POST requires no-cors + data sent as URL param
-           because Apps Script redirects and loses POST body on redirect */
-        var json = JSON.stringify({ action: 'save', records: records });
-        var resp = await fetch(SHEETS_URL, {
-            method: 'POST',
-            redirect: 'follow',
-            headers: { 'Content-Type': 'text/plain' },
-            body: json
-        });
-        if (!resp.ok) throw new Error('HTTP ' + resp.status);
-        var data = await resp.json();
-        if (!data.ok) throw new Error(data.error || 'Save failed');
-        updateSyncStatus('connected');
-        return true;
-    } catch(err) {
-        console.error('Sheets save error:', err);
-        updateSyncStatus('error');
-        throw err;
-    }
+// ── POST — save all records ─────────────────────────────────
+function doPost(e) {
+  try {
+    var payload = JSON.parse(e.postData.contents);
+    if (payload.action !== 'save') throw new Error('Unknown action');
+
+    var records = payload.records || [];
+
+    // ── 1. Write to Raw Records ──
+    writeRawRecords(records);
+
+    // ── 2. Mirror to Records (clean view) ──
+    writeCleanRecords(records);
+
+    return jsonResp({ ok: true, saved: records.length });
+
+  } catch(err) {
+    return jsonResp({ ok: false, error: err.message });
+  }
 }
 
-/* ── Init on page load — fetch from Sheets, refresh sidebar ── */
-async function initGitHubSync() {
-    var records = await sheetsLoadRecords();
-    if (records !== null && typeof renderSidebar === 'function') {
-        renderSidebar();
-    }
+// ── Write full data to Raw Records sheet ────────────────────
+function writeRawRecords(records) {
+  var sheet = getOrCreateSheet(RAW_SHEET, RAW_HEADERS);
+
+  // Clear existing data rows (keep header)
+  var lastRow = sheet.getLastRow();
+  if (lastRow > 1) sheet.getRange(2, 1, lastRow - 1, RAW_HEADERS.length).clearContent();
+
+  if (records.length === 0) return;
+
+  var rows = records.map(function(r) {
+    return [
+      r.id          || '',
+      r.savedOn     || '',
+      r.invoiceDate || '',
+      r.roNum       || '',
+      r.owner       || '',
+      r.ins         || '',
+      r.claim       || '',
+      r.veh         || '',
+      r.vin         || '',
+      r.notes       || '',
+      r.bodyRate    || '',
+      r.frameRate   || '',
+      r.mechRate    || '',
+      r.insideRate  || '',
+      r.outsideRate || '',
+      r.photoRate   || '',
+      r.ccRate      || '',
+      JSON.stringify(r.rowData || {})
+    ];
+  });
+
+  sheet.getRange(2, 1, rows.length, RAW_HEADERS.length).setValues(rows);
 }
 
-/* ── Hook into existing save/delete/import functions ── */
-function githubSaveAllRecords(records) {
-    return sheetsSaveAllRecords(records);
+// ── Write simplified data to Records sheet ──────────────────
+function writeCleanRecords(records) {
+  var sheet = getOrCreateSheet(CLEAN_SHEET, CLEAN_HEADERS);
+
+  // Clear existing data rows (keep header)
+  var lastRow = sheet.getLastRow();
+  if (lastRow > 1) sheet.getRange(2, 1, lastRow - 1, CLEAN_HEADERS.length).clearContent();
+
+  if (records.length === 0) return;
+
+  var rows = records.map(function(r) {
+    return [
+      r.invoiceDate || r.savedOn || '',   // DATE
+      r.roNum       || '',                // REPAIR ORDER#
+      r.owner       || '',                // CUSTOMER
+      r.ins         || '',                // INSURANCE
+      r.claim       || '',                // CLAIM#
+      r.veh         || '',                // VEHICLE
+      r.vin         || ''                 // VIN#
+    ];
+  });
+
+  sheet.getRange(2, 1, rows.length, CLEAN_HEADERS.length).setValues(rows);
 }
 
-/* ── Hide the GitHub setup modal gear since no token needed ── */
-document.addEventListener('DOMContentLoaded', function() {
-    var gear = document.getElementById('ghSettingsBtn');
-    if (gear) gear.style.display = 'none';
-    var overlay = document.getElementById('ghSetupOverlay');
-    if (overlay) overlay.style.display = 'none';
-});
-</script>
-</body>
-</html>
+// ── Helper: get sheet or create it with headers ─────────────
+function getOrCreateSheet(name, headers) {
+  var sheet = SS.getSheetByName(name);
+  if (!sheet) {
+    sheet = SS.insertSheet(name);
+    sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
+    // Style the header row
+    var hdrRange = sheet.getRange(1, 1, 1, headers.length);
+    hdrRange.setBackground('#2C3E50');
+    hdrRange.setFontColor('#ffffff');
+    hdrRange.setFontWeight('bold');
+  }
+  // Make sure headers exist (in case sheet was created manually)
+  var firstRow = sheet.getRange(1, 1, 1, headers.length).getValues()[0];
+  var allEmpty = firstRow.every(function(c) { return c === ''; });
+  if (allEmpty) {
+    sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
+  }
+  return sheet;
+}
+
+// ── Helper: return JSON response with CORS headers ──────────
+function jsonResp(obj) {
+  return ContentService
+    .createTextOutput(JSON.stringify(obj))
+    .setMimeType(ContentService.MimeType.JSON);
+}
