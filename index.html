@@ -267,6 +267,7 @@
             .mob-sync-ico {
                 width: 18px; height: 18px;
                 display: block; flex-shrink: 0;
+                mix-blend-mode: screen;
                 /* default = connected green */
                 filter: invert(74%) sepia(47%) saturate(600%) hue-rotate(100deg) brightness(105%) contrast(90%);
                 transition: filter 0.2s;
@@ -3719,7 +3720,7 @@ function updateSyncStatus(state) {
     if (el.tagName !== 'IMG') {
         var img = document.createElement('img');
         img.id = 'syncStatus';
-        img.style.cssText = 'width:18px;height:18px;vertical-align:middle;cursor:default;transition:filter 0.2s;';
+        img.style.cssText = 'width:18px;height:18px;vertical-align:middle;cursor:default;mix-blend-mode:screen;transition:filter 0.2s;';
         el.parentNode.replaceChild(img, el);
         el = img;
     }
