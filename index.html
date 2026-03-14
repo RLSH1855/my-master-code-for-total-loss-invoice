@@ -39,6 +39,644 @@
             src: local('Montserrat ExtraBold'), local('Montserrat-ExtraBold'),
                  url('https://fonts.gstatic.com/s/montserrat/v26/JTUHjIg1_i6t8kCHKm4532VJOt5-QNFgpCvr73w5aXo.woff2') format('woff2');
         }
+
+        /* ============================================================
+           CSS 12 — MOBILE RESPONSIVE  (@media max-width: 768px)
+           Zero impact on desktop or print — all rules scoped here.
+        ============================================================ */
+        @media screen and (max-width: 768px) {
+
+            /* ── Layout: single column, add bottom padding for bottom bar ── */
+            .main-layout {
+                grid-template-columns: 1fr !important;
+                padding-bottom: 70px;
+            }
+
+            /* ── Hide desktop sidebar completely ── */
+            .sidebar {
+                display: none !important;
+            }
+
+            /* ── ws-card: full width, no shadow ── */
+            .ws-card {
+                margin: 0 !important;
+                border: none !important;
+                box-shadow: none !important;
+                padding: 10px 10px 0 !important;
+            }
+
+            /* ── Logo / header ── */
+            .logo-container {
+                margin-bottom: 8px !important;
+            }
+            .business-logo {
+                max-height: 60px !important;
+            }
+            .business-info {
+                font-size: 10px !important;
+                line-height: 1.4 !important;
+            }
+            .ws-card h6 {
+                font-size: 13px !important;
+            }
+
+            /* ── Rates section: collapsible ── */
+            .rates-toggle-btn {
+                display: flex !important;
+            }
+            .no-print-rates-wrap {
+                overflow: hidden;
+                transition: max-height 0.3s ease;
+                max-height: 0;
+            }
+            .no-print-rates-wrap.open {
+                max-height: 600px;
+            }
+
+            /* ── top-grid: stack vertically ── */
+            .top-grid {
+                grid-template-columns: 1fr !important;
+                gap: 0 !important;
+                padding: 6px !important;
+            }
+
+            /* ── Customer fields: 2-col grid ── */
+            .print-customer-grid {
+                display: grid !important;
+                grid-template-columns: 1fr 1fr !important;
+                gap: 6px 10px !important;
+            }
+
+            .customer-field label {
+                font-size: 9px !important;
+            }
+
+            .customer-field input {
+                font-size: 12px !important;
+                padding: 6px 8px !important;
+            }
+
+            /* ── Rate fields: 2-col grid ── */
+            .no-print-rates {
+                display: grid !important;
+                grid-template-columns: 1fr 1fr !important;
+                gap: 6px 10px !important;
+                padding: 4px 0 !important;
+            }
+
+            /* ── Hide desktop table, show mobile cards ── */
+            .invoice-table-block { display: none !important; }
+            .mobile-cards-wrap   { display: block !important; }
+            /* ── Summary: stack vertically ── */
+            .summary-block { flex-direction: column !important; gap: 8px !important; }
+            /* ── Notes: full width, taller ── */
+            #NotesField { min-height: 100px !important; font-size: 12px !important; }
+            /* ── Legal page: smaller text ── */
+            .legal-acknowledgment { font-size: 9px !important; padding: 8px !important; }
+            /* ── Toast: above bottom bar ── */
+            #toast { bottom: 86px !important; }
+        }
+
+        /* ═══════════════════════════════════════
+           RATES TOGGLE — hidden on desktop
+        ═══════════════════════════════════════ */
+        .rates-toggle-btn { display: none; }
+
+        /* ═══════════════════════════════════════
+           MOBILE CARDS WRAP — hidden on desktop
+        ═══════════════════════════════════════ */
+        .mobile-cards-wrap { display: none; }
+
+        /* ═══════════════════════════════════════
+           MOBILE-ONLY DARK SHELL
+           Applied to body on small screens
+        ═══════════════════════════════════════ */
+        @media screen and (max-width: 768px) {
+            body {
+                background: #06090f !important;
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+            /* Desktop invoice wrapper becomes transparent on mobile */
+            .container-fluid, .container, #mainLayout, .main-layout,
+            .invoice-wrapper, .page-wrap, .desktop-wrap {
+                background: transparent !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                box-shadow: none !important;
+                border: none !important;
+            }
+        }
+
+        /* ═══════════════════════════════════════
+           MOBILE DARK APP HEADER
+           Shown only on mobile, sits above cards
+        ═══════════════════════════════════════ */
+        .mob-app-header {
+            display: none;
+        }
+        @media screen and (max-width: 768px) {
+            .mob-app-header {
+                display: block;
+                background: #06090f;
+                position: relative;
+                overflow: hidden;
+                padding-top: env(safe-area-inset-top, 16px);
+            }
+            /* Primary bloom behind the total */
+            .mob-app-header::before {
+                content: '';
+                position: absolute;
+                top: 0; left: 50%; transform: translateX(-50%);
+                width: 100%; max-width: 480px; height: 260px;
+                background: radial-gradient(ellipse at 50% 35%,
+                    rgba(59,100,220,0.28) 0%,
+                    rgba(30,60,160,0.16) 30%,
+                    rgba(10,20,80,0.08) 55%,
+                    transparent 72%
+                );
+                pointer-events: none; z-index: 0;
+            }
+            /* Secondary purple bloom offset left */
+            .mob-app-header::after {
+                content: '';
+                position: absolute;
+                top: 40px; left: -10%;
+                width: 55%; height: 55%;
+                background: radial-gradient(ellipse, rgba(99,60,200,0.1) 0%, transparent 65%);
+                pointer-events: none; z-index: 0;
+            }
+            .mob-topbar {
+                display: flex !important;
+                align-items: center;
+                justify-content: space-between;
+                padding: 16px 20px 0;
+                position: relative; z-index: 2;
+            }
+            .mob-brand-name {
+                font-size: 14px; font-weight: 600;
+                color: rgba(255,255,255,0.92);
+                letter-spacing: 0.1px;
+            }
+            .mob-brand-loc {
+                font-size: 9px; font-weight: 400;
+                color: rgba(255,255,255,0.28);
+                margin-top: 3px; letter-spacing: 0.5px;
+            }
+            .mob-sync-chip {
+                display: flex; align-items: center; gap: 5px;
+                padding: 5px 11px 5px 8px;
+                background: rgba(255,255,255,0.06);
+                border: 1px solid transparent;
+                background-clip: padding-box;
+                border-radius: 20px;
+                box-shadow:
+                    inset 0 1px 0 rgba(255,255,255,0.28),
+                    inset 1px 0 0 rgba(255,255,255,0.12),
+                    inset 0 -1px 0 rgba(255,255,255,0.04);
+            }
+            .mob-sync-dot {
+                width: 6px; height: 6px; border-radius: 50%;
+                background: #34d399;
+                box-shadow: 0 0 7px rgba(52,211,153,0.75);
+            }
+            .mob-sync-txt {
+                font-size: 9px; font-weight: 500;
+                color: rgba(255,255,255,0.35); letter-spacing: 0.5px;
+            }
+            .mob-hero {
+                text-align: center;
+                padding: 24px 20px 20px;
+                position: relative; z-index: 2;
+            }
+            .mob-hero-label {
+                font-size: 10px; font-weight: 400;
+                color: rgba(255,255,255,0.32);
+                letter-spacing: 3px; text-transform: uppercase;
+                margin-bottom: 10px;
+            }
+            .mob-hero-total {
+                font-size: 44px; font-weight: 300;
+                color: #fff; letter-spacing: 0.9px; line-height: 1;
+            }
+            .mob-hero-cents {
+                font-size: 26px; font-weight: 300;
+                color: rgba(255,255,255,0.45); letter-spacing: 0;
+            }
+            .mob-meta-strip {
+                display: flex;
+                margin: 0 20px 20px;
+                border-radius: 12px;
+                overflow: hidden;
+                background: rgba(255,255,255,0.06);
+                border: 1px solid transparent;
+                background-clip: padding-box;
+                box-shadow:
+                    inset 0 1px 0 rgba(255,255,255,0.3),
+                    inset 1px 0 0 rgba(255,255,255,0.15),
+                    inset 0 -1px 0 rgba(255,255,255,0.05),
+                    0 4px 12px rgba(0,0,0,0.28);
+            }
+            .mob-meta-cell { flex: 1; padding: 11px 8px; text-align: center; }
+            .mob-meta-cell + .mob-meta-cell { border-left: 1px solid rgba(255,255,255,0.06); }
+            .mob-meta-lbl {
+                font-size: 8px; font-weight: 500;
+                color: rgba(255,255,255,0.25);
+                letter-spacing: 1.4px; text-transform: uppercase;
+                margin-bottom: 4px;
+            }
+            .mob-meta-val {
+                font-size: 11px; font-weight: 600;
+                color: rgba(255,255,255,0.75);
+                letter-spacing: 0.2px; line-height: 1.3;
+            }
+        }
+
+        /* ═══════════════════════════════════════
+           MOBILE CARDS — white floating cards
+        ═══════════════════════════════════════ */
+
+        /* Section header — blue for procurement, amber for CCP */
+        .mob-section-hdr {
+            display: flex; align-items: center; gap: 9px;
+            padding: 13px 16px 9px;
+            border-top: 1px solid #e8f0f6;
+            background: #fafcff;
+            margin: 0;
+        }
+        .mob-section-hdr-accent {
+            width: 3px; height: 14px; border-radius: 2px; flex-shrink: 0;
+        }
+        .mob-section-hdr-text {
+            font-size: 9px; font-weight: 600;
+            letter-spacing: 1.8px; text-transform: uppercase; flex: 1;
+        }
+        .mob-section-hdr-count {
+            font-size: 8px; font-weight: 500;
+            border-radius: 20px; padding: 2px 8px; letter-spacing: 0.4px;
+        }
+        /* Procurement = blue */
+        .mob-section-hdr.hdr-blue .mob-section-hdr-accent { background: linear-gradient(to bottom,#3b82f6,#06b6d4); }
+        .mob-section-hdr.hdr-blue .mob-section-hdr-text   { color: #3b82f6; }
+        .mob-section-hdr.hdr-blue .mob-section-hdr-count  { color: #3b82f6; background: rgba(59,130,246,0.1); }
+        /* CCP = amber */
+        .mob-section-hdr.hdr-amber .mob-section-hdr-accent { background: linear-gradient(to bottom,#ea580c,#dc2626); }
+        .mob-section-hdr.hdr-amber .mob-section-hdr-text   { color: #ea580c; }
+        .mob-section-hdr.hdr-amber .mob-section-hdr-count  { color: #ea580c; background: rgba(234,88,12,0.1); }
+
+        /* Row list wrapper — spacing between cards */
+        .mob-row-list {
+            display: flex; flex-direction: column;
+            gap: 10px;
+            padding: 8px 12px 14px;
+            background: #ffffff;
+        }
+
+        /* Service card */
+        .mob-card {
+            border-radius: 10px;
+            overflow: hidden;
+            background: #ffffff;
+            border: none;
+            transition: opacity 0.2s;
+            box-shadow:
+                inset 0 1px 0 rgba(255,255,255,0.9),
+                inset 1px 0 0 rgba(255,255,255,0.7),
+                inset 0 -1px 0 rgba(160,200,230,0.25),
+                inset -1px 0 0 rgba(160,200,230,0.15),
+                0 0 0 0.8px rgba(100,150,200,0.55),
+                0 1px 2px rgba(10,30,60,0.08),
+                0 2px 6px rgba(10,30,60,0.07),
+                0 4px 12px rgba(10,30,60,0.05);
+        }
+        .mob-card.unchecked {
+            background: #f8fafc;
+            box-shadow:
+                0 0 0 0.8px rgba(160,190,210,0.4),
+                0 1px 3px rgba(10,30,60,0.04);
+        }
+
+        .mob-card-top {
+            display: flex; align-items: center;
+            padding: 11px 14px; gap: 10px;
+            border-bottom: 1px solid #daeaf4;
+            position: relative; cursor: pointer;
+        }
+        .mob-card-top::before {
+            content: ''; position: absolute;
+            left: 0; top: 0; bottom: 0; width: 3px;
+            background: linear-gradient(to bottom, #3b82f6, #06b6d4);
+            border-radius: 10px 0 0 0;
+        }
+        .mob-card.unchecked .mob-card-top::before { background: #c0d0e0; }
+
+        .mob-card-top input[type=checkbox] {
+            width: 16px; height: 16px;
+            accent-color: #2C3E50; flex-shrink: 0; cursor: pointer;
+            margin-left: 5px;
+        }
+        .mob-card-name {
+            flex: 1; font-size: 12px; font-weight: 500;
+            color: #1e3248; letter-spacing: 0.5px;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+        .mob-card-name .mob-card-sub-label {
+            font-size: 8px; font-weight: 400; font-style: italic;
+            color: #90aabe; display: block; white-space: normal;
+        }
+        /* Amount hidden — completed at office */
+        .mob-card-subtotal { display: none; }
+
+        /* Card body — 2-col grid, no tax */
+        .mob-card-body {
+            display: grid; grid-template-columns: 1fr 1fr;
+            padding: 13px 16px 15px 20px; gap: 8px;
+            background: #f0f6fc;
+        }
+        /* Hide tax column (3rd child) */
+        .mob-card-body > .mob-field:nth-child(3) { display: none; }
+
+        .mob-field { display: flex; flex-direction: column; gap: 3px; }
+        .mob-field-lbl {
+            font-size: 8px; font-weight: 500;
+            color: #90aabe; letter-spacing: 0.9px; text-transform: uppercase;
+            margin-bottom: 1px;
+        }
+        .mob-field input[type=number],
+        .mob-field select {
+            width: 100%;
+            background: #ffffff;
+            border: 1px solid #a8c0d4;
+            border-radius: 4px;
+            padding: 5px 7px;
+            font-size: 11px; font-family: 'Montserrat', sans-serif;
+            font-weight: 400; color: #1e3248; letter-spacing: 0.4px;
+            -webkit-appearance: none; outline: none;
+            box-shadow: inset 0 1px 2px rgba(20,50,100,0.05);
+            transition: border-color 0.15s ease, box-shadow 0.15s ease;
+        }
+        .mob-field input[type=number]:focus,
+        .mob-field select:focus {
+            border-color: #6aabdf;
+            box-shadow:
+                inset 0 1px 2px rgba(20,50,100,0.05),
+                0 0 0 2.5px rgba(59,130,246,0.18),
+                0 0 8px rgba(59,130,246,0.1);
+        }
+        .mob-field-val {
+            font-size: 10px; font-weight: 400;
+            color: #a8bece; padding-top: 5px; letter-spacing: 0.4px;
+        }
+
+        /* ═══ CCP mobile card ═══ */
+        .mob-ccp-card {
+            border-radius: 10px;
+            overflow: hidden;
+            background: #ffffff;
+            border: none;
+            box-shadow:
+                inset 0 1px 0 rgba(255,255,255,0.9),
+                inset 1px 0 0 rgba(255,255,255,0.7),
+                inset 0 -1px 0 rgba(160,200,230,0.25),
+                inset -1px 0 0 rgba(160,200,230,0.15),
+                0 0 0 0.8px rgba(100,150,200,0.55),
+                0 1px 2px rgba(10,30,60,0.08),
+                0 2px 6px rgba(10,30,60,0.07),
+                0 4px 12px rgba(10,30,60,0.05);
+        }
+        .mob-ccp-top {
+            display: flex; align-items: center; gap: 10px;
+            padding: 11px 14px;
+            border-bottom: 1px solid #daeaf4;
+            position: relative;
+        }
+        .mob-ccp-top::before {
+            content: ''; position: absolute;
+            left: 0; top: 0; bottom: 0; width: 3px;
+            background: linear-gradient(to bottom, #ea580c, #dc2626);
+            border-radius: 10px 0 0 0;
+        }
+        .mob-ccp-top input[type=checkbox] {
+            width: 16px; height: 16px; accent-color: #2C3E50; margin-left: 5px;
+        }
+        .mob-ccp-label {
+            flex: 1; font-size: 12px; font-weight: 500;
+            color: #1e3248; letter-spacing: 0.5px;
+        }
+        /* CCP total hidden — completed at office */
+        .mob-ccp-total { display: none; }
+
+        .mob-ccp-body { padding: 13px 16px 15px 20px; background: #f0f6fc; }
+        .mob-ccp-dates { display: flex; align-items: center; gap: 6px; margin-bottom: 7px; }
+        .mob-ccp-dates input[type=date] {
+            flex: 1; background: #ffffff;
+            border: 1px solid #a8c0d4; border-radius: 4px;
+            padding: 5px 7px;
+            font-size: 11px; font-family: 'Montserrat', sans-serif;
+            font-weight: 400; color: #1e3248; letter-spacing: 0.3px;
+            -webkit-appearance: none; outline: none;
+            box-shadow: inset 0 1px 2px rgba(20,50,100,0.05);
+            transition: border-color 0.15s ease, box-shadow 0.15s ease;
+        }
+        .mob-ccp-dates input[type=date]:focus {
+            border-color: #6aabdf;
+            box-shadow:
+                inset 0 1px 2px rgba(20,50,100,0.05),
+                0 0 0 2.5px rgba(59,130,246,0.18),
+                0 0 8px rgba(59,130,246,0.1);
+        }
+        .mob-ccp-dates span {
+            font-size: 11px; color: #a0b8cc; flex-shrink: 0;
+        }
+        .mob-ccp-days {
+            display: inline-flex; align-items: center;
+            font-size: 10px; font-weight: 600;
+            color: #ea580c; background: rgba(234,88,12,0.1);
+            border-radius: 4px; padding: 3px 9px; letter-spacing: 0.4px;
+        }
+
+        /* ── White card wrapper — float card base ── */
+        @media screen and (max-width: 768px) {
+            .mobile-cards-wrap {
+                background: #ffffff;
+                border-radius: 22px 22px 0 0;
+                margin-top: 0;
+                position: relative;
+                box-shadow:
+                    inset 0 1.5px 0 rgba(255,255,255,1),
+                    inset 1.5px 0 0 rgba(255,255,255,0.85),
+                    0 -1px 0 rgba(160,210,255,0.4),
+                    0 -3px 14px rgba(60,120,255,0.1);
+                padding-bottom: 80px;
+            }
+        }
+
+        /* ═══════════════════════════════════════
+           MOBILE BOTTOM NAV — light gray gradient
+        ═══════════════════════════════════════ */
+        .mob-bottom-bar { display: none; }
+
+        @media screen and (max-width: 768px) {
+            .mob-bottom-bar {
+                display: flex !important;
+                position: fixed;
+                bottom: 0; left: 0; right: 0;
+                height: 66px;
+                background: linear-gradient(to bottom, #ffffff, #e8ecf0);
+                border-top: 1.5px solid #b8bfc9;
+                z-index: 9000;
+                align-items: stretch;
+                box-shadow:
+                    0 -1px 3px  rgba(0,0,0,0.22),
+                    0 -3px 6px  rgba(0,0,0,0.14),
+                    0 -6px 10px rgba(0,0,0,0.06);
+                padding-bottom: env(safe-area-inset-bottom, 0px);
+            }
+        }
+
+        .mob-bar-btn {
+            flex: 1; display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            gap: 4px; border: none; background: transparent;
+            cursor: pointer; font-family: 'Montserrat', sans-serif;
+            padding: 0; -webkit-tap-highlight-color: transparent;
+            position: relative;
+        }
+        .mob-bar-btn::before {
+            content: ''; position: absolute; top: 0;
+            width: 20px; height: 2px; border-radius: 0 0 2px 2px;
+            opacity: 0;
+        }
+        .mob-bar-btn.active::before { opacity: 1; }
+
+        .mob-bar-btn svg {
+            width: 20px; height: 20px;
+            fill: none; stroke-width: 2.2;
+            stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0;
+        }
+        .mob-bar-btn .mob-bar-label {
+            font-size: 8px; font-weight: 700;
+            letter-spacing: 0.5px; text-transform: uppercase; line-height: 1;
+        }
+
+        /* New — green */
+        .mob-bar-btn.new-btn svg   { stroke: #22c55e; opacity: 0.75; }
+        .mob-bar-btn.new-btn .mob-bar-label { color: #22c55e; opacity: 0.75; }
+        .mob-bar-btn.new-btn.active svg { opacity: 1; filter: drop-shadow(0 0 4px rgba(34,197,94,0.45)); }
+        .mob-bar-btn.new-btn.active .mob-bar-label { opacity: 1; }
+        .mob-bar-btn.new-btn.active::before { background: #22c55e; box-shadow: 0 2px 8px rgba(34,197,94,0.5); }
+
+        /* Save — yellow */
+        .mob-bar-btn.save-btn svg   { stroke: #eab308; opacity: 0.75; }
+        .mob-bar-btn.save-btn .mob-bar-label { color: #eab308; opacity: 0.75; }
+        .mob-bar-btn.save-btn.active svg { opacity: 1; filter: drop-shadow(0 0 4px rgba(234,179,8,0.45)); }
+        .mob-bar-btn.save-btn.active .mob-bar-label { opacity: 1; }
+        .mob-bar-btn.save-btn.active::before { background: #eab308; box-shadow: 0 2px 8px rgba(234,179,8,0.5); }
+
+        /* Records — red */
+        .mob-bar-btn.rec-btn svg   { stroke: #ef4444; opacity: 0.75; }
+        .mob-bar-btn.rec-btn .mob-bar-label { color: #ef4444; opacity: 0.75; }
+        .mob-bar-btn.rec-btn.active svg { opacity: 1; filter: drop-shadow(0 0 4px rgba(239,68,68,0.45)); }
+        .mob-bar-btn.rec-btn.active .mob-bar-label { opacity: 1; }
+        .mob-bar-btn.rec-btn.active::before { background: #ef4444; box-shadow: 0 2px 8px rgba(239,68,68,0.5); }
+
+        /* Print — blue */
+        .mob-bar-btn.print-btn svg   { stroke: #3b82f6; opacity: 0.75; }
+        .mob-bar-btn.print-btn .mob-bar-label { color: #3b82f6; opacity: 0.75; }
+        .mob-bar-btn.print-btn.active svg { opacity: 1; filter: drop-shadow(0 0 4px rgba(59,130,246,0.45)); }
+        .mob-bar-btn.print-btn.active .mob-bar-label { opacity: 1; }
+        .mob-bar-btn.print-btn.active::before { background: #3b82f6; box-shadow: 0 2px 8px rgba(59,130,246,0.5); }
+
+        .mob-bar-sep {
+            width: 1px; background: rgba(0,0,0,0.07);
+            align-self: stretch; margin: 18px 0;
+        }
+
+        /* ═══════════════════════════════════════
+           RECORDS SLIDE-UP DRAWER
+        ═══════════════════════════════════════ */
+        .mob-drawer-overlay {
+            display: none; position: fixed; inset: 0;
+            background: rgba(0,0,0,0.55); z-index: 9001;
+        }
+        .mob-drawer-overlay.open { display: block; }
+
+        .mob-drawer {
+            position: fixed; bottom: 0; left: 0; right: 0;
+            height: 75vh;
+            background: #0d1520;
+            z-index: 9002;
+            border-radius: 16px 16px 0 0;
+            display: flex; flex-direction: column;
+            transform: translateY(100%);
+            transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+            box-shadow: 0 -8px 40px rgba(0,0,0,0.5);
+        }
+        .mob-drawer.open { transform: translateY(0); }
+
+        .mob-drawer-handle {
+            width: 36px; height: 4px;
+            background: rgba(255,255,255,0.15);
+            border-radius: 2px;
+            margin: 10px auto 0; flex-shrink: 0;
+        }
+        .mob-drawer-title {
+            color: rgba(255,255,255,0.9);
+            font-size: 11px; font-weight: 700;
+            letter-spacing: 1.5px; text-transform: uppercase;
+            padding: 10px 16px 6px;
+            display: flex; align-items: center; justify-content: space-between;
+            flex-shrink: 0;
+        }
+        .mob-drawer-title .sync-wrap {
+            display: flex; align-items: center; gap: 6px;
+        }
+        .mob-drawer-close {
+            background: none; border: none;
+            color: rgba(255,255,255,0.35);
+            font-size: 18px; cursor: pointer; padding: 0; line-height: 1;
+        }
+        .mob-drawer-search { margin: 0 12px 8px; flex-shrink: 0; }
+        .mob-drawer-search input {
+            width: 100%;
+            background: rgba(255,255,255,0.07);
+            border: 1px solid rgba(255,255,255,0.12);
+            color: white; font-size: 12px; padding: 8px 10px;
+            border-radius: 6px;
+            font-family: 'Montserrat', sans-serif; letter-spacing: 0.5px;
+            outline: none;
+            transition: border-color 0.15s, box-shadow 0.15s;
+        }
+        .mob-drawer-search input:focus {
+            border-color: rgba(99,160,255,0.5);
+            box-shadow: 0 0 0 2px rgba(59,130,246,0.15);
+        }
+        .mob-drawer-search input::placeholder { color: rgba(255,255,255,0.25); }
+        .mob-drawer-count {
+            font-size: 9px; color: rgba(255,255,255,0.28);
+            text-align: right; padding: 0 14px 4px;
+            letter-spacing: 0.5px; flex-shrink: 0;
+        }
+        .mob-drawer-list {
+            flex: 1; overflow-y: auto; padding: 0 12px 12px;
+            -webkit-overflow-scrolling: touch;
+        }
+        .mob-drawer-footer {
+            display: flex; border-top: 1px solid rgba(255,255,255,0.08);
+            padding: 10px 12px; gap: 10px; flex-shrink: 0;
+        }
+        .mob-drawer-footer button {
+            flex: 1; background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.12);
+            color: rgba(255,255,255,0.5);
+            font-family: 'Montserrat', sans-serif;
+            font-size: 9px; font-weight: 700;
+            letter-spacing: 0.5px; text-transform: uppercase;
+            padding: 8px; border-radius: 6px; cursor: pointer;
+            transition: background 0.15s;
+        }
+        .mob-drawer-footer button:active { background: rgba(255,255,255,0.1); }
+
     </style>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -1264,6 +1902,14 @@
             ============================================================ -->
             <div class="top-grid">
 
+                <!-- Mobile rates toggle button (hidden on desktop) -->
+                <button class="rates-toggle-btn" id="ratesToggleBtn" onclick="toggleRates()">
+                    Applied Rates <span>▼</span>
+                </button>
+
+                <!-- Collapsible rates wrapper -->
+                <div class="no-print-rates-wrap" id="ratesWrap">
+
                 <!-- Column 1: Body / Frame / Mechanical Rates -->
                 <div class="no-print-rates">
                     <div class="rate-field">
@@ -1301,6 +1947,8 @@
                         </span>
                     </div>
                 </div>
+
+                </div><!-- /no-print-rates-wrap -->
 
                 <!-- Column 3: Customer & Vehicle Info -->
                 <div class="print-customer-grid">
@@ -1359,6 +2007,41 @@
             </table>
             </div><!-- /invoice-table-block -->
             <!-- /HTML 4 — SERVICE TABLE -->
+
+            <!-- ── MOBILE DARK HEADER (visible only on mobile) ── -->
+            <div class="mob-app-header no-print">
+                <div class="mob-topbar">
+                    <div>
+                        <div class="mob-brand-name">3J's Auto Body &amp; Paint</div>
+                        <div class="mob-brand-loc">Signal Hill · CA 90755</div>
+                    </div>
+                    <div class="mob-sync-chip">
+                        <div class="mob-sync-dot"></div>
+                        <span class="mob-sync-txt" id="mobSyncLabel">Synced</span>
+                    </div>
+                </div>
+                <div class="mob-hero">
+                    <div class="mob-hero-label">Invoice Total</div>
+                    <div class="mob-hero-total" id="mobHeroTotal">$0<span class="mob-hero-cents">.00</span></div>
+                </div>
+                <div class="mob-meta-strip">
+                    <div class="mob-meta-cell">
+                        <div class="mob-meta-lbl">Owner</div>
+                        <div class="mob-meta-val" id="mobMetaOwner">—</div>
+                    </div>
+                    <div class="mob-meta-cell">
+                        <div class="mob-meta-lbl">Insurance</div>
+                        <div class="mob-meta-val" id="mobMetaIns">—</div>
+                    </div>
+                    <div class="mob-meta-cell">
+                        <div class="mob-meta-lbl">RO#</div>
+                        <div class="mob-meta-val" id="mobMetaRO">—</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mobile card view — built by buildMobileCards(), shown only on mobile -->
+            <div class="mobile-cards-wrap" id="mobileCardsWrap"></div>
 
 
             <!-- ============================================================
@@ -1506,6 +2189,53 @@
     </div><!-- /WORKSHEET CARD -->
 
 </div><!-- /MAIN LAYOUT -->
+
+<!-- ============================================================
+     MOBILE BOTTOM BAR
+============================================================ -->
+<div class="mob-bottom-bar no-print">
+    <button class="mob-bar-btn new-btn" onclick="createNewForm()">
+        <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+        <span class="mob-bar-label">New</span>
+    </button>
+    <div class="mob-bar-sep"></div>
+    <button class="mob-bar-btn save-btn" onclick="saveRecord()">
+        <svg viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+        <span class="mob-bar-label">Save</span>
+    </button>
+    <div class="mob-bar-sep"></div>
+    <button class="mob-bar-btn rec-btn" onclick="openMobDrawer()">
+        <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+        <span class="mob-bar-label">Records</span>
+    </button>
+    <div class="mob-bar-sep"></div>
+    <button class="mob-bar-btn print-btn" onclick="window.print()">
+        <svg viewBox="0 0 24 24"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+        <span class="mob-bar-label">Print</span>
+    </button>
+</div>
+
+<!-- Records slide-up drawer -->
+<div class="mob-drawer-overlay no-print" id="mobDrawerOverlay" onclick="closeMobDrawer()"></div>
+<div class="mob-drawer no-print" id="mobDrawer">
+    <div class="mob-drawer-handle"></div>
+    <div class="mob-drawer-title">
+        <span>Records <span id="autoSaveStatusMob" style="display:none; color:#2ecc71; font-size:9px; font-weight:600;">&#10003; SAVED</span></span>
+        <div class="sync-wrap">
+            <span id="syncStatusMob" style="font-size:12px;">&#128993;</span>
+            <button class="mob-drawer-close" onclick="closeMobDrawer()">✕</button>
+        </div>
+    </div>
+    <div class="mob-drawer-search">
+        <input type="text" id="mobSearch" placeholder="Search RO or Name..." onkeyup="filterMobDrawer()" spellcheck="false">
+    </div>
+    <div class="mob-drawer-count" id="mobDrawerCount"></div>
+    <div class="mob-drawer-list" id="mobDrawerList"></div>
+    <div class="mob-drawer-footer">
+        <button onclick="importRecordsBackup(); closeMobDrawer();">&#8593; Import</button>
+        <button onclick="exportRecordsBackup();">&#8595; Export</button>
+    </div>
+</div>
 
 
 <!-- ============================================================
@@ -2447,6 +3177,281 @@
 
     });
 
+</script>
+
+<script>
+/* ============================================================
+   MOBILE JS — cards, bottom bar, drawer
+============================================================ */
+
+/* ── Rates section toggle ── */
+function toggleRates() {
+    var wrap = document.getElementById('ratesWrap');
+    var btn  = document.getElementById('ratesToggleBtn');
+    if (!wrap) return;
+    wrap.classList.toggle('open');
+    btn.classList.toggle('open');
+}
+
+/* ── Build mobile card view from existing table rows ── */
+function buildMobileCards() {
+    var wrap = document.getElementById('mobileCardsWrap');
+    if (!wrap) return;
+    var html = '';
+    var currentListOpen = false;
+
+    $('#worksheet-body tr').each(function() {
+        var $tr = $(this);
+        var idx = $tr.attr('data-svc-index');
+
+        // Section header
+        if ($tr.find('.section-header').length) {
+            var hdrText = $tr.find('.section-header').text();
+            if (currentListOpen) { html += '</div>'; currentListOpen = false; }
+            var isCCP = hdrText.toLowerCase().indexOf('care') !== -1 || hdrText.toLowerCase().indexOf('ccp') !== -1 || hdrText.toLowerCase().indexOf('custody') !== -1;
+            var hdrClass = isCCP ? 'hdr-amber' : 'hdr-blue';
+            html += '<div class="mob-section-hdr ' + hdrClass + '">'
+                  + '<div class="mob-section-hdr-accent"></div>'
+                  + '<span class="mob-section-hdr-text">' + hdrText + '</span>'
+                  + '</div>';
+            html += '<div class="mob-row-list">';
+            currentListOpen = true;
+            return;
+        }
+
+        // CC&P rows
+        if ($tr.find('.ccp-input').length) {
+            if (!currentListOpen) { html += '<div class="mob-row-list">'; currentListOpen = true; }
+            var selId   = $tr.find('[id$="Sel"]').attr('id');
+            var subtype = selId ? selId.replace('Sel','') : '';
+            var isSel   = $tr.find('[id$="Sel"]').is(':checked');
+            var label   = subtype === 'in' ? 'Inside CC&P' : 'Outside CC&P';
+            html += '<div class="mob-ccp-card">'
+                  + '<div class="mob-ccp-top">'
+                  + '<input type="checkbox" id="mob_' + subtype + 'Sel" ' + (isSel ? 'checked' : '') + ' onchange="$(\'#' + subtype + 'Sel\').prop(\'checked\',this.checked); calculate(); syncMobCards();">'
+                  + '<span class="mob-ccp-label">' + label + '</span>'
+                  + '<span class="mob-ccp-total" id="mob_' + subtype + 'Total">$0.00</span>'
+                  + '</div>'
+                  + '<div class="mob-ccp-body">'
+                  + '<div class="mob-ccp-dates">'
+                  + '<input type="date" id="mob_' + subtype + 'Start" value="' + ($('#' + subtype + 'Start').val() || '') + '" oninput="$(\'#' + subtype + 'Start\').val(this.value); calculate(); syncMobCards();">'
+                  + '<span>→</span>'
+                  + '<input type="date" id="mob_' + subtype + 'Stop" value="' + ($('#' + subtype + 'Stop').val() || '') + '" oninput="$(\'#' + subtype + 'Stop\').val(this.value); calculate(); syncMobCards();">'
+                  + '</div>'
+                  + '<div class="mob-ccp-days" id="mob_' + subtype + 'DaysDisplay">0 days</div>'
+                  + '</div>'
+                  + '</div>';
+            return;
+        }
+
+        if (!idx) return;
+        var s = services[parseInt(idx)];
+        if (!s) return;
+
+        if (!currentListOpen) { html += '<div class="mob-row-list">'; currentListOpen = true; }
+
+        var isMkup   = (s.type === 'markup');
+        var isPhoto  = (s.type === 'photo_misc');
+        var isChecked= $tr.find('.sel-chk').is(':checked');
+        var hrsVal   = $tr.find('.hrs').val();
+        var typeVal  = $tr.find('.type-select').val() || 'body';
+        var subVal   = $tr.find('.sub').text();
+        var taxVal   = $tr.find('.tx').text();
+        var rowId    = 'mobrow_' + idx;
+
+        var cleanName = s.name.replace(/\s*\([^)]+\)\s*$/, '');
+        var subLabel  = '';
+        var nameMatch = s.name.match(/\(([^)]+)\)$/);
+        if (nameMatch && !isMkup) subLabel = nameMatch[1];
+        if (isMkup) subLabel = 'cost plus 25% markup';
+
+        var typeField = '';
+        if (!isMkup && !isPhoto) {
+            typeField = '<div class="mob-field"><span class="mob-field-lbl">Type</span>'
+                + '<select onchange="$(\'#worksheet-body tr[data-svc-index=' + idx + '] .type-select\').val(this.value); calculate(); syncMobCards();">'
+                + '<option value="body"'  + (typeVal==='body'  ? ' selected' : '') + '>Body</option>'
+                + '<option value="frame"' + (typeVal==='frame' ? ' selected' : '') + '>Frame</option>'
+                + '<option value="mech"'  + (typeVal==='mech'  ? ' selected' : '') + '>Mech</option>'
+                + '</select></div>';
+        } else {
+            typeField = '<div class="mob-field"><span class="mob-field-lbl">Type</span><div class="mob-field-val">Misc</div></div>';
+        }
+
+        var hrsLabel = isMkup ? 'Cost ($)' : (isPhoto ? 'Count' : 'Hours');
+        var hrsStep  = isPhoto ? '1' : (isMkup ? '0.01' : '0.1');
+
+        html += '<div class="mob-card ' + (!isChecked ? 'unchecked' : '') + '" id="' + rowId + '">'
+              + '<div class="mob-card-top" onclick="toggleMobCard(' + idx + ', this)">'
+              + '<input type="checkbox" ' + (isChecked ? 'checked' : '') + ' onclick="event.stopPropagation(); toggleMobCard(' + idx + ', this.parentElement, true);">'
+              + '<span class="mob-card-name">' + cleanName
+              + (subLabel ? '<span class="mob-card-sub-label">' + subLabel + '</span>' : '')
+              + '</span>'
+              + '<span class="mob-card-subtotal" id="mob_sub_' + idx + '">' + subVal + '</span>'
+              + '</div>'
+              + '<div class="mob-card-body">'
+              + typeField
+              + '<div class="mob-field"><span class="mob-field-lbl">' + hrsLabel + '</span>'
+              + '<input type="number" step="' + hrsStep + '" value="' + hrsVal + '" '
+              + (isPhoto ? 'min="0"' : '')
+              + ' oninput="$(\'#worksheet-body tr[data-svc-index=' + idx + '] .hrs\').val(this.value); calculate(); syncMobCards();"></div>'
+              + '<div class="mob-field" style="display:none"><span class="mob-field-lbl">Tax</span><div class="mob-field-val" id="mob_tax_' + idx + '">' + taxVal + '</div></div>'
+              + '</div>'
+              + '</div>';
+    });
+
+    if (currentListOpen) html += '</div>';
+    wrap.innerHTML = html;
+}
+
+/* Toggle card checked state */
+function toggleMobCard(idx, el, fromChk) {
+    var $tr  = $('#worksheet-body tr[data-svc-index=' + idx + ']');
+    var $chk = $tr.find('.sel-chk');
+    if (fromChk) {
+        var newVal = $(el).find('input[type=checkbox]').is(':checked');
+        $chk.prop('checked', newVal);
+    } else {
+        $chk.prop('checked', !$chk.is(':checked'));
+        $(el).find('input[type=checkbox]').prop('checked', $chk.is(':checked'));
+    }
+    $('#mobrow_' + idx).toggleClass('unchecked', !$chk.is(':checked'));
+    calculate();
+    syncMobCards();
+}
+
+/* Sync subtotals/tax back to cards after calculate() */
+function syncMobCards() {
+    $('#worksheet-body tr').each(function() {
+        var $tr = $(this);
+        var idx = $tr.attr('data-svc-index');
+        if (!idx) return;
+        $('#mob_sub_' + idx).text($tr.find('.sub').text());
+        $('#mob_tax_' + idx).text($tr.find('.tx').text());
+    });
+    ['in','out'].forEach(function(st) {
+        $('#mob_' + st + 'Total').text($('#' + st + 'Total').text());
+        var days = $('#' + st + 'DaysDisplay').val() || '0';
+        $('#mob_' + st + 'DaysDisplay').text(days + ' days');
+    });
+
+    // Update mobile hero header
+    var grandTotal = $('#GrandTotal').text() || '$0.00';
+    var parts = grandTotal.replace('$','').replace(/,/g,'').split('.');
+    var dollars = '$' + Number(parts[0] || 0).toLocaleString();
+    var cents   = '.' + (parts[1] ? parts[1] : '00');
+    $('#mobHeroTotal').html(dollars + '<span class="mob-hero-cents">' + cents + '</span>');
+    $('#mobMetaOwner').text($('#Cust').val() || '—');
+    $('#mobMetaIns').text($('#InsCoTop').val() || '—');
+    $('#mobMetaRO').text($('#WONum').val() || '—');
+}
+
+/* Hook into buildTable and calculate */
+$(document).ready(function() {
+    var origBuildTable = buildTable;
+    buildTable = function() {
+        origBuildTable.apply(this, arguments);
+        buildMobileCards();
+    };
+
+    var origCalc = calculate;
+    calculate = function() {
+        origCalc.apply(this, arguments);
+        syncMobCards();
+    };
+
+    var origUpdate = updateSyncStatus;
+    updateSyncStatus = function(state) {
+        origUpdate.apply(this, arguments);
+        // Sync dot in mob header
+        var dot   = document.querySelector('.mob-sync-dot');
+        var label = document.getElementById('mobSyncLabel');
+        if (state === 'connected') {
+            if (dot)   { dot.style.background = '#34d399'; dot.style.boxShadow = '0 0 7px rgba(52,211,153,0.75)'; }
+            if (label) label.textContent = 'Synced';
+        } else if (state === 'syncing') {
+            if (dot)   { dot.style.background = '#f59e0b'; dot.style.boxShadow = '0 0 7px rgba(245,158,11,0.6)'; }
+            if (label) label.textContent = 'Syncing';
+        } else if (state === 'error') {
+            if (dot)   { dot.style.background = '#ef4444'; dot.style.boxShadow = '0 0 7px rgba(239,68,68,0.6)'; }
+            if (label) label.textContent = 'Error';
+        }
+        // Legacy drawer sync icon
+        var mobEl = document.getElementById('syncStatusMob');
+        if (!mobEl) return;
+        if      (state === 'connected') { mobEl.textContent = '☁';  mobEl.style.color = '#27ae60'; }
+        else if (state === 'syncing')   { mobEl.textContent = '⟳';  mobEl.style.color = '#f39c12'; }
+        else if (state === 'error')     { mobEl.textContent = '☁';  mobEl.style.color = '#e74c3c'; }
+        else                            { mobEl.textContent = '💻'; mobEl.style.color = '#aaa'; }
+    };
+
+    // Live meta strip updates as user types
+    $(document).on('input', '#Cust',     function() { $('#mobMetaOwner').text($(this).val() || '—'); });
+    $(document).on('input', '#InsCoTop', function() { $('#mobMetaIns').text($(this).val() || '—'); });
+    $(document).on('input', '#WONum',    function() { $('#mobMetaRO').text($(this).val() || '—'); });
+});
+
+/* ── Drawer open/close ── */
+function openMobDrawer() {
+    renderMobDrawer();
+    document.getElementById('mobDrawerOverlay').classList.add('open');
+    document.getElementById('mobDrawer').classList.add('open');
+    setTimeout(function() {
+        var s = document.getElementById('mobSearch');
+        if (s) s.focus();
+    }, 350);
+}
+function closeMobDrawer() {
+    document.getElementById('mobDrawerOverlay').classList.remove('open');
+    document.getElementById('mobDrawer').classList.remove('open');
+}
+
+/* ── Render records in drawer ── */
+function renderMobDrawer(filter) {
+    var allRecords = getRecords();
+    var search = (filter || '').toLowerCase().trim();
+    var filtered = search ? allRecords.filter(function(r) {
+        var ro   = (r.roNum  || '').toLowerCase();
+        var own  = (r.owner  || '').toLowerCase();
+        var cl   = (r.claim  || '').toLowerCase();
+        var vin  = (r.vin    || '').toLowerCase();
+        return ro.includes(search) || own.includes(search) || cl.includes(search) || vin.includes(search);
+    }) : allRecords;
+
+    document.getElementById('mobDrawerCount').textContent =
+        search ? (filtered.length + ' of ' + allRecords.length + ' records')
+               : (allRecords.length + ' record' + (allRecords.length !== 1 ? 's' : '') + ' saved');
+
+    var html = '';
+    if (filtered.length === 0) {
+        html = '<div style="color:#7f9ab0; font-size:10px; text-align:center; margin-top:16px;">'
+             + (search ? 'No matching records.' : 'No saved records.') + '</div>';
+    } else {
+        filtered.forEach(function(r) {
+            html += '<div class="history-item" style="margin-bottom:6px;" onclick="loadRecord(' + r.id + '); closeMobDrawer();">'
+                  + '<button class="delete-btn" onclick="deleteRecord(' + r.id + ', event)">✕</button>'
+                  + '<div class="record-ro">RO# ' + (r.roNum || '—') + '</div>'
+                  + '<div class="record-name">' + (r.owner || 'No Owner') + '</div>'
+                  + '<div class="record-date">' + (r.veh || '') + ' | ' + r.savedOn + '</div>'
+                  + (r.claim ? '<div class="record-date">Claim: ' + r.claim + '</div>' : '')
+                  + '</div>';
+        });
+    }
+    document.getElementById('mobDrawerList').innerHTML = html;
+}
+
+function filterMobDrawer() {
+    renderMobDrawer(document.getElementById('mobSearch').value);
+}
+
+/* Re-render drawer after save/delete if open */
+var _origRenderSidebar = renderSidebar;
+renderSidebar = function(filter) {
+    _origRenderSidebar.apply(this, arguments);
+    var drawer = document.getElementById('mobDrawer');
+    if (drawer && drawer.classList.contains('open')) {
+        renderMobDrawer(filter);
+    }
+};
 </script>
 
 <!-- ============================================================
