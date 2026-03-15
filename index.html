@@ -3475,6 +3475,10 @@ $(document).ready(function() {
         buildMobileCards();
     };
 
+    // buildTable() already fired in the main ready() block before this wrap
+    // was registered — call buildMobileCards() now to catch that missed build.
+    buildMobileCards();
+
     var origCalc = calculate;
     calculate = function() {
         origCalc.apply(this, arguments);
