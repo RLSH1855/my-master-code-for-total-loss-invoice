@@ -1072,6 +1072,16 @@
             border: 1px solid #ddd;
         }
 
+        /* Fix: rates wrap spans cols 1-2 and lays children side-by-side */
+        .no-print-rates-wrap {
+            grid-column: span 2;
+            display: flex;
+            gap: 15px;
+        }
+        .no-print-rates-wrap .no-print-rates {
+            flex: 1;
+        }
+
         .rate-field {
             display: flex;
             justify-content: space-between;
@@ -1934,7 +1944,7 @@
                 <div class="business-info">
                     3J's Auto Body &amp; Paint<br>
                     1855 E 29th Street, Signal Hill, CA 90755<br>
-                    Phone: 562-424-6744 | Email: info@3jsautobody.com
+                    Phone: 562-424-6744 | Email: <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="ed84838b82adde879e8c9899828f828994c38e8280">[email&#160;protected]</a>
                 </div>
             </div>
 
@@ -1996,7 +2006,7 @@
                     <div class="rate-field">
                         <label>CC Processing %</label>
                         <span>
-                            <input type="number" id="CCRate" value="3" step="1" style="width:40px" class="auto-clear"> %
+                            <input type="number" id="CCRate" value="0" step="1" style="width:40px" class="auto-clear"> %
                         </span>
                     </div>
                 </div>
@@ -2294,7 +2304,7 @@
 <!-- ============================================================
      JAVASCRIPT
 ============================================================ -->
-<script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 
     /* ============================================================
        JS 1 — SERVICE DATA
@@ -2670,7 +2680,7 @@
         $('#InRate').val('150.00');
         $('#OutRate').val('120.00');
         $('#PhotoRate').val('5.00');
-        $('#CCRate').val('3');
+        $('#CCRate').val('0');
 
         // Reset each table row using its data-svc-index to find original defaults
         $('#worksheet-body tr').each(function() {
@@ -2686,7 +2696,9 @@
                 $(`#${s.subtype}TaxChk`).prop('checked', true);
                 $(`#${s.subtype}DaysDisplay`).val('0');
             } else {
-                $(this).find('.hrs').val(s.hrs);
+                let rawHrs = parseFloat(s.hrs);
+                let hrsFormatted = isNaN(rawHrs) ? '0.0' : ($(this).find('.hrs').hasClass('bg-yellow') ? rawHrs.toFixed(2) : rawHrs.toFixed(1));
+                $(this).find('.hrs').val(hrsFormatted);
                 $(this).find('.sel-chk').prop('checked', s.hrs > 0);
                 $(this).find('.t-chk').prop('checked', false);
                 $(this).find('.type-select').val('body');
@@ -2871,7 +2883,7 @@
         $('#InRate').val(record.inRate       || '150.00');
         $('#OutRate').val(record.outRate     || '120.00');
         $('#PhotoRate').val(record.photoRate || '5.00');
-        $('#CCRate').val(record.ccRate       || '3');
+        $('#CCRate').val(record.ccRate       || '0');
 
         // Restore all table row states
         if (record.rows && record.rows.length) {
@@ -3697,8 +3709,8 @@ window.applyLastDecodedToVehicle = function() {
      Permanent URL — never expires, no tokens needed.
 ============================================================ -->
 <script>
-var SHEETS_URL = https://script.google.com/macros/library/d/1FxA1Hm2qxeoBGIzL1oect5Ufd4goImGo9rulzyhymwrRU6o_Qnm2FmVS/9
-    
+var SHEETS_URL = 'https://script.google.com/macros/s/AKfycbwLTdd4HtAIrFlWgOlTgFSAjG6ZShT7aEsEqc6xZANBHQOtm39kXtcvJ3EtWdkJzqUlKA/exec';
+
 /* ── Sync status icon ── */
 function updateSyncStatus(state) {
     var el = document.getElementById('syncStatus');
@@ -3791,11 +3803,4 @@ function githubSaveAllRecords(records) {
 
 /* ── Hide the GitHub setup modal gear since no token needed ── */
 document.addEventListener('DOMContentLoaded', function() {
-    var gear = document.getElementById('ghSettingsBtn');
-    if (gear) gear.style.display = 'none';
-    var overlay = document.getElementById('ghSetupOverlay');
-    if (overlay) overlay.style.display = 'none';
-});
-</script>
-</body>
-</html>
+    var 
