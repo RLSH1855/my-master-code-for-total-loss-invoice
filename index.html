@@ -746,6 +746,8 @@
 
     </style>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
 
 <!--
@@ -880,6 +882,185 @@
             color: white !important;
             border: none !important;
         }
+
+        /* ══════════════════════════════════════════
+           SIDEBAR BUTTON EFFECTS
+        ══════════════════════════════════════════ */
+
+        /* ── Ripple (mouse-position) — all action buttons ── */
+        .sidebar-actions .btn {
+            position: relative;
+            overflow: hidden;
+        }
+        .sidebar-actions .btn::after {
+            content: "";
+            position: absolute;
+            width: 0; height: 0;
+            top: var(--my, 50%);
+            left: var(--mx, 50%);
+            transform: translate(-50%, -50%);
+            background: rgba(255,255,255,0.18);
+            border-radius: 100%;
+            transition: width .4s ease, height .4s ease;
+            pointer-events: none;
+        }
+        .sidebar-actions .btn:active::after { width: 300px; height: 300px; }
+
+        /* ── Save Record — pending/success/fail animation ── */
+        .save-btn-wrapper {
+            display: block; width: 100%; height: 34px; margin-bottom: 7px;
+        }
+        #sidebarSaveBtn {
+            position: relative;
+            display: inline-block;
+            width: 100%; height: 100%;
+            background: #f0ad4e;
+            border: none; border-radius: 4px;
+            cursor: pointer;
+            transition: all .33s ease-in-out;
+            font-family: 'Montserrat', sans-serif;
+        }
+        #sidebarSaveBtn:hover { background: #ec971f; }
+        #sidebarSaveBtn, #sidebarSaveBtn:focus { outline: none; }
+        #sidebarSaveBtn.sb-pending,
+        #sidebarSaveBtn.sb-success,
+        #sidebarSaveBtn.sb-fail {
+            width: 34px; border-radius: 50%;
+            pointer-events: none; cursor: default;
+        }
+        #sidebarSaveBtn.sb-pending .sb-txt,
+        #sidebarSaveBtn.sb-success .sb-txt,
+        #sidebarSaveBtn.sb-fail   .sb-txt { opacity: 0; }
+        #sidebarSaveBtn.sb-pending::before {
+            content: '';
+            position: absolute; top: 50%; left: 50%;
+            height: 18px; width: 18px;
+            border: 3px solid rgba(255,255,255,.35);
+            border-top-color: #fff; border-radius: 50%;
+            animation: sb-fadein .33s ease, sb-spin .66s linear 0s infinite;
+        }
+        #sidebarSaveBtn.sb-success, #sidebarSaveBtn.sb-success:hover { background: #27AE60; }
+        #sidebarSaveBtn.sb-success::after {
+            content: '';
+            position: absolute; top: 50%; left: 50%;
+            height: 25%; width: 50%;
+            border: 3px solid #fff; border-top-width: 0; border-left-width: 0;
+            transform: translate(-50%,-75%) rotate(-45deg);
+            animation: sb-fadein .6s ease;
+        }
+        #sidebarSaveBtn.sb-fail, #sidebarSaveBtn.sb-fail:hover { background: #E74C3C; }
+        #sidebarSaveBtn.sb-fail::after {
+            content: '';
+            position: absolute; top: 50%; left: 50%;
+            height: 65%; width: 65%;
+            background:
+                linear-gradient(to bottom, transparent 44%, #fff 44%, #fff 56%, transparent 56%),
+                linear-gradient(to right,  transparent 44%, #fff 44%, #fff 56%, transparent 56%);
+            transform: translate(-50%,-50%) rotate(-45deg);
+            animation: sb-fadein .6s ease;
+        }
+        .sb-txt {
+            position: absolute; top: 50%; left: 50%;
+            transform: translate(-50%,-50%);
+            white-space: nowrap; font-size: 10px;
+            font-weight: 500; font-family: 'Montserrat', sans-serif;
+            letter-spacing: 0.5px; text-transform: uppercase;
+            color: #1a252f; transition: inherit;
+        }
+        @keyframes sb-fadein { 0%{opacity:0} 100%{opacity:1} }
+        @keyframes sb-spin {
+            0%   { transform: translate(-50%,-50%) rotate(0deg); }
+            100% { transform: translate(-50%,-50%) rotate(360deg); }
+        }
+
+        /* ── Print to PDF — rainbow glow on hover ── */
+        .btn-print-glow {
+            background: #2980b9 !important;
+            color: white !important;
+            border: none !important;
+            z-index: 0;
+        }
+        .btn-print-glow::before {
+            content: '';
+            background: linear-gradient(45deg,#ff0000,#ff7300,#fffb00,#48ff00,#00ffd5,#002bff,#7a00ff,#ff00c8,#ff0000);
+            position: absolute; top: -2px; left: -2px;
+            background-size: 400%; z-index: -1;
+            filter: blur(5px);
+            width: calc(100% + 4px); height: calc(100% + 4px);
+            animation: glow-spin 20s linear infinite;
+            opacity: 0; transition: opacity .3s ease-in-out;
+            border-radius: 4px;
+        }
+        .btn-print-glow::after {
+            z-index: -1; content: '';
+            position: absolute; width: 100%; height: 100%;
+            background: #2980b9; left: 0; top: 0; border-radius: 4px;
+            transition: background .2s;
+        }
+        .btn-print-glow:hover::before { opacity: 1 !important; }
+        .btn-print-glow:hover::after  { background: #3498db !important; }
+        @keyframes glow-spin {
+            0%  { background-position:0 0; }
+            50% { background-position:400% 0; }
+            100%{ background-position:0 0; }
+        }
+
+        /* ── Mouse-position ripple on sidebar action buttons ── */
+        .btn-ripple {
+            position: relative;
+            overflow: hidden;
+        }
+        .btn-ripple::after {
+            content: '';
+            position: absolute;
+            width: 80px; height: 80px;
+            background: rgba(255,255,255,0.35);
+            border-radius: 50%;
+            transform: translate(var(--rx,-50%), var(--ry,-50%)) scale(0);
+            pointer-events: none;
+            transition: transform .45s ease, opacity .45s ease;
+            opacity: 1;
+        }
+        .btn-ripple.rippling::after {
+            transform: translate(var(--rx,-50%), var(--ry,-50%)) scale(3.5);
+            opacity: 0;
+        }
+
+        /* ── Slide-confirm delete on sidebar records ── */
+        .history-item { overflow: hidden; }
+        .del-slide-btn {
+            position: absolute; top: 50%; right: 6px;
+            transform: translateY(-50%);
+            background: #c0392b; border: none; border-radius: 3px;
+            color: white; width: 52px; height: 24px;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 9px; font-weight: 700;
+            letter-spacing: 0.4px; text-transform: uppercase;
+            cursor: pointer; overflow: hidden;
+            transition: all .25s cubic-bezier(0.310,-0.105,0.430,1.400);
+        }
+        .del-slide-btn .ds-text {
+            position: absolute; left: 0; top: 0;
+            width: 72%; height: 100%;
+            display: flex; align-items: center; justify-content: center;
+            transition: all .25s cubic-bezier(0.310,-0.105,0.430,1.400);
+        }
+        .del-slide-btn .ds-text::after {
+            content: ''; position: absolute; right: 0; top: 15%;
+            width: 1px; height: 70%; background: rgba(255,255,255,0.4);
+        }
+        .del-slide-btn .ds-icon {
+            position: absolute; right: 0; top: 0;
+            width: 28%; height: 100%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 11px;
+            transition: all .25s cubic-bezier(0.310,-0.105,0.430,1.400);
+        }
+        .del-slide-btn:hover .ds-text,
+        .del-slide-btn.ds-ok .ds-text  { left: -72%; opacity: 0; }
+        .del-slide-btn:hover .ds-icon,
+        .del-slide-btn.ds-ok .ds-icon  { width: 100%; font-size: 13px; }
+        .del-slide-btn.ds-ok           { background: #27AE60; }
 
         .search-box {
             background: #ecf0f1;
@@ -1044,11 +1225,21 @@
         .ws-card {
             background: white;
             padding: 15px;
-            border: 1px solid #ccc;
+            border: 1px solid #c8d4e3;
             max-width: 1000px;
             margin: 20px auto;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 8px 32px rgba(21,67,96,0.13), 0 2px 8px rgba(0,0,0,0.06);
             position: relative;
+            overflow: hidden;
+        }
+
+        /* ── Branded gradient accent bar across the very top of the card ── */
+        .ws-card::before {
+            content: '';
+            display: block;
+            height: 5px;
+            margin: -15px -15px 14px -15px;
+            background: linear-gradient(90deg, #0f3460 0%, #1a5276 30%, #2980b9 50%, #c0640a 68%, #f39c12 100%);
         }
 
 
@@ -1098,18 +1289,21 @@
 
         .rate-field {
             display: flex;
-            justify-content: space-between;
             align-items: center;
             margin-bottom: 3px;
+            gap: 4px;
         }
 
         .rate-field label {
             font-weight: 600;
             letter-spacing: 0.9px;
+            white-space: nowrap;
+            margin-right: 4px;
+            min-width: 145px;
         }
 
         .rate-field input {
-            width: 70px;
+            width: 60px;
             text-align: right;
             border: 1px solid #ccc;
             font-family: inherit;
@@ -1286,10 +1480,10 @@
         }
 
         th {
-            background: #2C3E50 !important;
+            background: linear-gradient(135deg, #0f3460 0%, #2C3E50 100%) !important;
             color: white !important;
-            border: 1px solid #333;
-            padding: 6px;
+            border: 1px solid #1a3a55;
+            padding: 8px 6px;
             text-align: center;
             font-weight: 800;
             text-transform: uppercase;
@@ -1304,22 +1498,69 @@
         }
 
         .section-header {
-            background-color: #2C3E50 !important;
             color: white !important;
-            font-size: 11px;
+            font-size: 11.5px;
             font-weight: 800;
-            padding: 8px !important;
+            padding: 10px 8px !important;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.7px;
+        }
+        .section-header-procurement {
+            background: linear-gradient(90deg, #154360 0%, #2980b9 100%) !important;
+        }
+        .section-header-ccp {
+            background: linear-gradient(90deg, #c0640a 0%, #f39c12 100%) !important;
         }
 
         td {
-            border: 1px solid #ccc;
-            padding: 9px 4px;
+            border: 1px solid #dde4ee;
+            padding: 9px 8px;
             vertical-align: middle;
-            font-weight: 500;
-            font-size: 11px;
-            letter-spacing: 0.5px;
+            font-weight: 600;
+            font-size: 11.5px;
+            letter-spacing: 0.3px;
+        }
+
+        /* ── Zebra stripes + hover on service rows ── */
+        #worksheet-body tr.calc-row:nth-child(even) {
+            background-color: #f4f8fc;
+        }
+        #worksheet-body tr.calc-row:hover {
+            background-color: #ddeeff !important;
+            transition: background-color 0.15s ease;
+        }
+
+        /* ── Section-colored checkboxes — accent-color (native checkmark, custom fill) ── */
+        .sel-chk, .t-chk,
+        input[id$="Sel"], input[id$="TaxChk"] {
+            width: 17px;
+            height: 17px;
+            cursor: pointer;
+            vertical-align: middle;
+            accent-color: #3498db; /* default blue (procurement) */
+        }
+
+        /* CC&P rows — amber */
+        tr[data-section="ccp"] .sel-chk,
+        tr[data-section="ccp"] .t-chk,
+        tr[data-section="ccp"] input[id$="Sel"],
+        tr[data-section="ccp"] input[id$="TaxChk"] {
+            accent-color: #e67e22;
+        }
+
+        /* Section-level select-all checkbox — colored to match its banner */
+        .section-all-chk {
+            width: 15px;
+            height: 15px;
+            cursor: pointer;
+            margin-right: 6px;
+            vertical-align: middle;
+        }
+        .section-header-procurement .section-all-chk {
+            accent-color: #aed6f1; /* light blue — sits cleanly on navy gradient */
+        }
+        .section-header-ccp .section-all-chk {
+            accent-color: #fde8c8; /* light amber — sits cleanly on amber gradient */
         }
 
         /* #9: center tax checkboxes */
@@ -1327,6 +1568,255 @@
             text-align: center;
             vertical-align: middle;
         }
+
+        /* ── Professional letterhead header ── */
+        .lh-grid {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            padding-bottom: 14px;
+        }
+        .lh-left {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 4px;
+        }
+        .lh-logo {
+            max-height: 72px;
+            width: auto;
+            margin-bottom: 2px;
+        }
+        .lh-company-name {
+            font-size: 13.5px;
+            font-weight: 800;
+            color: #0f3460;
+            letter-spacing: 0.6px;
+            text-transform: uppercase;
+            line-height: 1;
+        }
+        .lh-company-details {
+            font-size: 10px;
+            font-weight: 500;
+            color: #556;
+            letter-spacing: 0.3px;
+            line-height: 1.55;
+        }
+        .lh-right {
+            text-align: right;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 4px;
+        }
+        .lh-invoice-label {
+            font-size: 24px;
+            font-weight: 800;
+            color: #0f3460;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            line-height: 1;
+        }
+        .lh-invoice-sub {
+            font-size: 8.5px;
+            font-weight: 600;
+            color: #2980b9;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+        .lh-date {
+            font-size: 10.5px;
+            font-weight: 600;
+            color: #666;
+            letter-spacing: 0.5px;
+            margin-top: 2px;
+        }
+        /* ── Personalization bar — "Prepared For" strip ── */
+        .print-id-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 14px;
+            margin-bottom: 12px;
+            background: #f4f8fc;
+            border: 1px solid #dde4ee;
+            border-left: 4px solid #2980b9;
+            border-radius: 3px;
+        }
+        .pid-left { display: flex; flex-direction: column; gap: 2px; }
+        .pid-prepared {
+            font-size: 7.5px;
+            font-weight: 700;
+            letter-spacing: 1.8px;
+            color: #2980b9;
+            text-transform: uppercase;
+        }
+        .pid-customer {
+            font-size: 15px;
+            font-weight: 800;
+            color: #0f3460;
+            letter-spacing: 0.5px;
+            min-height: 18px;
+        }
+        .pid-vehicle {
+            font-size: 10px;
+            font-weight: 600;
+            color: #556;
+            letter-spacing: 0.3px;
+            min-height: 13px;
+        }
+        .pid-right { display: flex; gap: 10px; align-items: center; }
+        /* RO badge — asphalt blue, taller */
+        .pid-badge {
+            background: #0f3460;
+            color: white;
+            padding: 10px 16px;
+            border-radius: 4px;
+            text-align: center;
+            min-width: 90px;
+        }
+        /* Claim# badge — orange, taller + wide enough for long claim numbers */
+        .pid-badge-claim {
+            background: #c0640a;
+            min-width: 200px;
+            padding: 10px 16px;
+        }
+        .pid-badge-label {
+            display: block;
+            font-size: 7px;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            opacity: 0.85;
+        }
+        /* RO badge value */
+        .pid-badge-value {
+            display: block;
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+        }
+        /* Claim# value — Montserrat 11, medium weight, fits long claim numbers */
+        .pid-badge-claim .pid-badge-value {
+            font-size: 11px;
+            font-weight: 500;
+            letter-spacing: 1px;
+            white-space: nowrap;
+        }
+        @media screen {
+            .print-id-bar {
+                opacity: 0.7; /* subtle on screen, full on print */
+            }
+        }
+
+        /* ── Summary table — screen layout ── */
+        .summary-block {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            margin-top: 16px;
+        }
+        .summary-cell-rates {
+            width: 38%;
+            vertical-align: top;
+            padding-right: 0;
+        }
+        .summary-cell-totals {
+            vertical-align: top;
+        }
+
+        /* ── Print closing — "Thank you" line before legal page ── */
+        .invoice-closing {
+            text-align: center;
+            margin-top: 18px;
+            padding: 12px 0 8px;
+            border-top: 1px solid #e0e6ef;
+        }
+        .invoice-closing .closing-line {
+            font-weight: 700;
+            font-size: 10px;
+            letter-spacing: 1.2px;
+            text-transform: uppercase;
+            color: #2C3E50;
+            margin-bottom: 3px;
+        }
+        .invoice-closing .closing-contact {
+            font-size: 9.5px;
+            color: #888;
+            letter-spacing: 0.5px;
+        }
+        @media screen {
+            .invoice-closing { display: none; }
+        }
+
+        /* ── CC&P Flatpickr range input ── */
+        .ccp-range-input {
+            padding: 4px 10px;
+            border: 1px solid #bdc3c7;
+            border-radius: 4px;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 11px;
+            font-weight: 500;
+            letter-spacing: 0.3px;
+            cursor: pointer;
+            background: #f8f9fa;
+            color: #2C3E50;
+            min-width: 190px;
+            transition: border-color 0.2s, background 0.2s;
+        }
+        .ccp-range-input:hover, .ccp-range-input.flatpickr-input.active {
+            border-color: #3498db;
+            background: #f0f7ff;
+            outline: none;
+        }
+
+        /* ── Flatpickr custom theme — Montserrat, navy header, light blue range ── */
+        .flatpickr-calendar {
+            font-family: 'Montserrat', sans-serif !important;
+            font-size: 12px !important;
+            border-radius: 8px !important;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.22) !important;
+            border: none !important;
+            animation: fp-slideDown 0.22s cubic-bezier(0.34,1.26,0.64,1);
+        }
+        @keyframes fp-slideDown {
+            from { opacity:0; transform:translateY(-8px); }
+            to   { opacity:1; transform:translateY(0); }
+        }
+        .flatpickr-months { background: #2C3E50 !important; border-radius: 8px 8px 0 0 !important; }
+        .flatpickr-month  { background: #2C3E50 !important; color: white !important; fill: white !important; }
+        .flatpickr-current-month { color: white !important; font-family: 'Montserrat', sans-serif !important; font-weight: 600 !important; }
+        .flatpickr-current-month input.cur-year { color: white !important; font-family: 'Montserrat', sans-serif !important; }
+        .flatpickr-current-month .flatpickr-monthDropdown-months { background: #2C3E50 !important; color: white !important; font-family: 'Montserrat', sans-serif !important; }
+        .flatpickr-prev-month, .flatpickr-next-month { fill: white !important; color: white !important; }
+        .flatpickr-prev-month:hover svg, .flatpickr-next-month:hover svg { fill: #85c1e9 !important; }
+        .flatpickr-weekdays { background: #f4f6f8 !important; }
+        span.flatpickr-weekday { font-family: 'Montserrat', sans-serif !important; font-weight: 700 !important; font-size: 10px !important; color: #7f8c8d !important; background: #f4f6f8 !important; }
+        /* Range connecting line — light blue */
+        .flatpickr-day.inRange {
+            background: #aed6f1 !important;
+            border-color: #aed6f1 !important;
+            box-shadow: -5px 0 0 #aed6f1, 5px 0 0 #aed6f1 !important;
+            color: #1a5276 !important;
+        }
+        /* Start and end caps — navy */
+        .flatpickr-day.startRange, .flatpickr-day.endRange {
+            background: #2C3E50 !important; border-color: #2C3E50 !important; color: white !important;
+        }
+        .flatpickr-day.startRange.inRange, .flatpickr-day.endRange.inRange { box-shadow: none !important; }
+        /* Hover — lighter blue */
+        .flatpickr-day:hover:not(.disabled):not(.flatpickr-disabled) { background: #d6eaf8 !important; color: #1a5276 !important; }
+        .flatpickr-day.today { border-color: #3498db !important; font-weight: 700 !important; }
+        .flatpickr-day.today:hover { background: #3498db !important; color: white !important; }
+        /* Blocked/disabled days — grayed out with strikethrough */
+        .flatpickr-day.disabled, .flatpickr-day.flatpickr-disabled,
+        .flatpickr-day.disabled:hover, .flatpickr-day.flatpickr-disabled:hover {
+            color: #c8d6e5 !important; background: transparent !important;
+            cursor: not-allowed !important; text-decoration: line-through !important;
+        }
+        .flatpickr-day.selected { background: #2C3E50 !important; border-color: #2C3E50 !important; color: white !important; }
 
         .ccp-input {
             width: 94px;
@@ -1347,24 +1837,68 @@
             font-size: 11px;
         }
 
-        .cost-input-container {
+        /* Dollar sign inside rate input boxes */
+        .dollar-wrap {
+            position: relative;
             display: inline-flex;
             align-items: center;
-            gap: 2px;
-            white-space: nowrap;
+        }
+        .dollar-wrap::before {
+            content: '$';
+            position: absolute;
+            left: 5px;
+            pointer-events: none;
+            font-weight: 600;
+            font-size: 11px;
+            color: #333;
+            z-index: 1;
+        }
+        .dollar-wrap input {
+            padding-left: 14px !important;
         }
 
-        .cost-input-container span {
+        /* Percent sign inside CC Processing box */
+        .pct-wrap {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+        }
+        .pct-wrap::after {
+            content: '%';
+            position: absolute;
+            right: 5px;
+            pointer-events: none;
             font-weight: 400;
+            font-size: 11px;
+            color: #555;
+            z-index: 1;
+        }
+        .pct-wrap input {
+            padding-right: 18px !important;
+            text-align: right;
+        }
+
+        /* Dollar sign inside cost inputs in service table rows */
+        .cost-input-container {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            white-space: nowrap;
+        }
+        .cost-input-container > span {
+            position: absolute;
+            left: 5px;
             pointer-events: none;
             flex-shrink: 0;
             font-size: 11px;
+            font-weight: 600;
+            z-index: 1;
         }
 
         /* #7: table inputs normal weight, taller with padding */
         .cost-input-container input {
-            width: 52px;
-            padding: 5px 4px;
+            width: 68px;
+            padding: 5px 4px 5px 14px;
             text-align: right;
             border: 1px solid #ddd;
             font-weight: 400;
@@ -1373,19 +1907,20 @@
 
         .type-select {
             font-size: 10px;
-            padding: 2px;
+            padding: 2px 4px;
             border: 1px solid #ddd;
             width: 100%;
+            min-width: 75px;
             text-align: center;
             font-family: 'Montserrat', sans-serif;
             font-weight: 400;
             letter-spacing: 0.5px;
         }
 
-        /* #8: subtotal and tax dollar values semi-bold */
+        /* #8: subtotal and tax dollar values — heavier than service names */
         .val-out {
             text-align: right;
-            font-weight: 600;
+            font-weight: 700;
             letter-spacing: 0.5px;
         }
 
@@ -1395,24 +1930,29 @@
            #9: grand total row bold with 0.5px letter spacing
         ============================================================ */
         .bg-black-bar {
-            background: black !important;
+            background: linear-gradient(90deg, #0f3460 0%, #2C3E50 100%) !important;
             color: white !important;
             font-weight: 800;
             letter-spacing: 0.5px;
-            padding: 6px;
+            padding: 7px 8px;
             text-transform: uppercase;
         }
 
-        /* #9: grand total row — bold, 0.5px spacing */
+        /* Grand total row — amber gradient so it commands the eye */
+        .grand-total-row {
+            background: linear-gradient(90deg, #c0640a 0%, #f39c12 100%) !important;
+        }
         .grand-total-row td {
             font-weight: 800 !important;
-            letter-spacing: 0.5px !important;
-            font-size: 1.2em;
+            letter-spacing: 0.8px !important;
+            font-size: 1.25em !important;
+            color: white !important;
+            padding: 10px 8px !important;
         }
 
-        /* #9: itemized dollar amounts semi-bold */
+        /* #9: itemized dollar amounts — match val-out weight */
         .itemized-amount {
-            font-weight: 600;
+            font-weight: 700;
             text-align: right;
         }
 
@@ -1422,44 +1962,99 @@
         }
 
         .bg-yellow {
-            background: #ffffcc !important;
+            background: #a8e6d9 !important;
+            color: #1a1a1a !important;
         }
 
         /* ============================================================
            CSS 10 — LEGAL & SIGNATURES
         ============================================================ */
+
+        /* Wrapper — no gray border */
         .legal-acknowledgment {
             font-size: 10px;
-            color: #444;
+            color: #333;
             margin-top: 20px;
-            padding: 12px;
-            border: 1px solid #ccc;
             line-height: 1.5;
             letter-spacing: 0.09px;
+            /* border removed intentionally */
         }
 
-        .legal-acknowledgment p {
-            line-height: 1.5;
-            letter-spacing: 0.09px;
-            margin-bottom: 7px;
+        /* Header: logo + full-bleed gradient rule matching top of invoice */
+        .disclaimer-header-bar {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding-bottom: 12px;
+            margin-bottom: 0;
+        }
+        /* Disclaimer gradient bars — real divs, same gradient as page 1 top bar */
+        .disclaimer-gradient-bar,
+        .disclaimer-footer-line {
+            height: 5px;
+            background: linear-gradient(90deg, #0f3460 0%, #1a5276 30%, #2980b9 50%, #c0640a 68%, #f39c12 100%);
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+        .disclaimer-gradient-bar {
+            margin-bottom: 14px;
         }
 
+        .disclaimer-logo {
+            height: 52px;
+            width: auto;
+            flex-shrink: 0;
+        }
+
+        /* Title */
         .disclaimer-title {
             font-weight: 800;
             font-size: 13px;
             text-align: center;
             display: block;
-            margin-bottom: 18px;
-            letter-spacing: 0.5px;
+            margin-bottom: 14px;
+            letter-spacing: 0.3px;
             line-height: 1.3;
             color: #000;
+        }
+
+        /* Body paragraphs */
+        .disclaimer-body p {
+            line-height: 1.5;
+            letter-spacing: 0.05px;
+            margin-bottom: 8px;
+            font-size: 10px;
+        }
+
+        /* 2-column bullet list (Transfer of Custody) */
+        .disclaimer-bullets {
+            display: flex;
+            gap: 20px;
+            margin: 2px 0 8px 14px;
+        }
+
+        .disclaimer-bullets-col {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+            font-size: 10px;
+            line-height: 1.5;
+        }
+
+        /* Acknowledgment line */
+        .disclaimer-ack {
+            margin-top: 14px;
+            margin-bottom: 2px;
+            font-size: 10px;
+            letter-spacing: 0.05px;
         }
 
         /* ── Signature table ── */
         .sig-table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 32px;
+            margin-top: 14px;
             table-layout: fixed;
         }
 
@@ -1469,27 +2064,33 @@
 
         .sig-table td {
             border: none !important;
-            padding: 10px 12px 0 0 !important;
+            padding: 14px 16px 0 0 !important;
             vertical-align: bottom;
         }
 
         .sig-cell-date {
-            width: 100px;
+            width: 110px;
         }
 
         .sig-lbl {
             font-size: 9px;
             font-weight: 800;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.6px;
+            text-transform: uppercase;
             white-space: nowrap;
-            margin-bottom: 3px;
-            color: #333;
+            margin-bottom: 5px;
+            color: #111;
         }
 
         .sig-ln {
-            border-bottom: 1px solid #555;
-            min-height: 18px;
+            border-bottom: 1.5px solid #111;
+            min-height: 22px;
             width: 100%;
+        }
+
+        /* Footer bar margin on screen only */
+        .disclaimer-footer-line {
+            margin: 28px -15px 0 -15px;
         }
 
         .auto-fill-val {
@@ -1554,20 +2155,22 @@
                 text-align: center;
             }
 
-            .section-header, th, .bg-black-bar {
+            .section-header, .section-header-procurement, .section-header-ccp,
+            th, .bg-black-bar, .grand-total-row, .ws-card::before,
+            .lh-invoice-label, .lh-company-name,
+            .disclaimer-gradient-bar, .disclaimer-footer-line {
                 -webkit-print-color-adjust: exact;
                 print-color-adjust: exact;
             }
+            /* Show the thank-you closing on print */
+            .invoice-closing { display: block !important; }
 
-            /* Center header text when printing */
-            .ws-card h6,
-            .business-info,
-            #currentDate {
-                text-align: center !important;
-            }
+            /* Letterhead stays two-column on print — no centering override */
+            .lh-grid { display: flex !important; }
+            .lh-right { text-align: right !important; }
 
             /* Remove inner cell borders, keep outer table border only */
-            table {
+            table:not(.summary-block) {
                 border-collapse: collapse;
                 border: 1px solid #ccc;
             }
@@ -1579,6 +2182,16 @@
 
             tr:last-child td {
                 border-bottom: none !important;
+            }
+
+            /* Signature table — no box, no borders, ever */
+            .sig-table,
+            .sig-table tr,
+            .sig-table td {
+                border: none !important;
+                border-bottom: none !important;
+                box-shadow: none !important;
+                background: transparent !important;
             }
 
             /* Section header rows — NEVER orphaned from the rows that follow.
@@ -1608,12 +2221,14 @@
             }
 
             .invoice-header-block { order: 1; }
-            .top-grid             { order: 2; }
-            .print-notes-area     { order: 3; }
+            .print-id-bar         { order: 2; }
+            .top-grid             { order: 3; }
             .table-summary-unit   { order: 4; display: flex; flex-direction: column; }
             .invoice-table-block  { order: 1; }
             .summary-block        { order: 2; }
-            .legal-page           { order: 6; }
+            .print-notes-area     { order: 5; }
+            .invoice-closing      { order: 6; }
+            .legal-page           { order: 7; }
 
             /* Hide the original notes block in its normal position */
             .notes-block {
@@ -1651,18 +2266,22 @@
 
             /* Montserrat forced globally via * selector above */
 
-            /* Tighten legal text for print */
+            /* Disclaimer page — print rules */
             .legal-acknowledgment {
-                font-size: 9px !important;
-                line-height: 1.45 !important;
-                padding: 8px !important;
-                border: none !important;
                 margin-top: 0 !important;
+                font-size: 9px !important;
+                line-height: 1.4 !important;
             }
 
-            .legal-acknowledgment p {
-                margin-bottom: 5px !important;
-                font-size: 9px !important;
+            .disclaimer-header-bar {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+                margin-bottom: 12px !important;
+                padding-bottom: 8px !important;
+            }
+
+            .disclaimer-logo {
+                height: 42px !important;
             }
 
             .disclaimer-title {
@@ -1670,22 +2289,51 @@
                 margin-bottom: 10px !important;
             }
 
-            /* Signature table — print specific tightening */
+            .disclaimer-body p {
+                font-size: 9px !important;
+                margin-bottom: 5px !important;
+            }
+
+            .disclaimer-bullets {
+                margin: 2px 0 5px 10px !important;
+            }
+
+            .disclaimer-bullets-col {
+                font-size: 9px !important;
+                gap: 2px !important;
+            }
+
+            .disclaimer-ack {
+                font-size: 9px !important;
+                margin-top: 10px !important;
+            }
+
+            /* Signature table — strong professional lines */
             .sig-table {
-                margin-top: 20px !important;
+                margin-top: 10px !important;
             }
 
             .sig-table td {
-                padding: 8px 10px 0 0 !important;
+                padding: 10px 14px 0 0 !important;
             }
 
             .sig-lbl {
                 font-size: 8px !important;
-                margin-bottom: 2px !important;
+                margin-bottom: 4px !important;
             }
 
             .sig-ln {
-                min-height: 14px !important;
+                min-height: 18px !important;
+                border-bottom: 1.5px solid #000 !important;
+            }
+
+            .disclaimer-footer-line {
+                margin: 20px 0 0 0 !important;
+                padding: 0 !important;
+            }
+            .disclaimer-gradient-bar {
+                margin-bottom: 14px !important;
+                padding: 0 !important;
             }
 
             .auto-fill-val {
@@ -1704,12 +2352,38 @@
                 page-break-inside: auto;
             }
 
-            /* Summary box always glued to last service row — never orphaned */
+            /* Summary table — Chrome natively keeps tr together */
             .summary-block {
-                break-inside: avoid;
-                break-before: avoid;
-                page-break-inside: avoid;
-                page-break-before: avoid;
+                width: 100% !important;
+                border: none !important;
+                border-collapse: separate !important;
+                border-spacing: 0 !important;
+                margin-top: 8px !important;
+                margin-bottom: 4px !important;
+                break-inside: avoid !important;
+                page-break-inside: avoid !important;
+                break-before: avoid !important;
+                page-break-before: avoid !important;
+            }
+            .summary-row {
+                break-inside: avoid !important;
+                page-break-inside: avoid !important;
+            }
+            .summary-cell-rates {
+                width: 38% !important;
+                vertical-align: top !important;
+                padding-right: 8px !important;
+            }
+            .summary-cell-totals {
+                vertical-align: top !important;
+            }
+            /* Box-shadow border on summary cells — prints reliably unlike td border */
+            .summary-cell-rates,
+            .summary-cell-totals {
+                border: none !important;
+                box-shadow: inset 0 0 0 1px #343a40 !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
             }
 
             /* Notes block stays together */
@@ -1726,23 +2400,17 @@
             }
             #vinPopup, #vinOverlay { display: none !important; }
 
-            /* Hide date picker chrome on CCP rows — show values only */
-            .ccp-input {
-                -webkit-appearance: none;
-                appearance: none;
+            /* CC&P range input — show as plain text on print */
+            .ccp-range-input {
                 border: none !important;
                 background: transparent !important;
-                font-family: 'Montserrat', sans-serif;
+                padding: 0 !important;
+                min-width: unset !important;
+                font-weight: 700;
                 font-size: 11px;
-                letter-spacing: 0.5px;
-                width: auto;
-                padding: 0 2px;
+                cursor: default !important;
             }
-
-            /* Hide the calendar icon on date inputs */
-            .ccp-input::-webkit-calendar-picker-indicator {
-                display: none !important;
-            }
+            .ccp-input { display: none !important; }
 
             .cost-input-container {
                 display: inline-flex;
@@ -1751,7 +2419,7 @@
             }
 
             .cost-input-container input {
-                width: 46px;
+                width: 58px;
                 padding: 2px 4px;
                 text-align: right;
             }
@@ -1780,20 +2448,10 @@
                Screen layout is completely unchanged.
             ────────────────────────────────────────────────────────── */
 
-            /* Tighten logo area */
-            .logo-container {
-                margin-bottom: 6px !important;
-            }
-
-            .business-logo {
-                max-height: 72px !important;
-                margin-bottom: 2px !important;
-            }
-
-            .business-info {
-                font-size: 11px !important;
-                line-height: 1.2 !important;
-            }
+            /* Tighten letterhead for print */
+            .lh-grid { padding-bottom: 10px !important; }
+            .lh-logo { max-height: 62px !important; }
+            .lh-invoice-label { font-size: 20px !important; }
 
             /* Tighten invoice title and date */
             .ws-card h6 {
@@ -1818,9 +2476,9 @@
                 margin-bottom: 1px !important;
             }
 
-            /* Notes area — roomy gap above AND below */
+            /* Notes area — clear gap above summary box */
             .print-notes-area {
-                margin-top: 0px !important;
+                margin-top: 16px !important;
                 margin-bottom: 18px !important;
             }
 
@@ -1835,8 +2493,10 @@
 
             /* Tight row heights — professional invoice spacing */
             td {
-                padding: 4px 5px !important;
+                padding: 4px 6px !important;
                 font-size: 9.5pt !important;
+                font-weight: 600 !important;
+                letter-spacing: 0.2pt !important;
                 line-height: 1.25 !important;
             }
 
@@ -1852,9 +2512,31 @@
                 font-size: 9pt !important;
             }
 
+            /* Grand total — keep amber vivid on print */
+            .grand-total-row td {
+                font-size: 1.15em !important;
+                padding: 8px 6px !important;
+            }
+
             /* Invoice header block — tight below so customer box sits close */
             .invoice-header-block {
                 margin-bottom: 4px !important;
+            }
+
+            /* Small-claim mode: disclaimer allowed to flow onto same page as invoice */
+            .legal-page.legal-page-auto-break {
+                page-break-before: auto !important;
+                break-before: auto !important;
+            }
+
+            /* Summary compact sizing */
+            .summary-block .p-2 {
+                padding: 4px 6px !important;
+                font-size: 8.5pt !important;
+            }
+            .summary-block .p-2 > div {
+                font-size: 8.5pt !important;
+                line-height: 1.4 !important;
             }
         }
 
@@ -1866,10 +2548,10 @@
             }
         }
 
-        /* Page setup — US Letter, professional margins, dynamic page count */
+        /* Page setup — US Letter, margins match Chrome default so print dialog setting doesn't matter */
         @page {
             size: letter portrait;
-            margin: 0.70in 0.65in 0.80in 0.65in; /* top right bottom left */
+            margin: 0.4in 0.4in 0.4in 0.4in;
             @bottom-right {
                 content: "Page " counter(page) " of " counter(pages);
                 font-family: 'Montserrat', sans-serif;
@@ -1922,11 +2604,15 @@
 
             <h6>ACTIONS</h6>
             <div class="sidebar-actions mb-4">
-                <button class="btn btn-sm btn-success"           onclick="createNewForm(); this.blur();">+ Create New Form</button>
-                <button class="btn btn-sm btn-warning text-dark" onclick="saveRecord(); this.blur();">Save Record</button>
-                <button class="btn btn-sm btn-wipe"              onclick="clearForm(); this.blur();">Wipe Form Data</button>
-                <button class="btn btn-sm btn-primary"           onclick="window.print(); this.blur();">Print to PDF</button>
-                <button class="btn btn-sm btn-secondary"         onclick="window.print(); this.blur();">Local Printer</button>
+                <button class="btn btn-sm btn-success btn-ripple" onclick="createNewForm(); this.blur();">+ Create New Form</button>
+                <div class="save-btn-wrapper">
+                    <button id="sidebarSaveBtn" onclick="animateSaveBtn()">
+                        <span class="sb-txt">Save Record</span>
+                    </button>
+                </div>
+                <button class="btn btn-sm btn-wipe btn-ripple"       onclick="clearForm(); this.blur();">Wipe Form Data</button>
+                <button class="btn btn-sm btn-print-glow btn-ripple" onclick="window.print(); this.blur();">🖨&nbsp; Print to PDF</button>
+                <button class="btn btn-sm btn-secondary btn-ripple"  onclick="window.print(); this.blur();">Local Printer</button>
             </div>
 
             <h6 style="display:flex; align-items:center; justify-content:space-between;">
@@ -1985,20 +2671,51 @@
                  HTML 2 — INVOICE HEADER
             ============================================================ -->
             <div class="invoice-header-block">
-            <div class="logo-container">
-                <img src="https://static.wixstatic.com/media/b95bd9_fc4d86d4c40043f5b23fa60f23bdf077~mv2.png"
-                     alt="3J's Auto Body & Paint" class="business-logo">
-                <div class="business-info">
-                    3J's Auto Body &amp; Paint<br>
-                    1855 E 29th Street, Signal Hill, CA 90755<br>
-                    Phone: 562-424-6744 | Email: <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="ed84838b82adde879e8c9899828f828994c38e8280">[email&#160;protected]</a>
-                </div>
-            </div>
 
-            <h6 class="text-center fw-bold mb-1" style="letter-spacing:0.5px;">TOTAL LOSS INVOICE</h6>
-            <div class="text-end small mb-2" id="currentDate" style="letter-spacing:0.5px;"></div>
+                <!-- Two-column professional letterhead -->
+                <div class="lh-grid">
+
+                    <!-- LEFT: Brand identity -->
+                    <div class="lh-left">
+                        <img src="https://static.wixstatic.com/media/b95bd9_fc4d86d4c40043f5b23fa60f23bdf077~mv2.png"
+                             alt="3J's Auto Body & Paint" class="lh-logo">
+                        <div class="lh-company-name">3J's Auto Body &amp; Paint</div>
+                        <div class="lh-company-details">
+                            1855 E 29th Street, Signal Hill, CA 90755<br>
+                            562-424-6744 &nbsp;·&nbsp; info@3jsautobody.com
+                        </div>
+                    </div>
+
+                    <!-- RIGHT: Document identity -->
+                    <div class="lh-right">
+                        <div class="lh-invoice-label">TOTAL LOSS INVOICE</div>
+                        <div class="lh-invoice-sub">VEHICLE SERVICES &amp; STORAGE BILLING</div>
+                        <div class="lh-date" id="currentDate"></div>
+                    </div>
+
+                </div>
+
             </div><!-- /invoice-header-block -->
             <!-- /HTML 2 — INVOICE HEADER -->
+
+            <!-- Personalization bar — updates live, prints prominently -->
+            <div class="print-id-bar">
+                <div class="pid-left">
+                    <div class="pid-prepared">Prepared For</div>
+                    <div class="pid-customer" id="pidCustomer">—</div>
+                    <div class="pid-vehicle" id="pidVehicle">—</div>
+                </div>
+                <div class="pid-right">
+                    <div class="pid-badge">
+                        <span class="pid-badge-label">Repair Order</span>
+                        <span class="pid-badge-value" id="pidRO">—</span>
+                    </div>
+                    <div class="pid-badge pid-badge-claim">
+                        <span class="pid-badge-label">Claim #</span>
+                        <span class="pid-badge-value" id="pidClaim">—</span>
+                    </div>
+                </div>
+            </div>
 
             <!-- Print-only notes area — shown between header and table on print -->
             <div class="print-notes-area" style="display:none;">
@@ -2024,15 +2741,15 @@
                 <div class="no-print-rates">
                     <div class="rate-field">
                         <label>Body Rate</label>
-                        <span>$ <input type="number" id="BodyRate" value="90.00" min="0" step="0.01" class="auto-clear"></span>
+                        <span class="dollar-wrap"><input type="number" id="BodyRate" value="90.00" min="0" step="0.01" class="auto-clear"></span>
                     </div>
                     <div class="rate-field">
                         <label>Frame Rate</label>
-                        <span>$ <input type="number" id="FrameRate" value="90.00" min="0" step="0.01" class="auto-clear"></span>
+                        <span class="dollar-wrap"><input type="number" id="FrameRate" value="90.00" min="0" step="0.01" class="auto-clear"></span>
                     </div>
                     <div class="rate-field">
                         <label>Mechanical Rate</label>
-                        <span>$ <input type="number" id="MechRate" value="120.00" min="0" step="0.01" class="auto-clear"></span>
+                        <span class="dollar-wrap"><input type="number" id="MechRate" value="120.00" min="0" step="0.01" class="auto-clear"></span>
                     </div>
                 </div>
 
@@ -2040,20 +2757,20 @@
                 <div class="no-print-rates">
                     <div class="rate-field">
                         <label>Inside CC&amp;P Rate</label>
-                        <span>$ <input type="number" id="InRate" value="150.00" min="0" step="0.01" class="auto-clear"></span>
+                        <span class="dollar-wrap"><input type="number" id="InRate" value="150.00" min="0" step="0.01" class="auto-clear"></span>
                     </div>
                     <div class="rate-field">
                         <label>Outside CC&amp;P Rate</label>
-                        <span>$ <input type="number" id="OutRate" value="120.00" min="0" step="0.01" class="auto-clear"></span>
+                        <span class="dollar-wrap"><input type="number" id="OutRate" value="120.00" min="0" step="0.01" class="auto-clear"></span>
                     </div>
                     <div class="rate-field">
                         <label>Photo Fee (per pic)</label>
-                        <span>$ <input type="number" id="PhotoRate" value="5.00" min="0" step="0.01" class="auto-clear"></span>
+                        <span class="dollar-wrap"><input type="number" id="PhotoRate" value="5.00" min="0" step="0.01" class="auto-clear"></span>
                     </div>
                     <div class="rate-field">
-                        <label>CC Processing %</label>
-                        <span>
-                            <input type="number" id="CCRate" value="0" min="0" max="100" step="1" style="width:40px" class="auto-clear"> %
+                        <label>CC Processing</label>
+                        <span class="pct-wrap">
+                            <input type="number" id="CCRate" value="0" min="0" max="100" step="1" style="width:60px" class="auto-clear">
                         </span>
                     </div>
                 </div>
@@ -2064,7 +2781,7 @@
                 <div class="print-customer-grid">
                     <div class="customer-field">
                         <label>Repair Order #</label>
-                        <input type="text" id="WONum" placeholder="Ex: 12345" spellcheck="false" class="enter-blur">
+                        <input type="text" id="WONum" placeholder="Ex: 12345" spellcheck="false" class="enter-blur" oninput="syncFields()">
                     </div>
                     <div class="customer-field">
                         <label>Vehicle Owner</label>
@@ -2080,16 +2797,12 @@
                     </div>
                     <div class="customer-field">
                         <label>Vehicle</label>
-                        <input type="text" id="Veh" class="proper-case enter-blur">
+                        <input type="text" id="Veh" class="proper-case enter-blur" oninput="syncFields()">
                     </div>
                     <div class="customer-field vin-wrap">
                         <label>VIN #</label>
                         <input type="text" id="VIN" maxlength="17" style="text-transform:uppercase;" class="enter-blur vin-input" placeholder="17 digits">
                         <div class="vin-icon" id="VinIcon"></div>
-                    </div>
-                    <div class="customer-field">
-                        <label>Tax Rate</label>
-                        <span style="font-weight:600; letter-spacing:0.5px;">10.5%</span>
                     </div>
                 </div>
 
@@ -2104,7 +2817,9 @@
             <table>
                 <thead>
                     <tr>
-                        <th style="width:30px" class="no-print">Sel</th>
+                        <th style="width:30px" class="no-print" title="Select / Deselect All">
+                            <input type="checkbox" id="selectAllChk" checked title="Select / Deselect All Rows" style="width:17px;height:17px;cursor:pointer;">
+                        </th>
                         <th>Name</th>
                         <th style="width:90px">Type</th>
                         <th style="width:140px; white-space:nowrap;">Time / Cost / Days</th>
@@ -2157,63 +2872,70 @@
             <!-- ============================================================
                  HTML 5 — SUMMARY & TOTALS
             ============================================================ -->
-            <div class="summary-block mt-3 d-flex gap-3 align-items-stretch">
+            <!-- Summary as a real HTML table — Chrome respects break-inside on tr -->
+            <table class="summary-block" cellspacing="0" cellpadding="0">
+                <tbody>
+                <tr class="summary-row">
 
-                <!-- Applied Rates Reference Box -->
-                <div class="p-2 border border-dark" style="min-width:220px;">
-                    <div class="bg-black-bar mb-2">APPLIED RATES</div>
-                    <div style="font-size:10px; line-height:1.6; letter-spacing:0.5px;">
-                        <div class="d-flex justify-content-between"><span>Body Rate:</span>       <span class="itemized-amount" id="refBody">$0.00</span></div>
-                        <div class="d-flex justify-content-between"><span>Frame Rate:</span>      <span class="itemized-amount" id="refFrame">$0.00</span></div>
-                        <div class="d-flex justify-content-between"><span>Mechanical Rate:</span> <span class="itemized-amount" id="refMech">$0.00</span></div>
-                        <div class="d-flex justify-content-between"><span>Inside CC&amp;P:</span>     <span class="itemized-amount" id="refIn">$0.00</span></div>
-                        <div class="d-flex justify-content-between"><span>Outside CC&amp;P:</span>    <span class="itemized-amount" id="refOut">$0.00</span></div>
-                        <div class="d-flex justify-content-between"><span>Photo Fee (ea):</span>  <span class="itemized-amount" id="refPhoto">$0.00</span></div>
-                        <div class="d-flex justify-content-between"><span>CC Processing:</span>   <span class="itemized-amount" id="refCC">3%</span></div>
-                    </div>
-                </div>
+                    <!-- Applied Rates Reference Box -->
+                    <td class="summary-cell-rates p-2 border border-dark">
+                        <div class="bg-black-bar mb-2">APPLIED RATES</div>
+                        <div style="font-size:10px; line-height:1.6; letter-spacing:0.5px;">
+                            <div class="d-flex justify-content-between"><span>Body Rate:</span>       <span class="itemized-amount" id="refBody">$0.00</span></div>
+                            <div class="d-flex justify-content-between"><span>Frame Rate:</span>      <span class="itemized-amount" id="refFrame">$0.00</span></div>
+                            <div class="d-flex justify-content-between"><span>Mechanical Rate:</span> <span class="itemized-amount" id="refMech">$0.00</span></div>
+                            <div class="d-flex justify-content-between"><span>Inside CC&amp;P:</span>     <span class="itemized-amount" id="refIn">$0.00</span></div>
+                            <div class="d-flex justify-content-between"><span>Outside CC&amp;P:</span>    <span class="itemized-amount" id="refOut">$0.00</span></div>
+                            <div class="d-flex justify-content-between"><span>Photo Fee (ea):</span>  <span class="itemized-amount" id="refPhoto">$0.00</span></div>
+                            <div class="d-flex justify-content-between"><span>CC Processing:</span>   <span class="itemized-amount" id="refCC">3%</span></div>
+                            <div class="d-flex justify-content-between" style="border-top:1px solid #ccc; margin-top:4px; padding-top:4px;"><span>Sales Tax Rate:</span> <span class="itemized-amount">10.5%</span></div>
+                        </div>
+                    </td>
 
-                <!-- Itemized Totals Box -->
-                <div class="p-2 border border-dark flex-grow-1">
-                    <div class="bg-black-bar mb-2">ITEMIZED TOTALS</div>
-                    <table class="table table-borderless table-sm mb-0">
-                        <tr>
-                            <td style="letter-spacing:0.5px;">Itemized Additional Misc. Charges</td>
-                            <td id="MiscTotal" class="itemized-amount">$0.00</td>
-                        </tr>
-                        <tr>
-                            <td style="letter-spacing:0.5px;">Total Misc. Markup Amount (25%)</td>
-                            <td id="MarkupTotalAmount" class="itemized-amount" style="color:#666;">$0.00</td>
-                        </tr>
-                        <tr>
-                            <td style="letter-spacing:0.5px;">Itemized Labor Time Totals</td>
-                            <td id="LaborTotal" class="itemized-amount">$0.00</td>
-                        </tr>
-                        <tr>
-                            <td style="letter-spacing:0.5px;">Care, Custody and Protection Total Days</td>
-                            <td id="TotalCCDays" class="itemized-amount">0 Days</td>
-                        </tr>
-                        <tr>
-                            <td style="letter-spacing:0.5px;">Credit Card Processing Fee</td>
-                            <td id="CCFee" class="itemized-amount">$0.00</td>
-                        </tr>
-                        <tr style="border-top:1px solid #000;">
-                            <td style="letter-spacing:0.5px;"><strong>Total Amount Due</strong></td>
-                            <td id="GrandSub" class="itemized-amount">$0.00</td>
-                        </tr>
-                        <tr>
-                            <td style="letter-spacing:0.5px;"><strong>Total Tax Due</strong></td>
-                            <td id="GrandTax" class="itemized-amount">$0.00</td>
-                        </tr>
-                        <!-- #9: grand total row bold, 0.5px letter spacing -->
-                        <tr class="bg-black-bar grand-total-row">
-                            <td>TOTAL AMOUNT WITH TAX DUE</td>
-                            <td id="GrandTotal" class="text-end pe-2">$0.00</td>
-                        </tr>
-                    </table>
-                </div>
+                    <td style="width:8px;"></td>
 
-            </div><!-- /HTML 5 — SUMMARY & TOTALS -->
+                    <!-- Itemized Totals Box -->
+                    <td class="summary-cell-totals p-2 border border-dark">
+                        <div class="bg-black-bar mb-2">ITEMIZED TOTALS</div>
+                        <table class="table table-borderless table-sm mb-0">
+                            <tr>
+                                <td style="letter-spacing:0.5px;">Itemized Additional Misc. Charges</td>
+                                <td id="MiscTotal" class="itemized-amount">$0.00</td>
+                            </tr>
+                            <tr>
+                                <td style="letter-spacing:0.5px;">Total Misc. Markup Amount (25%)</td>
+                                <td id="MarkupTotalAmount" class="itemized-amount" style="color:#666;">$0.00</td>
+                            </tr>
+                            <tr>
+                                <td style="letter-spacing:0.5px;">Itemized Labor Time Totals</td>
+                                <td id="LaborTotal" class="itemized-amount">$0.00</td>
+                            </tr>
+                            <tr>
+                                <td style="letter-spacing:0.5px;">Care, Custody and Protection Total Days</td>
+                                <td id="TotalCCDays" class="itemized-amount">0 Days</td>
+                            </tr>
+                            <tr>
+                                <td style="letter-spacing:0.5px;">Credit Card Processing Fee</td>
+                                <td id="CCFee" class="itemized-amount">$0.00</td>
+                            </tr>
+                            <tr style="border-top:1px solid #000;">
+                                <td style="letter-spacing:0.5px;"><strong>Total Amount Due</strong></td>
+                                <td id="GrandSub" class="itemized-amount">$0.00</td>
+                            </tr>
+                            <tr>
+                                <td style="letter-spacing:0.5px;"><strong>Total Tax Due</strong></td>
+                                <td id="GrandTax" class="itemized-amount">$0.00</td>
+                            </tr>
+                            <tr class="bg-black-bar grand-total-row">
+                                <td>TOTAL AMOUNT WITH TAX DUE</td>
+                                <td id="GrandTotal" class="text-end pe-2">$0.00</td>
+                            </tr>
+                        </table>
+                    </td>
+
+                </tr>
+                </tbody>
+            </table><!-- /HTML 5 — SUMMARY & TOTALS -->
             </div><!-- /table-summary-unit -->
 
 
@@ -2227,36 +2949,95 @@
             <!-- /HTML 6 — NOTES -->
 
 
+            <!-- Print-only closing line -->
+            <div class="invoice-closing">
+                <div class="closing-line">Thank you for your business — we appreciate the partnership.</div>
+                <div class="closing-contact">3J's Auto Body &amp; Paint &nbsp;·&nbsp; 1855 E 29th St, Signal Hill, CA 90755 &nbsp;·&nbsp; 562-424-6744 &nbsp;·&nbsp; info@3jsautobody.com</div>
+            </div>
+
             <!-- ============================================================
                  HTML 7 — LEGAL AGREEMENT & SIGNATURES
                  Always starts on its own page, never splits across pages.
             ============================================================ -->
             <div class="legal-acknowledgment legal-page">
 
-                <span class="disclaimer-title">TOTAL LOSS VEHICLE RELEASE &amp; LIABILITY WAIVER DISCLAIMER</span>
+                <!-- Disclaimer gradient bar — real div, matches ws-card::before on page 1 -->
+                <div class="disclaimer-gradient-bar"></div>
 
-                <p><strong>1. Total Loss Determination:</strong> This vehicle has been declared a total loss solely by the insurance carrier. 3J's Auto Body did not make this determination and assumes no responsibility for valuation, settlement, salvage handling, title processing, or claim resolution.</p>
-                <p><strong>2. BAR Compliance &amp; Teardown:</strong> All inspections, diagnostics, and teardown procedures were performed with proper authorization and in compliance with California Business &amp; Professions Code §9884.9 and applicable Bureau of Automotive Repair regulations. The vehicle may be partially dismantled as a result of damage analysis. <strong>Reassembly is not performed on total loss vehicles.</strong> Vehicle released AS-IS without warranty or representation.</p>
-                <p><strong>3. Transfer of Custody to Carrier or Agent:</strong> Upon release to the insurance carrier, salvage vendor, or tow provider acting on the carrier's behalf, custody, possession, and control transfer from 3J's Auto Body. After release, 3J's Auto Body is not responsible for: vehicle condition or safety; missing or non-reinstalled parts; transport or storage damage; theft, fire, vandalism, or environmental exposure; salvage processing, resale, or disposal; valuation or claim disputes; title or ownership transfer; or post-release costs or obligations.</p>
-                <p><strong>4. Storage Charges (Notice to Carrier):</strong> Storage charges begin after teardown and documentation are completed in accordance with BAR requirements and applicable law. Storage charges continue to accrue until the vehicle is removed from the premises. A total loss determination does not stop or waive storage charges.</p>
-                <p><strong>5. Diagnostic &amp; Teardown Labor:</strong> Inspection and damage analysis require labor to evaluate and document the vehicle condition. Diagnostic time and teardown labor remain payable regardless of repair outcome.</p>
-                <p><strong>6. Carrier Assumption of Risk &amp; Indemnification:</strong> Upon pickup, the insurance carrier assumes full responsibility for the vehicle and agrees to defend, indemnify, and hold harmless 3J's Auto Body from any claims, damages, or expenses, including attorney's fees, arising from post-release handling, transport, storage, salvage processing, or claim disputes.</p>
-                <p><strong>7. Personal Property:</strong> The carrier and/or vehicle owner assumes responsibility for any contents remaining in the vehicle.</p>
-                <p><strong>8. General Release &amp; California Civil Code §1542 Waiver:</strong> The undersigned releases 3J's Auto Body from all claims arising after release and expressly waives California Civil Code §1542.</p>
+                <!-- Logo -->
+                <div class="disclaimer-header-bar">
+                    <img src="https://static.wixstatic.com/media/b95bd9_fc4d86d4c40043f5b23fa60f23bdf077~mv2.png"
+                         alt="3J's Auto Body" class="disclaimer-logo">
+                </div>
 
-                <p style="margin-top:12px; letter-spacing:0.09px;">
-                    <input type="checkbox" style="margin-right:6px;">I acknowledge receipt of the Total Loss Vehicle Release &amp; Liability Waiver and understand fully.
-                </p>
+                <span class="disclaimer-title">Total Loss Vehicle Release &amp; Liability Waiver Disclaimer</span>
+
+                <div class="disclaimer-body">
+                    <p><strong>Total Loss Determination</strong><br>
+                    This vehicle has been declared a total loss solely by the insurance carrier. 3J's Auto Body did not make this determination and assumes no responsibility for valuation, settlement, salvage handling, title processing, or claim resolution.</p>
+
+                    <p><strong>BAR Compliance &amp; Teardown</strong><br>
+                    All inspections, diagnostics, and teardown procedures were performed with proper authorization and in compliance with California Business &amp; Professions Code §9884.9 and applicable Bureau of Automotive Repair regulations. The vehicle may be partially dismantled as a result of damage analysis. <strong>Reassembly Is Not Performed On Total Loss Vehicles.</strong> Vehicle released AS-IS without warranty or representation.</p>
+
+                    <p><strong>Transfer of Custody to Carrier or Agent</strong><br>
+                    Upon release to the insurance carrier, salvage vendor, or tow provider acting on the carrier's behalf, custody, possession, and control transfer from 3J's Auto Body. After release, 3J's Auto Body is not responsible for:</p>
+                    <div class="disclaimer-bullets">
+                        <div class="disclaimer-bullets-col">
+                            <div>• Vehicle condition or safety</div>
+                            <div>• Missing or non-reinstalled parts</div>
+                            <div>• Transport or storage damage</div>
+                            <div>• Theft, fire, vandalism, or environmental exposure</div>
+                        </div>
+                        <div class="disclaimer-bullets-col">
+                            <div>• Salvage processing, resale, or disposal</div>
+                            <div>• Valuation or claim disputes</div>
+                            <div>• Title or ownership transfer</div>
+                            <div>• Post-release costs or obligations</div>
+                        </div>
+                    </div>
+
+                    <p><strong>Storage Charges (Notice to Carrier)</strong><br>
+                    Storage charges begin after teardown and documentation are completed in accordance with BAR requirements and applicable law. Storage charges continue to accrue until the vehicle is removed from the premises. The total loss determination does not stop or waive storage charges.</p>
+
+                    <p><strong>Diagnostic &amp; Teardown Labor</strong><br>
+                    Inspection and damage analysis require labor to evaluate and document the vehicle condition. Diagnostic time and teardown labor remain payable regardless of repair outcome.</p>
+
+                    <p><strong>Carrier Assumption of Risk &amp; Indemnification</strong><br>
+                    Upon pickup, the insurance carrier assumes full responsibility for the vehicle and agrees to defend, indemnify, and hold harmless 3J's Auto Body from any claims, damages, or expenses, including attorney's fees, arising from post-release handling, transport, storage, salvage processing, or claim disputes.</p>
+
+                    <p><strong>Personal Property</strong><br>
+                    The carrier and/or vehicle owner assumes responsibility for any contents remaining in the vehicle.</p>
+
+                    <p><strong>General Release &amp; California Civil Code §1542 Waiver</strong><br>
+                    The undersigned releases 3J's Auto Body from all claims arising after release and expressly waives California Civil Code §1542.</p>
+                </div>
+
+                <p class="disclaimer-ack">I acknowledge receipt of the <strong>Total Loss Vehicle Release &amp; Liability Waiver</strong> and understand fully</p>
 
                 <table class="sig-table">
-                    <!-- Row 1: Vehicle Owner | Signature | Date -->
+                    <!-- Row 1: Insurance Company | Claim# | D.O.L. -->
+                    <tr>
+                        <td class="sig-cell">
+                            <div class="sig-lbl">Insurance Company:</div>
+                            <div class="sig-ln"><span id="InsMirror" class="auto-fill-val"></span></div>
+                        </td>
+                        <td class="sig-cell">
+                            <div class="sig-lbl">Claim #:</div>
+                            <div class="sig-ln"><span id="ClaimMirror" class="auto-fill-val"></span></div>
+                        </td>
+                        <td class="sig-cell sig-cell-date">
+                            <div class="sig-lbl">D.O.L.:</div>
+                            <div class="sig-ln"></div>
+                        </td>
+                    </tr>
+                    <!-- Row 2: Vehicle Owner 1 | Signature | Date -->
                     <tr>
                         <td class="sig-cell">
                             <div class="sig-lbl">Vehicle Owner:</div>
                             <div class="sig-ln"><span id="OwnerMirror" class="auto-fill-val"></span></div>
                         </td>
                         <td class="sig-cell">
-                            <div class="sig-lbl">Signature:</div>
+                            <div class="sig-lbl">Vehicle Owner Signature:</div>
                             <div class="sig-ln"></div>
                         </td>
                         <td class="sig-cell sig-cell-date">
@@ -2264,34 +3045,25 @@
                             <div class="sig-ln"></div>
                         </td>
                     </tr>
-                    <!-- Row 2: Ins. Company | Claim # | blank -->
+                    <!-- Row 3: Vehicle Owner 2 | Signature | Date -->
                     <tr>
                         <td class="sig-cell">
-                            <div class="sig-lbl">Ins. Company:</div>
-                            <div class="sig-ln"><span id="InsMirror" class="auto-fill-val"></span></div>
-                        </td>
-                        <td class="sig-cell">
-                            <div class="sig-lbl">Claim #:</div>
-                            <div class="sig-ln"><span id="ClaimMirror" class="auto-fill-val"></span></div>
-                        </td>
-                        <td class="sig-cell"></td>
-                    </tr>
-                    <!-- Row 3: Tow Company | Driver Sig + Time | blank -->
-                    <tr>
-                        <td class="sig-cell">
-                            <div class="sig-lbl">Tow Company:</div>
+                            <div class="sig-lbl">Vehicle Owner:</div>
                             <div class="sig-ln"></div>
                         </td>
-                        <td class="sig-cell" colspan="1">
-                            <div class="sig-lbl">Tow Driver's Signature:</div>
+                        <td class="sig-cell">
+                            <div class="sig-lbl">Vehicle Owner Signature:</div>
                             <div class="sig-ln"></div>
                         </td>
                         <td class="sig-cell sig-cell-date">
-                            <div class="sig-lbl">Time:</div>
+                            <div class="sig-lbl">Date:</div>
                             <div class="sig-ln"></div>
                         </td>
                     </tr>
-                </table><!-- /sig-table -->
+                </table>
+
+                <!-- Blue footer bar -->
+                <div class="disclaimer-footer-line"></div>
 
             </div><!-- /HTML 7 — LEGAL AGREEMENT & SIGNATURES -->
 
@@ -2422,27 +3194,36 @@
     ============================================================ */
     function buildTable() {
         let html = '';
+        let section = 'procurement'; // tracks current section for checkbox accent-color
 
         services.forEach(function(s, idx) {
 
             // Section header row (dark divider, no inputs)
             if (s.type === "header") {
+                // Switch to CCP section when we hit the Care/Custody header
+                if (s.header && s.header.toLowerCase().indexOf('care') !== -1) { section = 'ccp'; }
                 let pbClass = s.pageBreak ? " section-page-break" : "";
-                html += `<tr class="${pbClass}"><td colspan="7" class="section-header ps-2">${s.header}</td></tr>`;
+                let hdrColorClass = (section === 'ccp') ? 'section-header-ccp' : 'section-header-procurement';
+                html += `<tr class="${pbClass}">
+                    <td colspan="7" class="section-header ${hdrColorClass} ps-2">
+                        <input type="checkbox" class="section-all-chk no-print" checked title="Select / Deselect all in this section">
+                        ${s.header}
+                    </td>
+                </tr>`;
 
-            // CC&P date-range rows (Inside / Outside storage)
+            // CC&P date-range rows (Inside / Outside storage) — Flatpickr range picker
             } else if (s.type === "special_ccp") {
                 let label = (s.subtype === 'in') ? 'Inside' : 'Outside';
                 html += `
-                <tr data-svc-index="${idx}">
+                <tr data-svc-index="${idx}" data-section="ccp">
                     <td class="no-print tax-chk-cell"><input type="checkbox" id="${s.subtype}Sel" checked></td>
                     <td>
                         <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:nowrap; white-space:nowrap; width:100%;">
                             <span style="font-weight:700; flex-shrink:0;">${label} CC&amp;P:</span>
-                            <div style="display:flex; align-items:center; gap:0; flex-shrink:0;">
-                                <input type="date" class="ccp-input enter-blur" id="${s.subtype}Start" style="width:92px; min-width:92px; max-width:92px;">
-                                <span style="flex-shrink:0; width:22px; text-align:center; font-size:10px; font-weight:500;">to</span>
-                                <input type="date" class="ccp-input enter-blur" id="${s.subtype}Stop" style="width:92px; min-width:92px; max-width:92px;">
+                            <div style="display:flex; align-items:center; gap:8px; flex-shrink:0;">
+                                <input type="text" class="ccp-range-input" id="${s.subtype}RangeInput" placeholder="Select date range…" readonly>
+                                <input type="hidden" class="ccp-input" id="${s.subtype}Start">
+                                <input type="hidden" class="ccp-input" id="${s.subtype}Stop">
                             </div>
                         </div>
                     </td>
@@ -2471,7 +3252,7 @@
                        </select>`;
 
                 html += `
-                <tr class="calc-row" data-type="${s.type}" data-svc-index="${idx}">
+                <tr class="calc-row" data-type="${s.type}" data-svc-index="${idx}" data-section="${section}">
                     <td class="no-print tax-chk-cell">
                         <input type="checkbox" class="sel-chk" ${s.hrs > 0 ? 'checked' : ''}>
                     </td>
@@ -2484,8 +3265,8 @@
                     <td class="text-center">
                         <div class="cost-input-container">
                             <span>${isCostMarkup ? '$' : ''}</span>
-                            <input type="number"
-                                   step="${isPhotoCount ? '1' : (isCostMarkup ? '0.01' : '0.1')}"
+                            <input type="${isCostMarkup ? 'text' : 'number'}"
+                                   ${isCostMarkup ? 'inputmode="decimal" onchange="this.value=parseFloat(this.value||0).toFixed(2)"' : (isPhotoCount ? 'step="1"' : 'step="0.1"')}
                                    value="${isPhotoCount ? '0' : (isCostMarkup ? parseFloat(s.hrs).toFixed(2) : parseFloat(s.hrs).toFixed(1))}"
                                    class="hrs enter-blur ${isCostMarkup ? 'bg-yellow' : ''} ${isPhotoCount ? 'photo-int' : ''}"
                                    id="${s.id ? s.id + 'Val' : ''}">
@@ -2622,11 +3403,23 @@
        JS 4 — FIELD SYNC & HELPERS
     ============================================================ */
 
-    /* Mirrors owner, insurance co, and claim # into the signature section */
+    /* Mirrors owner, insurance co, and claim # into the signature section + personalization bar */
     function syncFields() {
-        document.getElementById('OwnerMirror').innerText = document.getElementById('Cust').value;
-        document.getElementById('InsMirror').innerText   = document.getElementById('InsCoTop').value;
-        document.getElementById('ClaimMirror').innerText = document.getElementById('ClaimNumTop').value;
+        var cust  = document.getElementById('Cust').value;
+        var ins   = document.getElementById('InsCoTop').value;
+        var claim = document.getElementById('ClaimNumTop').value;
+        var ro    = document.getElementById('WONum').value;
+        var veh   = document.getElementById('Veh').value;
+
+        document.getElementById('OwnerMirror').innerText  = cust;
+        document.getElementById('InsMirror').innerText    = ins;
+        document.getElementById('ClaimMirror').innerText  = claim;
+
+        // Personalization bar
+        document.getElementById('pidCustomer').innerText = cust  || '—';
+        document.getElementById('pidVehicle').innerText  = veh   || '—';
+        document.getElementById('pidRO').innerText       = ro    || '—';
+        document.getElementById('pidClaim').innerText    = claim || '—';
     }
 
     /* VIN validation — checks for exactly 17 characters on blur */
@@ -2767,6 +3560,7 @@
         syncFields();
         setTodayDate();
         calculate();
+        refreshCCPDisplay();
         showToast('Form wiped.', '');
     }
 
@@ -2954,7 +3748,8 @@
                     $(this).find('.sel-chk').prop('checked', r.checked);
                     if (r.hrs !== null && r.hrs !== undefined) {
                         let num = parseFloat(r.hrs);
-                        $(this).find('.hrs').val(!isNaN(num) ? num.toFixed(1) : r.hrs);
+                        let isMkup = $(this).find('.hrs').hasClass('bg-yellow');
+                        $(this).find('.hrs').val(!isNaN(num) ? num.toFixed(isMkup ? 2 : 1) : r.hrs);
                     }
                     if (r.type !== null && r.type !== undefined) $(this).find('.type-select').val(r.type);
                     $(this).find('.t-chk').prop('checked', r.taxChk);
@@ -2964,6 +3759,7 @@
 
         syncFields();
         calculate();
+        refreshCCPDisplay();
         showToast('Loaded: RO# ' + (record.roNum || record.owner), 'success');
     }
 
@@ -3084,7 +3880,10 @@
             filtered.forEach(function(r) {
                 html += `
                 <div class="history-item" onclick="loadRecord(${r.id})">
-                    <button class="delete-btn" onclick="deleteRecord(${r.id}, event)">✕</button>
+                    <button class="del-slide-btn" onclick="slideDeleteRecord(${r.id}, this, event)">
+                        <span class="ds-text">Del</span>
+                        <span class="ds-icon">✕</span>
+                    </button>
                     <div class="record-ro">RO# ${r.roNum || '—'}</div>
                     <div class="record-name">${r.owner || 'No Owner'}</div>
                     <div class="record-date">${r.veh || ''}&nbsp;|&nbsp;${r.savedOn}</div>
@@ -3113,6 +3912,9 @@
         buildTable();
         setTodayDate();
         calculate();
+
+        // Init CCP date pickers after buildTable() so the inputs exist in the DOM
+        if (typeof initCCPPickers === 'function') initCCPPickers();
 
         // Load records from localStorage immediately (instant display)
         renderSidebar();
@@ -3211,6 +4013,67 @@
         $(document).on('change', '.sel-chk, .t-chk, #inSel, #outSel, #inTaxChk, #outTaxChk',
             function() { calculate(); });
 
+        // Global "Select All / Deselect All" checkbox in table header
+        $(document).on('change', '#selectAllChk', function() {
+            var checked = $(this).is(':checked');
+            $('.sel-chk').prop('checked', checked);
+            $('.section-all-chk').prop('checked', checked);
+            calculate();
+        });
+
+        // Per-section "Select All / Deselect All" checkbox in section header rows
+        $(document).on('change', '.section-all-chk', function() {
+            var checked = $(this).is(':checked');
+            var $headerRow = $(this).closest('tr');
+            // Check/uncheck all sel-chk rows until the next section header
+            $headerRow.nextAll('tr').each(function() {
+                if ($(this).find('.section-header').length) return false; // stop at next section
+                $(this).find('.sel-chk').prop('checked', checked);
+            });
+            // Update global checkbox to indeterminate if not all match
+            var total = $('.sel-chk').length;
+            var totalChecked = $('.sel-chk:checked').length;
+            var globalChk = document.getElementById('selectAllChk');
+            if (globalChk) {
+                globalChk.indeterminate = (totalChecked > 0 && totalChecked < total);
+                globalChk.checked = (totalChecked === total);
+            }
+            calculate();
+        });
+
+        // Keep section-all-chk and global checkbox in sync when individual rows change
+        $(document).on('change', '.sel-chk', function() {
+            var $headerRow = $(this).closest('tr').prevAll('tr').filter(function() {
+                return $(this).find('.section-header').length;
+            }).first();
+            if ($headerRow.length) {
+                var $sectionRows = $headerRow.nextAll('tr').filter(function() {
+                    return !$(this).find('.section-header').length && $(this).find('.sel-chk').length;
+                }).toArray();
+                // Stop at next section header
+                var sectionRows = [];
+                for (var i = 0; i < $sectionRows.length; i++) {
+                    if ($($sectionRows[i]).prevAll('tr').filter(function(){ return $(this).find('.section-header').length; }).first()[0] !== $headerRow[0]) break;
+                    sectionRows.push($sectionRows[i]);
+                }
+                var sTotal = sectionRows.length;
+                var sChecked = sectionRows.filter(function(r){ return $(r).find('.sel-chk').is(':checked'); }).length;
+                var sChk = $headerRow.find('.section-all-chk')[0];
+                if (sChk) {
+                    sChk.indeterminate = (sChecked > 0 && sChecked < sTotal);
+                    sChk.checked = (sChecked === sTotal);
+                }
+            }
+            // Update global
+            var total = $('.sel-chk').length;
+            var totalChecked = $('.sel-chk:checked').length;
+            var globalChk = document.getElementById('selectAllChk');
+            if (globalChk) {
+                globalChk.indeterminate = (totalChecked > 0 && totalChecked < total);
+                globalChk.checked = (totalChecked === total);
+            }
+        });
+
         $(document).on('change', '.type-select',
             function() { calculate(); });
 
@@ -3280,11 +4143,31 @@
                 }
                 if (!hasVisible) $(rows[i]).addClass('row-print-hide');
             }
+
+            // Step 3 — smart disclaimer page break based on visible row count.
+            // For small claims (≤ 12 rows visible), the invoice content is short enough
+            // that forcing the disclaimer to a new page creates a nearly-empty page.
+            // Allow it to flow naturally instead. For larger claims, keep it on its own page.
+            var visibleDataRows = $('#worksheet-body tr')
+                .not('.row-print-hide')
+                .filter(function() { return !$(this).find('.section-header').length; })
+                .length;
+            var legalPage = document.querySelector('.legal-page');
+            if (legalPage) {
+                if (visibleDataRows <= 12) {
+                    legalPage.classList.add('legal-page-auto-break');
+                } else {
+                    legalPage.classList.remove('legal-page-auto-break');
+                }
+            }
         });
 
         window.addEventListener('afterprint', function() {
             // Restore all hidden rows after printing
             $('#worksheet-body tr').removeClass('row-print-hide');
+            // Restore disclaimer page break
+            var legalPage = document.querySelector('.legal-page');
+            if (legalPage) legalPage.classList.remove('legal-page-auto-break');
         });
 
         // Auto-save: save record automatically whenever a field changes
@@ -3897,6 +4780,109 @@ window.addEventListener('orientationchange', function() {
     }, 300);
 });
 
+/* ============================================================
+   CCP DATE RANGE PICKERS — Flatpickr with BAR compliance
+   California BAR regulations prohibit overlapping storage dates.
+   Inside and Outside ranges must never share a date.
+============================================================ */
+
+let ccpInPicker  = null;
+let ccpOutPicker = null;
+
+function initCCPPickers() {
+    const fmt = function(d) {
+        return d.getFullYear() + '-' +
+               String(d.getMonth()+1).padStart(2,'0') + '-' +
+               String(d.getDate()).padStart(2,'0');
+    };
+
+    function overlaps(s1, e1, s2, e2) {
+        return s1 <= e2 && e1 >= s2;
+    }
+
+    function getHiddenRange(sub) {
+        return { s: $('#' + sub + 'Start').val(), e: $('#' + sub + 'Stop').val() };
+    }
+
+    ccpInPicker = flatpickr('#inRangeInput', {
+        mode: 'range',
+        dateFormat: 'M j, Y',
+        disableMobile: true,
+        disable: [function(date) {
+            let r = getHiddenRange('out');
+            if (!r.s || !r.e) return false;
+            let d1 = new Date(r.s + 'T00:00:00'), d2 = new Date(r.e + 'T00:00:00');
+            return date >= d1 && date <= d2;
+        }],
+        onChange: function(selectedDates) {
+            if (selectedDates.length === 2) {
+                let r = getHiddenRange('out');
+                if (r.s && r.e) {
+                    let d1 = new Date(r.s + 'T00:00:00'), d2 = new Date(r.e + 'T00:00:00');
+                    if (overlaps(selectedDates[0], selectedDates[1], d1, d2)) {
+                        showToast('BAR violation: Inside dates overlap with Outside CC&P range.', 'error');
+                        ccpInPicker.clear(); return;
+                    }
+                }
+                $('#inStart').val(fmt(selectedDates[0]));
+                $('#inStop').val(fmt(selectedDates[1]));
+                $('#inStart').trigger('change');
+            } else if (selectedDates.length === 0) {
+                $('#inStart').val(''); $('#inStop').val('');
+                $('#inStart').trigger('change');
+            }
+        }
+    });
+
+    ccpOutPicker = flatpickr('#outRangeInput', {
+        mode: 'range',
+        dateFormat: 'M j, Y',
+        disableMobile: true,
+        disable: [function(date) {
+            let r = getHiddenRange('in');
+            if (!r.s || !r.e) return false;
+            let d1 = new Date(r.s + 'T00:00:00'), d2 = new Date(r.e + 'T00:00:00');
+            return date >= d1 && date <= d2;
+        }],
+        onChange: function(selectedDates) {
+            if (selectedDates.length === 2) {
+                let r = getHiddenRange('in');
+                if (r.s && r.e) {
+                    let d1 = new Date(r.s + 'T00:00:00'), d2 = new Date(r.e + 'T00:00:00');
+                    if (overlaps(selectedDates[0], selectedDates[1], d1, d2)) {
+                        showToast('BAR violation: Outside dates overlap with Inside CC&P range.', 'error');
+                        ccpOutPicker.clear(); return;
+                    }
+                }
+                $('#outStart').val(fmt(selectedDates[0]));
+                $('#outStop').val(fmt(selectedDates[1]));
+                $('#outStart').trigger('change');
+            } else if (selectedDates.length === 0) {
+                $('#outStart').val(''); $('#outStop').val('');
+                $('#outStart').trigger('change');
+            }
+        }
+    });
+}
+
+/* Syncs Flatpickr display with whatever is in the hidden inputs.
+   Called after loadRecord() and clearForm() so the visible picker
+   always reflects the stored values. */
+function refreshCCPDisplay() {
+    function setPickerFromHidden(picker, sub) {
+        if (!picker) return;
+        let s = $('#' + sub + 'Start').val();
+        let e = $('#' + sub + 'Stop').val();
+        if (s && e) {
+            picker.setDate([s, e], false);
+        } else {
+            picker.clear();
+        }
+    }
+    setPickerFromHidden(ccpInPicker,  'in');
+    setPickerFromHidden(ccpOutPicker, 'out');
+}
+
 /* ── GitHub Setup Modal functions ── */
 function openGhSetup() {
     document.getElementById('ghSetupOverlay').style.display = 'block';
@@ -3921,11 +4907,64 @@ function clearGhToken() {
     setTimeout(closeGhSetup, 1000);
 }
 
-/* ── Init on page load — hide gear (no token needed), start sync ── */
+/* ── Save button: pending → success / fail animation ── */
+function animateSaveBtn() {
+    var btn = document.getElementById('sidebarSaveBtn');
+    if (!btn || btn.classList.contains('sb-pending')) return;
+    btn.classList.add('sb-pending');
+    // Attempt the actual save
+    var ok = false;
+    try { saveRecord(); ok = true; } catch(e) { ok = false; }
+    setTimeout(function() {
+        btn.classList.remove('sb-pending');
+        btn.classList.add(ok ? 'sb-success' : 'sb-fail');
+        setTimeout(function() {
+            btn.classList.remove('sb-success', 'sb-fail');
+        }, 1800);
+    }, 600);
+}
+
+/* ── Slide-confirm delete: slide to green check, then delete ── */
+function slideDeleteRecord(id, btn, e) {
+    e.stopPropagation();
+    if (btn.classList.contains('ds-ok')) {
+        // Second click — confirmed, execute delete
+        deleteRecord(id, e);
+        return;
+    }
+    btn.classList.add('ds-ok');
+    // Auto-reset if user doesn't confirm within 3s
+    setTimeout(function() {
+        if (btn && btn.classList.contains('ds-ok')) {
+            btn.classList.remove('ds-ok');
+        }
+    }, 3000);
+}
+
+/* ── Mouse-position ripple for sidebar action buttons ── */
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.btn-ripple').forEach(function(btn) {
+        btn.addEventListener('click', function(e) {
+            var rect = btn.getBoundingClientRect();
+            var x = e.clientX - rect.left;
+            var y = e.clientY - rect.top;
+            btn.style.setProperty('--rx', (x - 40) + 'px');
+            btn.style.setProperty('--ry', (y - 40) + 'px');
+            btn.classList.remove('rippling');
+            // Force reflow so the transition restarts
+            void btn.offsetWidth;
+            btn.classList.add('rippling');
+            setTimeout(function() { btn.classList.remove('rippling'); }, 500);
+        });
+    });
+});
+
+/* ── Init on page load — hide gear (no token needed) ── */
 document.addEventListener('DOMContentLoaded', function() {
     var btn = document.getElementById('ghSettingsBtn');
     if (btn) btn.style.display = 'none';
-    initGitHubSync();
+    // Note: initGitHubSync() and initCCPPickers() are called inside $(document).ready()
+    // after buildTable() so the table inputs exist when Flatpickr attaches.
 });
 </script>
 </body>
