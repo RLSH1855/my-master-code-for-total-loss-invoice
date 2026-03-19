@@ -4928,8 +4928,15 @@ function animateSaveBtn() {
 function slideDeleteRecord(id, btn, e) {
     e.stopPropagation();
     if (btn.classList.contains('ds-ok')) {
-        // Second click — confirmed, execute delete
-        deleteRecord(id, e);
+        // Second click — confirmed via slide animation, delete directly (no native dialog)
+        var records = getRecords().filter(function(r) { return r.id !== id; });
+        localStorage.setItem('3js_records', JSON.stringify(records));
+        renderSidebar();
+        githubSaveAllRecords(records).then(function(synced) {
+            showToast(synced ? 'Record deleted.' : 'Deleted locally (sync offline).', '');
+        }).catch(function() {
+            showToast('Deleted locally — sync failed.', 'error');
+        });
         return;
     }
     btn.classList.add('ds-ok');
