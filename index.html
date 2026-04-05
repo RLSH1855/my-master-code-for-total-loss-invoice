@@ -1466,6 +1466,47 @@
             background: linear-gradient(90deg, #c0640a 0%, #f39c12 100%) !important;
         }
 
+        /* ── Manual entry rows ── */
+        .manual-add-cell {
+            padding: 3px 8px !important;
+            background: #f0f4f8;
+            border-top: 1px dashed #b0bec5 !important;
+        }
+        .btn-manual-add {
+            background: none;
+            border: 1px dashed #7f8c8d;
+            border-radius: 3px;
+            color: #555;
+            font-size: 10px;
+            padding: 2px 10px;
+            cursor: pointer;
+            letter-spacing: 0.3px;
+        }
+        .btn-manual-add:hover { background: #e8f0fe; border-color: #2980b9; color: #2980b9; }
+        .manual-del-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #c0392b;
+            font-size: 16px;
+            padding: 0 2px;
+            line-height: 1;
+        }
+        .manual-del-btn:hover { color: #e74c3c; }
+        .manual-name-input {
+            width: 100%;
+            border: none;
+            border-bottom: 1px solid #ccc;
+            background: transparent;
+            font-size: 11px;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 400;
+            letter-spacing: 0.3px;
+            color: #1a1a1a;
+            padding: 1px 0;
+        }
+        .manual-name-input:focus { outline: none; border-bottom-color: #2980b9; }
+
         td {
             border: 1px solid #dde4ee;
             padding: 9px 8px;
@@ -2695,19 +2736,23 @@
                 <!-- Collapsible rates wrapper -->
                 <div class="no-print-rates-wrap" id="ratesWrap">
 
-                <!-- Column 1: Body / Frame / Mechanical Rates -->
+                <!-- Column 1: Body / Frame / Mechanical / T/L Rates -->
                 <div class="no-print-rates">
                     <div class="rate-field">
                         <label>Body Rate</label>
-                        <span class="dollar-wrap"><input type="number" id="BodyRate" value="90.00" min="0" step="0.01" class="auto-clear"></span>
+                        <span class="dollar-wrap"><input type="number" id="BodyRate" value="65.00" min="0" step="0.01" class="auto-clear"></span>
                     </div>
                     <div class="rate-field">
                         <label>Frame Rate</label>
-                        <span class="dollar-wrap"><input type="number" id="FrameRate" value="90.00" min="0" step="0.01" class="auto-clear"></span>
+                        <span class="dollar-wrap"><input type="number" id="FrameRate" value="98.00" min="0" step="0.01" class="auto-clear"></span>
                     </div>
                     <div class="rate-field">
                         <label>Mechanical Rate</label>
-                        <span class="dollar-wrap"><input type="number" id="MechRate" value="120.00" min="0" step="0.01" class="auto-clear"></span>
+                        <span class="dollar-wrap"><input type="number" id="MechRate" value="130.00" min="0" step="0.01" class="auto-clear"></span>
+                    </div>
+                    <div class="rate-field">
+                        <label>T/L Rate</label>
+                        <span class="dollar-wrap"><input type="number" id="TLRate" value="100.00" min="0" step="0.01" class="auto-clear"></span>
                     </div>
                 </div>
 
@@ -2842,6 +2887,7 @@
                             <div class="d-flex justify-content-between"><span>Body Rate:</span>       <span class="itemized-amount" id="refBody">$0.00</span></div>
                             <div class="d-flex justify-content-between"><span>Frame Rate:</span>      <span class="itemized-amount" id="refFrame">$0.00</span></div>
                             <div class="d-flex justify-content-between"><span>Mechanical Rate:</span> <span class="itemized-amount" id="refMech">$0.00</span></div>
+                            <div class="d-flex justify-content-between"><span>T/L Rate:</span>        <span class="itemized-amount" id="refTL">$0.00</span></div>
                             <div class="d-flex justify-content-between"><span>Inside CC&amp;P:</span>     <span class="itemized-amount" id="refIn">$0.00</span></div>
                             <div class="d-flex justify-content-between"><span>Outside CC&amp;P:</span>    <span class="itemized-amount" id="refOut">$0.00</span></div>
                             <div class="d-flex justify-content-between"><span>Photo Fee (ea):</span>  <span class="itemized-amount" id="refPhoto">$0.00</span></div>
@@ -2985,7 +3031,7 @@
                         </td>
                         <td class="sig-cell sig-cell-date">
                             <div class="sig-lbl">D.O.L.:</div>
-                            <div class="sig-ln"></div>
+                            <div class="sig-ln"><input type="text" id="DOLDate" class="auto-fill-val enter-blur" placeholder="MM/DD/YYYY" style="border:none; border-bottom:1px solid #333; background:transparent; width:100%; font-size:11px; font-family:inherit;"></div>
                         </td>
                     </tr>
                     <!-- Row 2: Vehicle Owner 1 | Signature | Date -->
@@ -3092,53 +3138,57 @@
          - body / frame / mech / markup / photo_misc : standard rows
     ============================================================ */
     const services = [
-        { name: "Initial Contact (Obtain Contact Info)",           hrs: 0.2, type: "body" },
-        { name: "Create Opportunity in Software",                  hrs: 0.2, type: "body" },
-        { name: "Assign Repair Order Number",                      hrs: 0.2, type: "body" },
-        { name: "Create Work Order File",                          hrs: 0.3, type: "body" },
-        { name: "Arrange Move or Travel to Vehicle",               hrs: 0.2, type: "body" },
-        { name: "Identify/Prepay Insurance Charges",               hrs: 0.4, type: "body" },
+        { name: "Initial Contact (Obtain Contact Info)",           hrs: 0.2, type: "tl" },
+        { name: "Create Opportunity in Software",                  hrs: 0.3, type: "tl" },
+        { name: "Assign Repair Order Number",                      hrs: 0.2, type: "tl" },
+        { name: "Create Work Order File",                          hrs: 0.3, type: "tl" },
+        { name: "Arrange Move or Travel to Vehicle",               hrs: 0.5, type: "tl" },
+        { name: "Identify/Prepay Insurance Charges",               hrs: 0,   type: "tl" },
         { name: "Prepaid Charges (Towing/Storage)",                hrs: 0,   type: "markup", id: "Prep" },
-        { name: "Create In-House Tow Worksheet",                   hrs: 0.3, type: "body" },
+        { name: "Create In-House Tow Worksheet",                   hrs: 0,   type: "tl" },
+        { type: "manual_add", sectionId: "sec-a" },
         { header: "Total Procurement Charges",                               type: "header", pageBreak: true },
-        { name: "Update Insurance Info",                           hrs: 0.3, type: "body" },
-        { name: "Pre-Order Parts per Plan",                        hrs: 0.3, type: "body" },
-        { name: "Pre-Wash Vehicle",                                hrs: 0.5, type: "body" },
+        { name: "Update Insurance Info",                           hrs: 0.3, type: "tl" },
+        { name: "Pre-Order Parts per Plan",                        hrs: 0.3, type: "tl" },
+        { name: "Pre-Wash Vehicle",                                hrs: 0,   type: "body" },
         { name: "Move Vehicle to Shop",                            hrs: 0.2, type: "body" },
-        { name: "Setup for Pre-Repair Diagnostic (Labor)",         hrs: 0.5, type: "body" },
+        { name: "Setup for Pre-Repair Diagnostic (Labor)",         hrs: 0.5, type: "mech" },
         { name: "Complete Pre-Repair Diagnostic (Sublet Cost)",    hrs: 0,   type: "markup", id: "Scan" },
-        { name: "Save Diagnostic Report",                          hrs: 0.3, type: "body" },
-        { name: "Take Preliminary Photos",                         hrs: 0.9, type: "body" },
-        { name: "Complete Meticulous Disassembly",                 hrs: 0,   type: "body",   id: "Dis" },
-        { name: "Complete Frame Operations",                       hrs: 0,   type: "frame",  id: "Frame" },
+        { name: "Save Diagnostic Report",                          hrs: 0.5, type: "tl" },
+        { name: "Take Preliminary Photos",                         hrs: 0.5, type: "tl" },
+        { name: "Complete Meticulous Disassembly",                 hrs: 2.0, type: "body",   id: "Dis" },
+        { name: "Complete Frame Operations",                       hrs: 1.0, type: "frame",  id: "Frame" },
         { name: "Complete Mechanical Operations",                  hrs: 0,   type: "mech",   id: "Mech" },
-        { name: "Setup/Measure Structural Condition",              hrs: 1.5, type: "body" },
-        { name: "Save Measurement Report",                         hrs: 0.3, type: "body" },
-        { name: "Identify All Labor/Parts for Repair",             hrs: 2.2, type: "body" },
-        { name: "Check In Parts/Mirror Match",                     hrs: 1.0, type: "body" },
-        { name: "Line Match Invoices",                             hrs: 0.8, type: "body" },
-        { name: "Transmit Pics/Plan to Insurance",                 hrs: 0.3, type: "body" },
-        { name: "Communicate With Insurance Co",                   hrs: 0.3, type: "body" },
-        { name: "Communicate With Vehicle Owner",                  hrs: 0.2, type: "body" },
+        { name: "Setup/Measure Structural Condition",              hrs: 2.0, type: "frame" },
+        { name: "Save Measurement Report",                         hrs: 0.5, type: "tl" },
+        { name: "Identify All Labor/Parts for Repair",             hrs: 2.0, type: "tl" },
+        { name: "Check In Parts/Mirror Match",                     hrs: 1.0, type: "tl" },
+        { name: "Line Match Invoices",                             hrs: 1.5, type: "tl" },
+        { name: "Transmit Pics/Plan to Insurance",                 hrs: 1.0, type: "tl" },
+        { name: "Communicate With Insurance Co",                   hrs: 0,   type: "tl" },
+        { name: "Communicate With Vehicle Owner",                  hrs: 0,   type: "tl" },
         { name: "Insurance Required Photos (Count)",               hrs: 0,   type: "photo_misc", id: "Photo" },
+        { type: "manual_add", sectionId: "sec-b" },
         { header: "Return to Storage Area",                                  type: "header" },
-        { name: "Verify Restocking Fees",                          hrs: 0.5, type: "body" },
+        { name: "Verify Restocking Fees",                          hrs: 0,   type: "tl" },
         { name: "Secure Damaged Parts",                            hrs: 0.2, type: "body" },
         { name: "Non-Returnable Parts Costs",                      hrs: 0,   type: "markup", id: "NonRet" },
-        { name: "Place Non-Returnable Parts in Vehicle",           hrs: 0.5, type: "body" },
+        { name: "Place Non-Returnable Parts in Vehicle",           hrs: 0.2, type: "body" },
         { name: "Labor for Part Handling",                         hrs: 0.3, type: "body" },
-        { name: "Install Weather Tarp/Wrap (Labor)",               hrs: 0.5, type: "body" },
+        { name: "Install Weather Tarp/Wrap (Labor)",               hrs: 0.2, type: "body" },
         { name: "Weather Protection Tarp/Wrap ($)",                hrs: 0,   type: "markup", id: "Wrap" },
-        { name: "Move Vehicle to Protected Area",                  hrs: 0.2, type: "body" },
-        { name: "Initiate CC&P Charges",                           hrs: 0.2, type: "body" },
+        { name: "Move Vehicle to Protected Area",                  hrs: 0.3, type: "body" },
+        { name: "Initiate CC&P Charges",                           hrs: 0.3, type: "tl" },
+        { type: "manual_add", sectionId: "sec-c" },
         { header: "Care, Custody and Protection",                            type: "header", pageBreak: true },
         { name: "CC&P Inside",  type: "special_ccp", subtype: "in" },
         { name: "CC&P Outside", type: "special_ccp", subtype: "out" },
-        { name: "Assist Customer in Retrieving Personal Items & Removing Plates", hrs: 0.3, type: "body" },
-        { name: "Purge Computer Data",                             hrs: 1.0, type: "body" },
-        { name: "Complete Total Loss Worksheet",                   hrs: 0.2, type: "body" },
-        { name: "Relay Charges/Salvage Pickup",                    hrs: 0.2, type: "body" },
-        { name: "Receive/Process Payment & Assist at Vehicle Pickup", hrs: 0.2, type: "body" }
+        { name: "Assist Customer in Retrieving Personal Items & Removing Plates", hrs: 1.0, type: "tl" },
+        { name: "Purge Computer Data",                             hrs: 1.0, type: "tl" },
+        { name: "Complete Total Loss Worksheet",                   hrs: 0.5, type: "tl" },
+        { name: "Relay Charges/Salvage Pickup",                    hrs: 0.5, type: "tl" },
+        { name: "Receive/Process Payment & Assist at Vehicle Pickup", hrs: 0.3, type: "tl" },
+        { type: "manual_add", sectionId: "sec-d" }
     ];
 
 
@@ -3197,17 +3247,26 @@
                     <td class="no-print tax-chk-cell"><input type="checkbox" id="${s.subtype}TaxChk" checked></td>
                 </tr>`;
 
+            // Manual entry add-button row
+            } else if (s.type === "manual_add") {
+                html += `<tr class="manual-add-btn-row no-print" data-manual-section="${s.sectionId}">
+                    <td colspan="7" class="manual-add-cell">
+                        <button type="button" class="btn-manual-add" onclick="addManualRow('${s.sectionId}')">+ Add Manual Entry</button>
+                    </td>
+                </tr>`;
+
             // Standard labor / markup / photo rows
             } else {
                 let isCostMarkup = (s.type === "markup");
                 let isPhotoCount = (s.type === "photo_misc");
+                let typeLabels = { body:'Body', frame:'Frame', mech:'Mechanical', tl:'T/L' };
                 let typeCell = (isCostMarkup || isPhotoCount)
                     ? 'Misc'
-                    : `<select class="type-select">
-                           <option value="body"  selected>Body</option>
-                           <option value="frame">Frame</option>
-                           <option value="mech">Mechanical</option>
-                       </select>`;
+                    : `<select class="type-select">${
+                        ['body','frame','mech','tl'].map(function(v){
+                            return `<option value="${v}"${v===s.type?' selected':''}>${typeLabels[v]}</option>`;
+                        }).join('')
+                    }</select>`;
 
                 html += `
                 <tr class="calc-row" data-type="${s.type}" data-svc-index="${idx}" data-section="${section}">
@@ -3257,6 +3316,7 @@
             body:  parseFloat($('#BodyRate').val())  || 0,
             frame: parseFloat($('#FrameRate').val()) || 0,
             mech:  parseFloat($('#MechRate').val())  || 0,
+            tl:    parseFloat($('#TLRate').val())    || 0,
             in:    parseFloat($('#InRate').val())     || 0,
             out:   parseFloat($('#OutRate').val())    || 0,
             photo: parseFloat($('#PhotoRate').val())  || 0
@@ -3268,6 +3328,7 @@
         $('#refBody').text('$'  + rates.body.toFixed(2));
         $('#refFrame').text('$' + rates.frame.toFixed(2));
         $('#refMech').text('$'  + rates.mech.toFixed(2));
+        $('#refTL').text('$'    + rates.tl.toFixed(2));
         $('#refIn').text('$'    + rates.in.toFixed(2));
         $('#refOut').text('$'   + rates.out.toFixed(2));
         $('#refPhoto').text('$' + rates.photo.toFixed(2));
@@ -3356,6 +3417,54 @@
         return Math.ceil((e - s) / (1000 * 60 * 60 * 24)) + 1;
     }
 
+
+    /* ============================================================
+       JS 3b — MANUAL ENTRY ROWS
+       addManualRow(sectionId, data) — inserts a new blank (or
+       pre-filled) manual row before the section's Add button.
+       removeManualRow(btn) — removes the row containing the button.
+       Manual rows are calc-rows: calculate() picks them up automatically.
+       Empty manual rows are hidden before print/PDF.
+    ============================================================ */
+
+    function addManualRow(sectionId, data) {
+        let name    = (data && data.name    != null) ? String(data.name)  : '';
+        let type    = (data && data.type)   || 'body';
+        let hrs     = (data && data.hrs     != null) ? parseFloat(data.hrs) : 0;
+        let checked = (data && data.checked != null) ? data.checked : true;
+        let taxChk  = (data && data.taxChk  != null) ? data.taxChk  : false;
+
+        let typeOptions = ['body','frame','mech','tl'].map(function(v) {
+            let label = { body:'Body', frame:'Frame', mech:'Mechanical', tl:'T/L' }[v] || v;
+            return `<option value="${v}"${v === type ? ' selected' : ''}>${label}</option>`;
+        }).join('');
+
+        let row = `<tr class="calc-row manual-row" data-manual-section="${sectionId}" data-type="${type}">
+            <td class="no-print tax-chk-cell"><input type="checkbox" class="sel-chk"${checked ? ' checked' : ''}></td>
+            <td><input type="text" class="manual-name-input" placeholder="Enter description…" value="${name.replace(/"/g, '&quot;')}"></td>
+            <td class="text-center"><select class="type-select">${typeOptions}</select></td>
+            <td class="text-center">
+                <div class="cost-input-container">
+                    <span></span>
+                    <input type="number" step="0.1" value="${isNaN(hrs) ? '0.0' : hrs.toFixed(1)}" class="hrs enter-blur">
+                </div>
+            </td>
+            <td class="sub val-out">$0.00</td>
+            <td class="tx  val-out">$0.00</td>
+            <td class="no-print tax-chk-cell" style="display:flex;align-items:center;gap:3px;">
+                <input type="checkbox" class="t-chk"${taxChk ? ' checked' : ''}>
+                <button type="button" onclick="removeManualRow(this)" class="manual-del-btn" title="Remove row">&times;</button>
+            </td>
+        </tr>`;
+
+        $(`tr.manual-add-btn-row[data-manual-section="${sectionId}"]`).before(row);
+        calculate();
+    }
+
+    function removeManualRow(btn) {
+        $(btn).closest('tr').remove();
+        calculate();
+    }
 
     /* ============================================================
        JS 4 — FIELD SYNC & HELPERS
@@ -3469,12 +3578,16 @@
         if (!confirm("Wipe all form data? This cannot be undone.")) return;
 
         // Clear all plain text and date fields
-        $('#WONum, #Cust, #InsCoTop, #ClaimNumTop, #Veh, #VIN, #NotesField').val('');
+        $('#WONum, #Cust, #InsCoTop, #ClaimNumTop, #Veh, #VIN, #NotesField, #DOLDate').val('');
+
+        // Remove all manual rows
+        $('#worksheet-body tr.manual-row').remove();
 
         // Reset all rate inputs to their default values
-        $('#BodyRate').val('90.00');
-        $('#FrameRate').val('90.00');
-        $('#MechRate').val('120.00');
+        $('#BodyRate').val('65.00');
+        $('#FrameRate').val('98.00');
+        $('#MechRate').val('130.00');
+        $('#TLRate').val('100.00');
         $('#InRate').val('150.00');
         $('#OutRate').val('120.00');
         $('#PhotoRate').val('5.00');
@@ -3573,7 +3686,20 @@
 
         // Collect all table row states
         let rows = [];
+        let manualRows = [];
         $('#worksheet-body tr').each(function() {
+            if ($(this).hasClass('manual-add-btn-row')) return; // skip add-button rows
+            if ($(this).hasClass('manual-row')) {
+                manualRows.push({
+                    name:    $(this).find('.manual-name-input').val(),
+                    type:    $(this).find('.type-select').val() || 'body',
+                    hrs:     $(this).find('.hrs').val(),
+                    checked: $(this).find('.sel-chk').is(':checked'),
+                    taxChk:  $(this).find('.t-chk').is(':checked'),
+                    section: $(this).data('manual-section')
+                });
+                return;
+            }
             rows.push({
                 svcIndex:  $(this).attr('data-svc-index'),
                 checked:   $(this).find('.sel-chk').is(':checked'),
@@ -3601,12 +3727,15 @@
             bodyRate:     $('#BodyRate').val(),
             frameRate:    $('#FrameRate').val(),
             mechRate:     $('#MechRate').val(),
+            tlRate:       $('#TLRate').val(),
+            dolDate:      $('#DOLDate').val(),
             inRate:       $('#InRate').val(),
             outRate:      $('#OutRate').val(),
             photoRate:    $('#PhotoRate').val(),
             ccRate:       $('#CCRate').val(),
             total:        $('#GrandTotal').text(),
-            rows:         rows
+            rows:         rows,
+            manualRows:   manualRows
         };
 
         let records     = getRecords();
@@ -3685,18 +3814,25 @@
         if (record.invoiceDate) $('#currentDate').text(record.invoiceDate);
 
         // Restore rates
-        $('#BodyRate').val(record.bodyRate   || '90.00');
-        $('#FrameRate').val(record.frameRate || '90.00');
-        $('#MechRate').val(record.mechRate   || '120.00');
+        $('#BodyRate').val(record.bodyRate   || '65.00');
+        $('#FrameRate').val(record.frameRate || '98.00');
+        $('#MechRate').val(record.mechRate   || '130.00');
+        $('#TLRate').val(record.tlRate       || '100.00');
+        $('#DOLDate').val(record.dolDate     || '');
         $('#InRate').val(record.inRate       || '150.00');
         $('#OutRate').val(record.outRate     || '120.00');
         $('#PhotoRate').val(record.photoRate || '5.00');
         $('#CCRate').val(record.ccRate       || '0');
 
-        // Restore all table row states
+        // Clear any manual rows from a previous load
+        $('#worksheet-body tr.manual-row').remove();
+
+        // Restore all table row states (standard rows only — by index, skipping btn rows)
         if (record.rows && record.rows.length) {
-            $('#worksheet-body tr').each(function(i) {
-                let r = record.rows[i];
+            let rowIdx = 0;
+            $('#worksheet-body tr').each(function() {
+                if ($(this).hasClass('manual-add-btn-row') || $(this).hasClass('manual-row')) return;
+                let r = record.rows[rowIdx++];
                 if (!r) return;
 
                 if (r.ccpStart !== null && r.ccpStart !== undefined) {
@@ -3716,6 +3852,13 @@
                     if (r.type !== null && r.type !== undefined) $(this).find('.type-select').val(r.type);
                     $(this).find('.t-chk').prop('checked', r.taxChk);
                 }
+            });
+        }
+
+        // Restore manual rows
+        if (record.manualRows && record.manualRows.length) {
+            record.manualRows.forEach(function(mr) {
+                addManualRow(mr.section, mr);
             });
         }
 
@@ -4078,8 +4221,20 @@
             document.getElementById('printNotesDisplay').textContent = val;
             updatePdfTitle();
 
-            // Step 1 — hide unchecked service rows
+            // Step 1 — hide unchecked service rows, empty manual rows, and add-button rows
             $('#worksheet-body tr').each(function() {
+                // Always hide the manual add-button rows
+                if ($(this).hasClass('manual-add-btn-row')) {
+                    $(this).addClass('row-print-hide');
+                    return;
+                }
+                // Hide manual rows with no description
+                if ($(this).hasClass('manual-row')) {
+                    if (!$(this).find('.manual-name-input').val().trim()) {
+                        $(this).addClass('row-print-hide');
+                    }
+                    return;
+                }
                 var chk    = $(this).find('.sel-chk');
                 var ccpChk = $(this).find('[id$="Sel"]');
                 if ((chk.length    && !chk.is(':checked')) ||
@@ -4149,7 +4304,10 @@
         }
 
         // Bind auto-save to all relevant inputs
-        $(document).on('change blur', '#WONum, #Cust, #InsCoTop, #ClaimNumTop, #Veh, #VIN, .sel-chk, .t-chk, .type-select, .hrs, .auto-clear, .ccp-input, #inSel, #outSel, #inTaxChk, #outTaxChk, #BodyRate, #FrameRate, #MechRate, #InRate, #OutRate, #PhotoRate, #CCRate', function() {
+        $(document).on('change blur', '#WONum, #Cust, #InsCoTop, #ClaimNumTop, #Veh, #VIN, .sel-chk, .t-chk, .type-select, .hrs, .auto-clear, .ccp-input, #inSel, #outSel, #inTaxChk, #outTaxChk, #BodyRate, #FrameRate, #MechRate, #TLRate, #InRate, #OutRate, #PhotoRate, #CCRate, #DOLDate', function() {
+            triggerAutoSave();
+        });
+        $(document).on('change blur', '.manual-name-input', function() {
             triggerAutoSave();
         });
         $(document).on('input', '#NotesField', function() {
@@ -4253,6 +4411,7 @@ function buildMobileCards() {
                 + '<option value="body"'  + (typeVal==='body'  ? ' selected' : '') + '>Body</option>'
                 + '<option value="frame"' + (typeVal==='frame' ? ' selected' : '') + '>Frame</option>'
                 + '<option value="mech"'  + (typeVal==='mech'  ? ' selected' : '') + '>Mech</option>'
+                + '<option value="tl"'    + (typeVal==='tl'    ? ' selected' : '') + '>T/L</option>'
                 + '</select></div>';
         } else {
             typeField = '<div class="mob-field"><span class="mob-field-lbl">Type</span><div class="mob-field-val">Misc</div></div>';
