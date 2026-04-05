@@ -3562,7 +3562,7 @@
     /* Saves the current form state to localStorage.
        Always overwrites an existing record with the same RO#.
        Never creates a duplicate. */
-    function saveRecord() {
+    function saveRecord(silent) {
         let roNum = $('#WONum').val().trim();
         let owner = $('#Cust').val().trim();
 
@@ -3652,15 +3652,15 @@
         githubSaveAllRecords(records).then(function(synced) {
             if (synced) {
                 setCloud('green');
-                showConfirm(true, 'Saved!');
+                if (!silent) showConfirm(true, 'Saved!');
             } else {
                 setCloud('gray');
-                showToast('Saved locally (Sheets offline).', '');
+                if (!silent) showToast('Saved locally (Sheets offline).', '');
             }
         }).catch(function(err) {
             setCloud('red');
-            showConfirm(false, 'Sheets error.');
-            showToast('Local save OK \u2014 Sheets error: ' + err.message, 'error');
+            if (!silent) showConfirm(false, 'Sheets error.');
+            if (!silent) showToast('Local save OK \u2014 Sheets error: ' + err.message, 'error');
         });
     }
 
@@ -4143,7 +4143,7 @@
                 // This prevents creating duplicate/junk records while the user is
                 // still filling in the customer name or other fields.
                 if (roNum || claimNum) {
-                    saveRecord();
+                    saveRecord(true);
                 }
             }, 2000); // 2-second debounce
         }
