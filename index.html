@@ -4911,7 +4911,7 @@ function saveAction() {
 function doneAction() {
     setCloud('amber');
     var ok = false;
-    try { saveRecord(); ok = true; } catch(e) { ok = false; }
+    try { saveRecord(true); ok = true; } catch(e) { ok = false; }
     if (!ok) { setCloud('red'); showConfirm(false, 'Save failed.'); return; }
     var roNum = ($('#WONum').val() || '').trim();
     var filename = 'RO-' + (roNum || 'XXXX') + '_Total_Loss_Worksheet.pdf';
