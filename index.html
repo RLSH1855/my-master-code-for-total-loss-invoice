@@ -4915,12 +4915,12 @@ function doneAction() {
     if (!ok) { setCloud('red'); showConfirm(false, 'Save failed.'); return; }
     var roNum = ($('#WONum').val() || '').trim();
     var filename = 'RO-' + (roNum || 'XXXX') + '_Total_Loss_Worksheet.pdf';
-    var element  = document.querySelector('.main-content') || document.body;
+    var element  = document.getElementById('capture-area');
     var opt = {
         margin:      [0.3, 0.3],
         filename:    filename,
         image:       { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2, useCORS: true, logging: false },
+        html2canvas: { scale: 2, useCORS: true, logging: false, scrollY: 0 },
         jsPDF:       { unit: 'in', format: 'letter', orientation: 'portrait' }
     };
     html2pdf().set(opt).from(element).save();
