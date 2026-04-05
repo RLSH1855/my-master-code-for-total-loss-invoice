@@ -3031,7 +3031,7 @@
                         </td>
                         <td class="sig-cell sig-cell-date">
                             <div class="sig-lbl">D.O.L.:</div>
-                            <div class="sig-ln"><input type="text" id="DOLDate" class="auto-fill-val enter-blur" placeholder="MM/DD/YYYY" style="border:none; border-bottom:1px solid #333; background:transparent; width:100%; font-size:11px; font-family:inherit;"></div>
+                            <div class="sig-ln"><input type="text" id="DOLDate" class="auto-fill-val enter-blur" placeholder="M/D/YYYY" style="border:none; border-bottom:1px solid #333; background:transparent; width:100%; font-size:11px; font-family:inherit;"></div>
                         </td>
                     </tr>
                     <!-- Row 2: Vehicle Owner 1 | Signature | Date -->
@@ -4309,6 +4309,30 @@
         });
         $(document).on('change blur', '.manual-name-input', function() {
             triggerAutoSave();
+        });
+
+        // Format D.O.L. input to M/D/YYYY on blur — no leading zeros
+        $(document).on('blur', '#DOLDate', function() {
+            var raw = $(this).val().trim();
+            if (!raw) return;
+            // Try to parse common formats: M/D/YYYY, MM/DD/YYYY, M-D-YYYY, YYYY-MM-DD
+            var m, d, y;
+            var isoMatch = raw.match(/^(\d{4})[-\/](\d{1,2})[-\/](\d{1,2})$/);
+            var mdyMatch  = raw.match(/^(\d{1,2})[-\/](\d{1,2})[-\/](\d{2,4})$/);
+            if (isoMatch) {
+                y = parseInt(isoMatch[1], 10);
+                m = parseInt(isoMatch[2], 10);
+                d = parseInt(isoMatch[3], 10);
+            } else if (mdyMatch) {
+                m = parseInt(mdyMatch[1], 10);
+                d = parseInt(mdyMatch[2], 10);
+                y = parseInt(mdyMatch[3], 10);
+                if (y < 100) y += 2000; // handle 2-digit year
+            } else {
+                return; // unrecognized format — leave as-is
+            }
+            if (m < 1 || m > 12 || d < 1 || d > 31) return;
+            $(this).val(m + '/' + d + '/' + y);
         });
         $(document).on('input', '#NotesField', function() {
             triggerAutoSave();
