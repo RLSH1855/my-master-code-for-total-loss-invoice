@@ -4707,19 +4707,17 @@ async function sheetsSaveAllRecords(records) {
     }
 }
 
-/* ── Init on page load — silent background check, no syncing spinner ── */
+/* ── Init on page load — connectivity check only, never overwrites localStorage ── */
 async function initGitHubSync() {
     try {
         var resp = await fetch(SHEETS_URL + '?t=' + Date.now(), { method: 'GET', redirect: 'follow' });
         if (!resp.ok) throw new Error('HTTP ' + resp.status);
         var data = await resp.json();
-        if (!data.ok) throw new Error(data.error || 'Load failed');
-        localStorage.setItem('3js_records', JSON.stringify(data.records));
+        if (!data.ok) throw new Error(data.error || 'Ping failed');
         updateSyncStatus('connected');
-        if (typeof renderSidebar === 'function') renderSidebar();
     } catch(err) {
         console.warn('Sheets init check:', err.message);
-        updateSyncStatus('local'); // gray — no alarm, data is safe locally
+        updateSyncStatus('local');
     }
 }
 
