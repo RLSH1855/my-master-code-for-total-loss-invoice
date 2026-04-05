@@ -4913,17 +4913,13 @@ function doneAction() {
     var ok = false;
     try { saveRecord(true); ok = true; } catch(e) { ok = false; }
     if (!ok) { setCloud('red'); showConfirm(false, 'Save failed.'); return; }
-    var roNum = ($('#WONum').val() || '').trim();
-    var filename = 'RO-' + (roNum || 'XXXX') + '_Total_Loss_Worksheet.pdf';
-    var element  = document.getElementById('capture-area');
-    var opt = {
-        margin:      [0.3, 0.3],
-        filename:    filename,
-        image:       { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2, useCORS: true, logging: false, scrollY: 0 },
-        jsPDF:       { unit: 'in', format: 'letter', orientation: 'portrait' }
-    };
-    html2pdf().set(opt).from(element).save();
+    var roNum    = ($('#WONum').val() || '').trim();
+    var owner    = ($('#Cust').val()  || '').trim();
+    var lastName = owner.split(/\s+/).filter(Boolean).pop() || '';
+    var prevTitle = document.title;
+    document.title = 'RO-' + (roNum || 'XXXX') + (lastName ? '_' + lastName : '') + '_Total_Loss_Worksheet';
+    window.print();
+    document.title = prevTitle;
 }
 
 /* ── Slide-confirm delete: slide to green check, then delete ── */
