@@ -2209,23 +2209,7 @@
                 display: table-row-group;
             }
 
-            /* On print: use flex ordering to move notes below header, above table */
-            #capture-area {
-                display: flex;
-                flex-direction: column;
-            }
-
-            .invoice-header-block { order: 1; }
-            .print-id-bar         { order: 2; }
-            .top-grid             { order: 3; }
-            .table-summary-unit   { order: 4; display: flex; flex-direction: column; }
-            .invoice-table-block  { order: 1; }
-            .summary-block        { order: 2; }
-            .print-notes-area     { order: 5; }
-            .invoice-closing      { order: 6; }
-            .legal-page           { order: 7; }
-
-            /* Hide the original notes block in its normal position */
+            /* Hide the screen notes block — print-notes-area is used instead */
             .notes-block {
                 display: none !important;
             }
@@ -2716,13 +2700,6 @@
                 </div>
             </div>
 
-            <!-- Print-only notes area — shown between header and table on print -->
-            <div class="print-notes-area" style="display:none;">
-                <b>Notes:</b>
-                <div class="notes-content" id="printNotesDisplay"></div>
-            </div>
-
-
             <!-- ============================================================
                  HTML 3 — RATES & CUSTOMER INFO
             ============================================================ -->
@@ -2942,6 +2919,11 @@
             </table><!-- /HTML 5 — SUMMARY & TOTALS -->
             </div><!-- /table-summary-unit -->
 
+            <!-- Print-only notes area — sits here naturally, no flex reordering needed -->
+            <div class="print-notes-area" style="display:none;">
+                <b>Notes:</b>
+                <div class="notes-content" id="printNotesDisplay"></div>
+            </div>
 
             <!-- ============================================================
                  HTML 6 — NOTES
