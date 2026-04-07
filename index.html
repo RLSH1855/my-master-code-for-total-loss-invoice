@@ -3608,8 +3608,12 @@
                 $(`#${s.subtype}DaysDisplay`).val('0');
             } else {
                 let rawHrs = parseFloat(s.hrs);
-                let hrsFormatted = isNaN(rawHrs) ? '0.0' : ($(this).find('.hrs').hasClass('bg-yellow') ? rawHrs.toFixed(2) : rawHrs.toFixed(1));
-                $(this).find('.hrs').val(hrsFormatted);
+                let $hrsInput = $(this).find('.hrs');
+                let hrsFormatted = isNaN(rawHrs) ? '0.0'
+                    : $hrsInput.hasClass('photo-int') ? Math.round(rawHrs).toString()
+                    : $hrsInput.hasClass('bg-yellow') ? rawHrs.toFixed(2)
+                    : rawHrs.toFixed(1);
+                $hrsInput.val(hrsFormatted);
                 $(this).find('.sel-chk').prop('checked', s.hrs > 0);
                 $(this).find('.t-chk').prop('checked', false);
                 $(this).find('.type-select').val('body');
@@ -5094,13 +5098,7 @@ function doneAction() {
     var ok = false;
     try { saveRecord(true); ok = true; } catch(e) { ok = false; }
     if (!ok) { setCloud('red'); showConfirm(false, 'Save failed.'); return; }
-    var roNum    = ($('#WONum').val() || '').trim();
-    var owner    = ($('#Cust').val()  || '').trim();
-    var lastName = owner.split(/\s+/).filter(Boolean).pop() || '';
-    var prevTitle = document.title;
-    document.title = 'RO-' + (roNum || 'XXXX') + (lastName ? '_' + lastName : '') + '_Total_Loss_Worksheet';
     window.print();
-    document.title = prevTitle;
 }
 
 /* ── Slide-confirm delete: slide to green check, then delete ── */
