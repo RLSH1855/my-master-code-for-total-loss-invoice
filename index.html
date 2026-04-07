@@ -4200,8 +4200,8 @@
         });
 
         // Sync notes textarea content into print-only display div before printing
-        // Update document.title used as PDF filename
-        function updatePdfTitle() {
+        // Update document.title used as PDF filename — exposed globally so doneAction can call it
+        window.updatePdfTitle = function updatePdfTitle() {
             var ro    = ($('#WONum').val() || 'RO').trim().replace(/\s/g, '_');
             var owner = ($('#Cust').val()  || '').trim();
             var parts = owner.split(/\s+/).filter(Boolean);
@@ -5098,6 +5098,7 @@ function doneAction() {
     var ok = false;
     try { saveRecord(true); ok = true; } catch(e) { ok = false; }
     if (!ok) { setCloud('red'); showConfirm(false, 'Save failed.'); return; }
+    if (typeof window.updatePdfTitle === 'function') window.updatePdfTitle();
     window.print();
 }
 
