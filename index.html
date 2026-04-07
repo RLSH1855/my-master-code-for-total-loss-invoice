@@ -4219,20 +4219,18 @@
             updatePdfTitle();
         });
 
-        window.addEventListener('beforeprint', function() {
+        // Shared DOM prep for both window.print() and html2pdf export
+        window.preparePrintDom = function() {
             // Sync notes display
             var val = document.getElementById('NotesField').value;
             document.getElementById('printNotesDisplay').textContent = val;
-            updatePdfTitle();
 
             // Step 1 — hide unchecked service rows, empty manual rows, and add-button rows
             $('#worksheet-body tr').each(function() {
-                // Always hide the manual add-button rows
                 if ($(this).hasClass('manual-add-btn-row')) {
                     $(this).addClass('row-print-hide');
                     return;
                 }
-                // Hide manual rows with no description
                 if ($(this).hasClass('manual-row')) {
                     if (!$(this).find('.manual-name-input').val().trim()) {
                         $(this).addClass('row-print-hide');
@@ -4247,28 +4245,19 @@
                 }
             });
 
-            // Step 2 — hide section header rows whose entire section is empty.
-            // Walk every section-header row; if every data row before the NEXT
-            // header (or end of table) is hidden, hide the header too.
+            // Step 2 — hide section header rows whose entire section is empty
             var rows = $('#worksheet-body tr').toArray();
             for (var i = 0; i < rows.length; i++) {
                 if (!$(rows[i]).find('.section-header').length) continue;
-                // found a header row — scan forward for visible data rows
                 var hasVisible = false;
                 for (var j = i + 1; j < rows.length; j++) {
-                    if ($(rows[j]).find('.section-header').length) break; // next header
-                    if (!$(rows[j]).hasClass('row-print-hide')) {
-                        hasVisible = true;
-                        break;
-                    }
+                    if ($(rows[j]).find('.section-header').length) break;
+                    if (!$(rows[j]).hasClass('row-print-hide')) { hasVisible = true; break; }
                 }
                 if (!hasVisible) $(rows[i]).addClass('row-print-hide');
             }
 
-            // Step 3 — smart disclaimer page break based on visible row count.
-            // For small claims (≤ 12 rows visible), the invoice content is short enough
-            // that forcing the disclaimer to a new page creates a nearly-empty page.
-            // Allow it to flow naturally instead. For larger claims, keep it on its own page.
+            // Step 3 — smart disclaimer page break
             var visibleDataRows = $('#worksheet-body tr')
                 .not('.row-print-hide')
                 .filter(function() { return !$(this).find('.section-header').length; })
@@ -4281,14 +4270,21 @@
                     legalPage.classList.remove('legal-page-auto-break');
                 }
             }
+        };
+
+        window.restorePrintDom = function() {
+            $('#worksheet-body tr').removeClass('row-print-hide');
+            var legalPage = document.querySelector('.legal-page');
+            if (legalPage) legalPage.classList.remove('legal-page-auto-break');
+        };
+
+        window.addEventListener('beforeprint', function() {
+            updatePdfTitle();
+            window.preparePrintDom();
         });
 
         window.addEventListener('afterprint', function() {
-            // Restore all hidden rows after printing
-            $('#worksheet-body tr').removeClass('row-print-hide');
-            // Restore disclaimer page break
-            var legalPage = document.querySelector('.legal-page');
-            if (legalPage) legalPage.classList.remove('legal-page-auto-break');
+            window.restorePrintDom();
         });
 
         // Auto-save: save record automatically whenever a field changes
@@ -5092,14 +5088,71 @@ function saveAction() {
     // Cloud status updated by saveRecord's then/catch
 }
 
-/* ── Done action — save + PDF ── */
+/* ── Done action — save + PDF via html2pdf (guaranteed filename) ── */
 function doneAction() {
     setCloud('amber');
     var ok = false;
     try { saveRecord(true); ok = true; } catch(e) { ok = false; }
     if (!ok) { setCloud('red'); showConfirm(false, 'Save failed.'); return; }
-    if (typeof window.updatePdfTitle === 'function') window.updatePdfTitle();
-    window.print();
+
+    // Build filename
+    var ro       = ($('#WONum').val() || 'RO').trim().replace(/\s/g, '_');
+    var owner    = ($('#Cust').val()  || '').trim();
+    var parts    = owner.split(/\s+/).filter(Boolean);
+    var lastName = parts.length > 0 ? parts[parts.length - 1] : '';
+    function cap(s) { return s.charAt(0).toUpperCase() + s.slice(1).toLowerCase(); }
+    if (lastName) lastName = cap(lastName);
+    ro = ro.split('_').map(cap).join('_');
+    var filename = ro + (lastName ? '_' + lastName : '') + '_Total_Loss_Invoice.pdf';
+
+    // Prepare DOM (hide unchecked rows, sync notes, etc.)
+    if (typeof window.preparePrintDom === 'function') window.preparePrintDom();
+
+    var opt = {
+        margin:      [0.4, 0.4, 0.4, 0.4],
+        filename:    filename,
+        image:       { type: 'jpeg', quality: 0.98 },
+        html2canvas: {
+            scale: 2,
+            useCORS: true,
+            onclone: function(doc) {
+                // Extract all @media print rules and inject them as regular CSS
+                // so html2canvas renders the print layout correctly
+                var printCss = '';
+                try {
+                    var sheets = document.styleSheets;
+                    for (var i = 0; i < sheets.length; i++) {
+                        var rules = sheets[i].cssRules || [];
+                        for (var j = 0; j < rules.length; j++) {
+                            if (rules[j] instanceof CSSMediaRule &&
+                                rules[j].conditionText === 'print') {
+                                for (var k = 0; k < rules[j].cssRules.length; k++) {
+                                    printCss += rules[j].cssRules[k].cssText + '\n';
+                                }
+                            }
+                        }
+                    }
+                } catch(e) {}
+                if (printCss) {
+                    var style = doc.createElement('style');
+                    style.textContent = printCss;
+                    doc.head.appendChild(style);
+                }
+                // Also apply row-print-hide visibility since it's driven by a print rule
+                doc.querySelectorAll('.row-print-hide').forEach(function(el) {
+                    el.style.display = 'none';
+                });
+            }
+        },
+        jsPDF:       { unit: 'in', format: 'letter', orientation: 'portrait' },
+        pagebreak:   { mode: ['css', 'legacy'] }
+    };
+
+    html2pdf().set(opt).from(document.getElementById('capture-area')).save()
+        .then(function() {
+            if (typeof window.restorePrintDom === 'function') window.restorePrintDom();
+            showConfirm(true, 'Done!');
+        });
 }
 
 /* ── Slide-confirm delete: slide to green check, then delete ── */
