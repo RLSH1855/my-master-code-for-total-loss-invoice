@@ -2255,63 +2255,66 @@
             .disclaimer-header-bar {
                 -webkit-print-color-adjust: exact !important;
                 print-color-adjust: exact !important;
-                margin-bottom: 12px !important;
-                padding-bottom: 8px !important;
+                margin-bottom: 6px !important;
+                padding-bottom: 4px !important;
             }
 
             .disclaimer-logo {
-                height: 42px !important;
+                height: 34px !important;
             }
 
             .disclaimer-title {
-                font-size: 11px !important;
-                margin-bottom: 10px !important;
+                font-size: 10px !important;
+                margin-bottom: 6px !important;
             }
 
             .disclaimer-body p {
-                font-size: 9px !important;
-                margin-bottom: 5px !important;
+                font-size: 8.5px !important;
+                margin-bottom: 3px !important;
             }
 
             .disclaimer-bullets {
-                margin: 2px 0 5px 10px !important;
+                margin: 1px 0 3px 8px !important;
             }
 
             .disclaimer-bullets-col {
-                font-size: 9px !important;
-                gap: 2px !important;
+                font-size: 8.5px !important;
+                gap: 1px !important;
             }
 
             .disclaimer-ack {
-                font-size: 9px !important;
-                margin-top: 10px !important;
+                font-size: 8.5px !important;
+                margin-top: 6px !important;
             }
 
             /* Signature table — strong professional lines */
             .sig-table {
-                margin-top: 10px !important;
+                margin-top: 6px !important;
+                width: 100% !important;
+                break-inside: avoid !important;
+                page-break-inside: avoid !important;
             }
 
             .sig-table td {
-                padding: 10px 14px 0 0 !important;
+                padding: 6px 12px 0 0 !important;
             }
 
             .sig-lbl {
                 font-size: 8px !important;
-                margin-bottom: 4px !important;
+                margin-bottom: 3px !important;
             }
 
             .sig-ln {
-                min-height: 18px !important;
+                min-height: 16px !important;
                 border-bottom: 1.5px solid #000 !important;
             }
 
             .disclaimer-footer-line {
-                margin: 20px 0 0 0 !important;
+                margin: 10px 0 0 0 !important;
                 padding: 0 !important;
             }
             .disclaimer-gradient-bar {
-                margin-bottom: 14px !important;
+                margin-bottom: 8px !important;
                 padding: 0 !important;
             }
 
@@ -2329,6 +2332,12 @@
             .table-summary-unit {
                 break-inside: auto;
                 page-break-inside: auto;
+            }
+
+            /* Keep totals box attached to the bottom of the table */
+            .invoice-table-block {
+                break-after: avoid;
+                page-break-after: avoid;
             }
 
             /* Summary table — Chrome natively keeps tr together */
