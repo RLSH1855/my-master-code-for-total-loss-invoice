@@ -1,0 +1,1066 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>3J's — Light Mode</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+    font-family: 'Montserrat', sans-serif;
+    background: #dde3ec;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 40px 20px 60px;
+}
+
+/* ═══════════════════════════
+   PHONE — desktop preview only
+═══════════════════════════ */
+.phone {
+    width: 340px;
+    background: #c8cfd8;
+    border-radius: 52px;
+    padding: 14px;
+    position: relative;
+    box-shadow:
+        0 0 0 1px rgba(255,255,255,0.7),
+        0 0 0 2px rgba(0,0,0,0.12),
+        0 40px 120px rgba(0,0,0,0.22),
+        0 20px 60px rgba(0,0,0,0.12);
+}
+.notch {
+    width: 90px; height: 22px;
+    background: #c8cfd8;
+    border-radius: 0 0 14px 14px;
+    margin: 0 auto 8px;
+    position: relative;
+}
+.notch::after {
+    content: '';
+    position: absolute;
+    top: 6px; left: 50%; transform: translateX(-50%);
+    width: 10px; height: 10px;
+    background: #aab0b8;
+    border-radius: 50%;
+}
+.screen {
+    border-radius: 40px;
+    overflow: hidden;
+    height: 660px;
+    position: relative;
+    background: #f0f4f8;
+}
+.scroll {
+    height: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding-bottom: 72px;
+}
+.scroll::-webkit-scrollbar { display: none; }
+
+/* ═══════════════════════════
+   RESPONSIVE — real mobile
+═══════════════════════════ */
+@media (max-width: 480px) {
+    body {
+        padding: 0;
+        background: #f0f4f8;
+    }
+    .phone {
+        width: 100%;
+        background: transparent;
+        border-radius: 0;
+        padding: 0;
+        box-shadow: none;
+    }
+    .notch { display: none; }
+    .screen {
+        border-radius: 0;
+        height: 100vh;
+        height: 100dvh;
+    }
+    .scroll { padding-bottom: 80px; }
+    .topbar { padding-top: env(safe-area-inset-top, 20px); }
+    .bottom-nav {
+        padding-bottom: env(safe-area-inset-bottom, 0px);
+        height: calc(66px + env(safe-area-inset-bottom, 0px));
+    }
+}
+
+/* ═══════════════════════════
+   APP BACKGROUND — light
+═══════════════════════════ */
+.app {
+    min-height: 100%;
+    background: #f0f4f8;
+    position: relative;
+}
+
+/* ═══════════════════════════
+   TOP BAR
+═══════════════════════════ */
+.topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 20px 0;
+    position: relative;
+    z-index: 2;
+}
+.brand-name {
+    font-size: 14px; font-weight: 600;
+    color: #1a2e42;
+    letter-spacing: 0.1px;
+}
+.brand-loc {
+    font-size: 9px; font-weight: 400;
+    color: #8a9bac;
+    margin-top: 3px; letter-spacing: 0.5px;
+}
+.sync-chip {
+    display: flex; align-items: center; gap: 5px;
+    padding: 5px 11px 5px 8px;
+    background: #ffffff;
+    border: 1px solid #d0dae4;
+    border-radius: 20px;
+    box-shadow:
+        0 1px 3px rgba(0,0,0,0.08),
+        inset 0 1px 0 rgba(255,255,255,0.9);
+}
+.sync-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: #22c55e;
+    box-shadow: 0 0 6px rgba(34,197,94,0.6);
+}
+.sync-txt {
+    font-size: 9px; font-weight: 600;
+    color: #22c55e;
+    letter-spacing: 0.5px;
+}
+
+/* ═══════════════════════════
+   HERO — total amount
+═══════════════════════════ */
+.hero {
+    padding: 28px 20px 20px;
+    text-align: center;
+    position: relative;
+    z-index: 2;
+}
+.hero-label {
+    font-size: 10px; font-weight: 400;
+    color: #8a9bac;
+    letter-spacing: 3px; text-transform: uppercase;
+    margin-bottom: 10px;
+}
+.hero-number {
+    font-size: 44px; font-weight: 300;
+    color: #1a2e42;
+    letter-spacing: 0.9px; line-height: 1;
+}
+.hero-cents {
+    font-size: 26px; font-weight: 300;
+    color: #8a9bac;
+}
+
+/* Meta strip */
+.meta-strip {
+    display: flex;
+    margin: 16px 20px 0;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #ffffff;
+    border: 1px solid #d8e4ee;
+    box-shadow:
+        0 2px 8px rgba(0,0,0,0.07),
+        inset 0 1px 0 rgba(255,255,255,1);
+}
+.meta-cell { flex: 1; padding: 11px 8px; text-align: center; }
+.meta-cell + .meta-cell { border-left: 1px solid #e8f0f6; }
+.meta-l {
+    font-size: 8px; font-weight: 500;
+    color: #9ab0c4;
+    letter-spacing: 1.4px; text-transform: uppercase;
+    margin-bottom: 4px;
+}
+.meta-v {
+    font-size: 11px; font-weight: 600;
+    color: #2a4060;
+    letter-spacing: 0.2px;
+    line-height: 1.3;
+}
+
+/* ═══════════════════════════
+   MAIN WHITE CARD
+═══════════════════════════ */
+.float-card {
+    margin: 20px 0 0;
+    background: #ffffff;
+    border-radius: 20px 20px 0 0;
+    overflow: hidden;
+    position: relative;
+    box-shadow:
+        0 -2px 0 rgba(255,255,255,1),
+        0 -6px 20px rgba(0,0,0,0.06);
+}
+.card-hdr {
+    padding: 14px 16px 12px;
+    border-bottom: 1px solid #edf2f7;
+    display: flex; align-items: center;
+    justify-content: space-between;
+    background: #f8fafc;
+}
+.card-hdr-txt {
+    font-size: 9px; font-weight: 700;
+    color: #7a90a8;
+    letter-spacing: 2.2px; text-transform: uppercase;
+}
+.card-hdr-badge {
+    font-size: 8px; font-weight: 700;
+    color: #3b82f6;
+    background: rgba(59,130,246,0.1);
+    border-radius: 4px; padding: 2px 7px;
+    letter-spacing: 0.8px;
+}
+
+/* Bento field grid */
+.field-grid { display: grid; grid-template-columns: 1fr 1fr; }
+.field-cell {
+    padding: 10px 16px;
+    border-bottom: 1px solid #f0f4f8;
+    border-right: 1px solid #f0f4f8;
+}
+.field-cell:nth-child(even)      { border-right: none; }
+.field-cell:nth-last-child(-n+2) { border-bottom: none; }
+.field-lbl {
+    font-size: 8px; font-weight: 600;
+    color: #9ab0c4;
+    letter-spacing: 1.2px; text-transform: uppercase;
+    margin-bottom: 4px;
+}
+.field-inp {
+    width: 100%;
+    background: #f4f8fc;
+    border: 1.5px solid #c8d8e8;
+    border-radius: 6px;
+    padding: 6px 9px;
+    font-size: 12px; font-family: 'Montserrat', sans-serif;
+    font-weight: 500; color: #1a2e42;
+    letter-spacing: 0.4px;
+    outline: none; -webkit-appearance: none;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.field-inp:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59,130,246,0.15);
+    background: #ffffff;
+}
+
+/* ═══════════════════════════
+   SERVICE SECTION
+═══════════════════════════ */
+.svc-section { background: #ffffff; padding: 0 0 16px; }
+
+.sec-divider {
+    display: flex; align-items: center;
+    padding: 13px 16px 9px;
+    gap: 9px;
+    border-top: 1px solid #edf2f7;
+    background: #f8fafc;
+}
+.sec-accent-bar {
+    width: 3px; height: 14px;
+    border-radius: 2px;
+    flex-shrink: 0;
+}
+.bar-blue  { background: linear-gradient(to bottom, #3b82f6, #06b6d4); }
+.bar-amber { background: linear-gradient(to bottom, #f59e0b, #f97316); }
+
+.sec-title {
+    font-size: 9px; font-weight: 700;
+    letter-spacing: 1.8px; text-transform: uppercase;
+    flex: 1;
+}
+.sec-title-blue  { color: #2563eb; }
+.sec-title-amber { color: #d97706; }
+.sec-title-dark  { color: #2a4060; }
+.sec-badge {
+    font-size: 8px; font-weight: 600;
+    border-radius: 20px; padding: 2px 8px;
+}
+.badge-blue  { color: #2563eb; background: rgba(59,130,246,0.1); }
+.badge-amber { color: #d97706; background: rgba(245,158,11,0.1); }
+
+/* Row list */
+.row-list {
+    display: flex; flex-direction: column;
+    gap: 8px;
+    padding: 8px 12px 14px;
+}
+
+/* Service rows */
+.svc-row {
+    border-radius: 10px;
+    overflow: hidden;
+    background: #ffffff;
+    border: 1.5px solid #d8e8f4;
+    box-shadow:
+        0 1px 3px rgba(10,30,60,0.06),
+        0 3px 8px rgba(10,30,60,0.04);
+}
+.svc-row.off {
+    background: #f8fafc;
+    border-color: #e0eaf2;
+    box-shadow: none;
+}
+.svc-row-top {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 14px;
+    border-bottom: 1px solid #e8f0f8;
+    background: #f4f8fc;
+    position: relative;
+}
+.svc-row-top::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0; width: 3px;
+    border-radius: 10px 0 0 0;
+    background: linear-gradient(to bottom, #3b82f6, #06b6d4);
+}
+.svc-row.off .svc-row-top::before { background: #c8d8e8; }
+.svc-row.off .svc-row-top { background: #f8fafc; }
+
+.svc-chk  { width: 16px; height: 16px; accent-color: #2563eb; flex-shrink: 0; margin-left: 5px; }
+.svc-name { flex: 1; font-size: 12px; font-weight: 500; color: #1e3248; letter-spacing: 0.3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.svc-amt  { display: none; }
+
+.svc-row-fields {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 8px; padding: 12px 14px 14px 18px;
+    background: #f8fbff;
+}
+.svc-row-fields > div:nth-child(3) { display: none; }
+
+.f-lbl { font-size: 8px; font-weight: 600; color: #7a9ab8; letter-spacing: 0.9px; text-transform: uppercase; margin-bottom: 3px; }
+.f-inp {
+    width: 100%; background: #ffffff;
+    border: 1.5px solid #c8d8e8;
+    border-radius: 5px;
+    padding: 5px 7px;
+    font-size: 11px; font-family: 'Montserrat', sans-serif;
+    font-weight: 500; color: #1e3248;
+    -webkit-appearance: none; outline: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
+}
+.f-inp:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 2.5px rgba(59,130,246,0.15);
+}
+.f-static { font-size: 11px; font-weight: 400; color: #a8bece; padding-top: 5px; }
+
+/* CCP rows */
+.ccp-row {
+    border-radius: 10px; overflow: hidden;
+    background: #ffffff;
+    border: 1.5px solid #fde8c8;
+    box-shadow:
+        0 1px 3px rgba(10,30,60,0.06),
+        0 3px 8px rgba(10,30,60,0.04);
+}
+.ccp-row.off {
+    background: #f8fafc;
+    border-color: #e0eaf2;
+    box-shadow: none;
+}
+.ccp-row-top {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 14px;
+    border-bottom: 1px solid #fde8c8;
+    background: #fffbf4;
+    position: relative;
+}
+.ccp-row-top::before {
+    content: '';
+    position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
+    border-radius: 10px 0 0 0;
+    background: linear-gradient(to bottom, #f59e0b, #f97316);
+}
+.ccp-row.off .ccp-row-top::before { background: #c8d8e8; }
+.ccp-row.off .ccp-row-top { background: #f8fafc; border-bottom-color: #e8f0f8; }
+
+.ccp-row-top input[type=checkbox] { width: 16px; height: 16px; accent-color: #d97706; flex-shrink: 0; margin-left: 5px; }
+.ccp-name { flex: 1; font-size: 12px; font-weight: 500; color: #1e3248; letter-spacing: 0.3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ccp-amt  { display: none; }
+
+.ccp-body  { padding: 12px 14px 14px 18px; background: #fffcf8; }
+.ccp-row.off .ccp-body { background: #f8fafc; }
+.ccp-dates { display: flex; align-items: center; gap: 6px; margin-bottom: 7px; }
+.ccp-date-inp {
+    flex: 1; background: #ffffff;
+    border: 1.5px solid #e8d0a0;
+    border-radius: 5px;
+    padding: 5px 7px;
+    font-size: 11px; font-family: 'Montserrat', sans-serif;
+    font-weight: 400; color: #1e3248;
+    -webkit-appearance: none; outline: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
+}
+.ccp-row.off .ccp-date-inp { border-color: #c8d8e8; }
+.ccp-date-inp:focus {
+    border-color: #f59e0b;
+    box-shadow: 0 0 0 2.5px rgba(245,158,11,0.18);
+}
+.ccp-arr { font-size: 11px; color: #b0c0cc; flex-shrink: 0; }
+.ccp-days {
+    display: inline-flex; align-items: center;
+    font-size: 10px; font-weight: 700;
+    color: #d97706;
+    background: rgba(245,158,11,0.1);
+    border-radius: 5px; padding: 3px 9px;
+    border: 1px solid rgba(245,158,11,0.2);
+}
+
+/* ═══════════════════════════
+   TOTALS SUMMARY
+═══════════════════════════ */
+.totals-card {
+    margin: 6px 12px 0;
+    background: #ffffff;
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1.5px solid #d8e8f4;
+    box-shadow:
+        0 2px 8px rgba(10,30,60,0.06),
+        0 4px 14px rgba(10,30,60,0.04);
+}
+.totals-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 9px 14px;
+    border-bottom: 1px solid #edf4fa;
+}
+.totals-row:last-child { border-bottom: none; }
+.totals-row.grand {
+    background: #f0f7ff;
+    padding: 12px 14px;
+    border-top: 2px solid #bdd8f0;
+}
+.t-lbl { font-size: 10px; font-weight: 400; color: #7a90a8; letter-spacing: 0.4px; }
+.t-lbl.bold { font-weight: 700; color: #1a2e42; font-size: 11px; }
+.t-val { font-size: 10px; font-weight: 600; color: #2a4060; }
+.t-val.grand-val { font-size: 15px; font-weight: 800; color: #1a2e42; }
+.t-val.tax-val { color: #dc2626; }
+.svc-section-end { background: #ffffff; height: 8px; }
+
+/* ═══════════════════════════
+   BOTTOM NAV — light version
+═══════════════════════════ */
+.bottom-nav {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 66px;
+    background: #ffffff;
+    border-top: 1.5px solid #d8e4ee;
+    display: flex; align-items: stretch;
+    box-shadow:
+        0 -2px 8px rgba(0,0,0,0.08),
+        0 -1px 3px rgba(0,0,0,0.04);
+}
+.nav-btn {
+    flex: 1;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 4px; background: none; border: none; cursor: pointer;
+    font-family: 'Montserrat', sans-serif;
+    position: relative;
+    -webkit-tap-highlight-color: transparent;
+    transition: background 0.12s;
+}
+.nav-btn:active { background: rgba(0,0,0,0.04); }
+.nav-btn.active::before {
+    content: '';
+    position: absolute; top: 0;
+    width: 20px; height: 2.5px;
+    border-radius: 0 0 3px 3px;
+}
+.btn-new.active::before  { background: #22c55e; }
+.btn-save.active::before { background: #f59e0b; }
+.btn-rec.active::before  { background: #ef4444; }
+.btn-prt.active::before  { background: #3b82f6; }
+
+.nav-ico { width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; }
+.nav-ico svg { width: 20px; height: 20px; fill: none; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+
+.btn-new  .nav-ico svg { stroke: #16a34a; opacity: 0.6; }
+.btn-save .nav-ico svg { stroke: #d97706; opacity: 0.6; }
+.btn-rec  .nav-ico svg { stroke: #dc2626; opacity: 0.6; }
+.btn-prt  .nav-ico svg { stroke: #2563eb; opacity: 0.6; }
+.btn-new.active  .nav-ico svg { stroke: #16a34a; opacity: 1; }
+.btn-save.active .nav-ico svg { stroke: #d97706; opacity: 1; }
+.btn-rec.active  .nav-ico svg { stroke: #dc2626; opacity: 1; }
+.btn-prt.active  .nav-ico svg { stroke: #2563eb; opacity: 1; }
+
+.nav-lbl { font-size: 8px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; }
+.btn-new  .nav-lbl { color: #16a34a; opacity: 0.6; }
+.btn-save .nav-lbl { color: #d97706; opacity: 0.6; }
+.btn-rec  .nav-lbl { color: #dc2626; opacity: 0.6; }
+.btn-prt  .nav-lbl { color: #2563eb; opacity: 0.6; }
+.btn-new.active  .nav-lbl { color: #16a34a; opacity: 1; }
+.btn-save.active .nav-lbl { color: #d97706; opacity: 1; }
+.btn-rec.active  .nav-lbl { color: #dc2626; opacity: 1; }
+.btn-prt.active  .nav-lbl { color: #2563eb; opacity: 1; }
+
+.nav-sep { width: 1px; background: #e8eef4; margin: 16px 0; }
+</style>
+</head>
+<body>
+
+<div class="phone">
+    <div class="notch"></div>
+    <div class="screen">
+        <div class="scroll">
+            <div class="app">
+
+                <!-- Top bar -->
+                <div class="topbar">
+                    <div class="brand">
+                        <div class="brand-name">3J's Auto Body &amp; Paint</div>
+                        <div class="brand-loc">Signal Hill · CA 90755</div>
+                    </div>
+                    <div class="sync-chip">
+                        <div class="sync-dot"></div>
+                        <span class="sync-txt">Synced</span>
+                    </div>
+                </div>
+
+                <!-- Hero -->
+                <div class="hero">
+                    <div class="hero-label">Invoice Total</div>
+                    <div class="hero-number">$8,466<span class="hero-cents">.51</span></div>
+                </div>
+
+                <!-- Meta strip -->
+                <div class="meta-strip">
+                    <div class="meta-cell">
+                        <div class="meta-l">Owner</div>
+                        <div class="meta-v">Tyra Parrish</div>
+                    </div>
+                    <div class="meta-cell">
+                        <div class="meta-l">Insurance</div>
+                        <div class="meta-v">Farmers Ins.</div>
+                    </div>
+                    <div class="meta-cell">
+                        <div class="meta-l">RO#</div>
+                        <div class="meta-v">12639</div>
+                    </div>
+                </div>
+
+                <!-- Main card — Customer Details -->
+                <div class="float-card">
+                    <div class="card-hdr">
+                        <span class="card-hdr-txt">Customer Details</span>
+                        <span class="card-hdr-badge">ACTIVE</span>
+                    </div>
+                    <div class="field-grid">
+                        <div class="field-cell">
+                            <div class="field-lbl">Vehicle</div>
+                            <input class="field-inp" value="2013 Chev Sonic">
+                        </div>
+                        <div class="field-cell">
+                            <div class="field-lbl">Claim #</div>
+                            <input class="field-inp" value="700974783-1">
+                        </div>
+                        <div class="field-cell">
+                            <div class="field-lbl">Date</div>
+                            <input class="field-inp" value="03 / 10 / 2026">
+                        </div>
+                        <div class="field-cell">
+                            <div class="field-lbl">VIN</div>
+                            <input class="field-inp" value="1G1JC5SG5D4...">
+                        </div>
+                    </div>
+
+                    <!-- PROCUREMENT CHARGES -->
+                    <div class="svc-section">
+                        <div class="sec-divider">
+                            <div class="sec-accent-bar bar-blue"></div>
+                            <span class="sec-title sec-title-blue">Procurement Charges</span>
+                            <span class="sec-badge badge-blue">15 items</span>
+                        </div>
+                        <div class="row-list">
+
+                            <div class="svc-row">
+                                <div class="svc-row-top">
+                                    <input type="checkbox" class="svc-chk" checked>
+                                    <span class="svc-name">Initial Contact</span>
+                                </div>
+                                <div class="svc-row-fields">
+                                    <div><div class="f-lbl">Type</div><select class="f-inp"><option>Body</option></select></div>
+                                    <div><div class="f-lbl">Hours</div><input type="number" class="f-inp" value="0.2" min="0" step="0.1"></div>
+                                    <div><div class="f-lbl">Tax</div><div class="f-static">$0.00</div></div>
+                                </div>
+                            </div>
+
+                            <div class="svc-row">
+                                <div class="svc-row-top">
+                                    <input type="checkbox" class="svc-chk" checked>
+                                    <span class="svc-name">Assign Repair Order Number</span>
+                                </div>
+                                <div class="svc-row-fields">
+                                    <div><div class="f-lbl">Type</div><select class="f-inp"><option>Body</option></select></div>
+                                    <div><div class="f-lbl">Hours</div><input type="number" class="f-inp" value="0.2" min="0" step="0.1"></div>
+                                    <div><div class="f-lbl">Tax</div><div class="f-static">$0.00</div></div>
+                                </div>
+                            </div>
+
+                            <div class="svc-row">
+                                <div class="svc-row-top">
+                                    <input type="checkbox" class="svc-chk" checked>
+                                    <span class="svc-name">Create Work Order File</span>
+                                </div>
+                                <div class="svc-row-fields">
+                                    <div><div class="f-lbl">Type</div><select class="f-inp"><option>Body</option></select></div>
+                                    <div><div class="f-lbl">Hours</div><input type="number" class="f-inp" value="0.3" min="0" step="0.1"></div>
+                                    <div><div class="f-lbl">Tax</div><div class="f-static">$0.00</div></div>
+                                </div>
+                            </div>
+
+                            <div class="svc-row">
+                                <div class="svc-row-top">
+                                    <input type="checkbox" class="svc-chk" checked>
+                                    <span class="svc-name">Create In-House Tow Worksheet</span>
+                                </div>
+                                <div class="svc-row-fields">
+                                    <div><div class="f-lbl">Type</div><select class="f-inp"><option>Body</option></select></div>
+                                    <div><div class="f-lbl">Hours</div><input type="number" class="f-inp" value="0.3" min="0" step="0.1"></div>
+                                    <div><div class="f-lbl">Tax</div><div class="f-static">$0.00</div></div>
+                                </div>
+                            </div>
+
+                            <div class="svc-row">
+                                <div class="svc-row-top">
+                                    <input type="checkbox" class="svc-chk" checked>
+                                    <span class="svc-name">Tow Vehicle to Facility</span>
+                                </div>
+                                <div class="svc-row-fields">
+                                    <div><div class="f-lbl">Type</div><select class="f-inp"><option>Body</option></select></div>
+                                    <div><div class="f-lbl">Hours</div><input type="number" class="f-inp" value="1.0" min="0" step="0.1"></div>
+                                    <div><div class="f-lbl">Tax</div><div class="f-static">$0.00</div></div>
+                                </div>
+                            </div>
+
+                            <div class="svc-row">
+                                <div class="svc-row-top">
+                                    <input type="checkbox" class="svc-chk" checked>
+                                    <span class="svc-name">Vehicle Check-In &amp; Inspection</span>
+                                </div>
+                                <div class="svc-row-fields">
+                                    <div><div class="f-lbl">Type</div><select class="f-inp"><option>Body</option></select></div>
+                                    <div><div class="f-lbl">Hours</div><input type="number" class="f-inp" value="0.5" min="0" step="0.1"></div>
+                                    <div><div class="f-lbl">Tax</div><div class="f-static">$0.00</div></div>
+                                </div>
+                            </div>
+
+                            <div class="svc-row">
+                                <div class="svc-row-top">
+                                    <input type="checkbox" class="svc-chk" checked>
+                                    <span class="svc-name">Photo Documentation</span>
+                                </div>
+                                <div class="svc-row-fields">
+                                    <div><div class="f-lbl">Type</div><select class="f-inp"><option>Photo</option></select></div>
+                                    <div><div class="f-lbl">Hours</div><input type="number" class="f-inp" value="1.0" min="0" step="0.1"></div>
+                                    <div><div class="f-lbl">Tax</div><div class="f-static">$0.00</div></div>
+                                </div>
+                            </div>
+
+                            <div class="svc-row">
+                                <div class="svc-row-top">
+                                    <input type="checkbox" class="svc-chk" checked>
+                                    <span class="svc-name">Insurance Notification &amp; Filing</span>
+                                </div>
+                                <div class="svc-row-fields">
+                                    <div><div class="f-lbl">Type</div><select class="f-inp"><option>Body</option></select></div>
+                                    <div><div class="f-lbl">Hours</div><input type="number" class="f-inp" value="0.3" min="0" step="0.1"></div>
+                                    <div><div class="f-lbl">Tax</div><div class="f-static">$0.00</div></div>
+                                </div>
+                            </div>
+
+                            <div class="svc-row">
+                                <div class="svc-row-top">
+                                    <input type="checkbox" class="svc-chk" checked>
+                                    <span class="svc-name">Disassembly for Inspection</span>
+                                </div>
+                                <div class="svc-row-fields">
+                                    <div><div class="f-lbl">Type</div><select class="f-inp"><option>Body</option></select></div>
+                                    <div><div class="f-lbl">Hours</div><input type="number" class="f-inp" value="3.0" min="0" step="0.1"></div>
+                                    <div><div class="f-lbl">Tax</div><div class="f-static">$0.00</div></div>
+                                </div>
+                            </div>
+
+                            <div class="svc-row">
+                                <div class="svc-row-top">
+                                    <input type="checkbox" class="svc-chk" checked>
+                                    <span class="svc-name">Damage Assessment Report</span>
+                                </div>
+                                <div class="svc-row-fields">
+                                    <div><div class="f-lbl">Type</div><select class="f-inp"><option>Body</option></select></div>
+                                    <div><div class="f-lbl">Hours</div><input type="number" class="f-inp" value="2.0" min="0" step="0.1"></div>
+                                    <div><div class="f-lbl">Tax</div><div class="f-static">$0.00</div></div>
+                                </div>
+                            </div>
+
+                            <div class="svc-row">
+                                <div class="svc-row-top">
+                                    <input type="checkbox" class="svc-chk" checked>
+                                    <span class="svc-name">Supplement Preparation</span>
+                                </div>
+                                <div class="svc-row-fields">
+                                    <div><div class="f-lbl">Type</div><select class="f-inp"><option>Body</option></select></div>
+                                    <div><div class="f-lbl">Hours</div><input type="number" class="f-inp" value="2.5" min="0" step="0.1"></div>
+                                    <div><div class="f-lbl">Tax</div><div class="f-static">$0.00</div></div>
+                                </div>
+                            </div>
+
+                            <div class="svc-row">
+                                <div class="svc-row-top">
+                                    <input type="checkbox" class="svc-chk" checked>
+                                    <span class="svc-name">Parts Research &amp; Ordering</span>
+                                </div>
+                                <div class="svc-row-fields">
+                                    <div><div class="f-lbl">Type</div><select class="f-inp"><option>Body</option></select></div>
+                                    <div><div class="f-lbl">Hours</div><input type="number" class="f-inp" value="1.5" min="0" step="0.1"></div>
+                                    <div><div class="f-lbl">Tax</div><div class="f-static">$0.00</div></div>
+                                </div>
+                            </div>
+
+                            <div class="svc-row">
+                                <div class="svc-row-top">
+                                    <input type="checkbox" class="svc-chk" checked>
+                                    <span class="svc-name">Adjuster Coordination</span>
+                                </div>
+                                <div class="svc-row-fields">
+                                    <div><div class="f-lbl">Type</div><select class="f-inp"><option>Body</option></select></div>
+                                    <div><div class="f-lbl">Hours</div><input type="number" class="f-inp" value="1.0" min="0" step="0.1"></div>
+                                    <div><div class="f-lbl">Tax</div><div class="f-static">$0.00</div></div>
+                                </div>
+                            </div>
+
+                            <div class="svc-row">
+                                <div class="svc-row-top">
+                                    <input type="checkbox" class="svc-chk" checked>
+                                    <span class="svc-name">Total Loss Determination Support</span>
+                                </div>
+                                <div class="svc-row-fields">
+                                    <div><div class="f-lbl">Type</div><select class="f-inp"><option>Body</option></select></div>
+                                    <div><div class="f-lbl">Hours</div><input type="number" class="f-inp" value="2.0" min="0" step="0.1"></div>
+                                    <div><div class="f-lbl">Tax</div><div class="f-static">$0.00</div></div>
+                                </div>
+                            </div>
+
+                            <div class="svc-row">
+                                <div class="svc-row-top">
+                                    <input type="checkbox" class="svc-chk" checked>
+                                    <span class="svc-name">Final Documentation &amp; Release</span>
+                                </div>
+                                <div class="svc-row-fields">
+                                    <div><div class="f-lbl">Type</div><select class="f-inp"><option>Body</option></select></div>
+                                    <div><div class="f-lbl">Hours</div><input type="number" class="f-inp" value="1.0" min="0" step="0.1"></div>
+                                    <div><div class="f-lbl">Tax</div><div class="f-static">$0.00</div></div>
+                                </div>
+                            </div>
+
+                        </div><!-- /row-list procurement -->
+
+                        <!-- CC&P SECTION -->
+                        <div class="sec-divider" style="margin-top:4px;">
+                            <div class="sec-accent-bar bar-amber"></div>
+                            <span class="sec-title sec-title-amber">Care, Custody &amp; Protection</span>
+                            <span class="sec-badge badge-amber">2 items</span>
+                        </div>
+                        <div class="row-list">
+                            <div class="ccp-row">
+                                <div class="ccp-row-top">
+                                    <input type="checkbox" checked>
+                                    <span class="ccp-name">Inside CC&amp;P</span>
+                                </div>
+                                <div class="ccp-body">
+                                    <div class="ccp-dates">
+                                        <input type="date" class="ccp-date-inp" value="2026-01-29">
+                                        <span class="ccp-arr">→</span>
+                                        <input type="date" class="ccp-date-inp" value="2026-03-10">
+                                    </div>
+                                    <div class="ccp-days">41 days · $150 / day</div>
+                                </div>
+                            </div>
+
+                            <div class="ccp-row off">
+                                <div class="ccp-row-top">
+                                    <input type="checkbox">
+                                    <span class="ccp-name">Outside CC&amp;P</span>
+                                </div>
+                                <div class="ccp-body">
+                                    <div class="ccp-dates">
+                                        <input type="date" class="ccp-date-inp">
+                                        <span class="ccp-arr">→</span>
+                                        <input type="date" class="ccp-date-inp">
+                                    </div>
+                                    <div class="ccp-days" style="color:#a0b8cc;background:rgba(160,184,204,0.1);border-color:transparent;">0 days</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- INVOICE SUMMARY -->
+                        <div class="sec-divider" style="margin-top:4px;">
+                            <div class="sec-accent-bar" style="background:linear-gradient(to bottom,#1e3248,#3b82f6);"></div>
+                            <span class="sec-title sec-title-dark">Invoice Summary</span>
+                        </div>
+
+                        <div class="totals-card">
+                            <div class="totals-row">
+                                <span class="t-lbl">Procurement Labor</span>
+                                <span class="t-val">$1,512.00</span>
+                            </div>
+                            <div class="totals-row">
+                                <span class="t-lbl">Inside CC&amp;P (41 days)</span>
+                                <span class="t-val">$6,150.00</span>
+                            </div>
+                            <div class="totals-row">
+                                <span class="t-lbl">Outside CC&amp;P</span>
+                                <span class="t-val">$0.00</span>
+                            </div>
+                            <div class="totals-row">
+                                <span class="t-lbl">Subtotal</span>
+                                <span class="t-val" style="font-weight:700;color:#1e3248;">$7,662.00</span>
+                            </div>
+                            <div class="totals-row">
+                                <span class="t-lbl">Sales Tax (10.5%)</span>
+                                <span class="t-val tax-val">$804.51</span>
+                            </div>
+                            <div class="totals-row grand">
+                                <span class="t-lbl bold">Total Due</span>
+                                <span class="t-val grand-val">$8,466.51</span>
+                            </div>
+                        </div>
+
+                    </div><!-- /svc-section -->
+                </div><!-- /float-card -->
+                <div class="svc-section-end"></div>
+
+            </div><!-- /app -->
+        </div><!-- /scroll -->
+
+        <!-- Bottom nav -->
+        <div class="bottom-nav">
+            <button class="nav-btn btn-new">
+                <div class="nav-ico"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></div>
+                <span class="nav-lbl">New</span>
+            </button>
+            <div class="nav-sep"></div>
+            <button class="nav-btn btn-save active">
+                <div class="nav-ico"><svg viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg></div>
+                <span class="nav-lbl">Save</span>
+            </button>
+            <div class="nav-sep"></div>
+            <button class="nav-btn btn-rec">
+                <div class="nav-ico"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></div>
+                <span class="nav-lbl">Records</span>
+            </button>
+            <div class="nav-sep"></div>
+            <button class="nav-btn btn-prt">
+                <div class="nav-ico"><svg viewBox="0 0 24 24"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg></div>
+                <span class="nav-lbl">Print</span>
+            </button>
+        </div>
+
+    </div><!-- /screen -->
+</div><!-- /phone -->
+
+<script>
+/* ============================================================
+   3J's Light Mode — Mobile Interactivity
+============================================================ */
+
+var BODY_RATE = 90.00;
+var TAX_RATE  = 0.105;
+
+function fmt(n) { return '$' + n.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ','); }
+
+/* ── Toggle .off on checkbox change ── */
+document.querySelectorAll('.svc-chk').forEach(function(chk) {
+    chk.addEventListener('change', function() {
+        this.closest('.svc-row').classList.toggle('off', !this.checked);
+        recalculate();
+    });
+});
+document.querySelectorAll('.ccp-row input[type=checkbox]').forEach(function(chk) {
+    chk.addEventListener('change', function() {
+        this.closest('.ccp-row').classList.toggle('off', !this.checked);
+        recalcCCP(); recalculate();
+    });
+});
+
+/* ── Hours input change ── */
+document.querySelectorAll('.svc-row input[type=number]').forEach(function(inp) {
+    inp.addEventListener('input', recalculate);
+});
+
+/* ── CCP date change ── */
+document.querySelectorAll('.ccp-date-inp').forEach(function(inp) {
+    inp.addEventListener('change', function() { recalcCCP(); recalculate(); });
+});
+
+function recalcCCP() {
+    document.querySelectorAll('.ccp-row').forEach(function(row) {
+        var inputs = row.querySelectorAll('.ccp-date-inp');
+        var daysEl = row.querySelector('.ccp-days');
+        if (!daysEl) return;
+        var s = inputs[0].value, e = inputs[1].value;
+        if (s && e) {
+            var days = Math.max(0, Math.round((new Date(e) - new Date(s)) / 86400000));
+            daysEl.textContent = days + ' days · $150 / day';
+            if (row.classList.contains('off')) {
+                daysEl.style.color = '#a0b8cc';
+                daysEl.style.background = 'rgba(160,184,204,0.1)';
+                daysEl.style.borderColor = 'transparent';
+            } else {
+                daysEl.style.color = '#d97706';
+                daysEl.style.background = 'rgba(245,158,11,0.1)';
+                daysEl.style.borderColor = 'rgba(245,158,11,0.2)';
+            }
+        } else {
+            daysEl.textContent = '0 days';
+        }
+    });
+}
+
+function recalculate() {
+    var procTotal = 0;
+    document.querySelectorAll('.svc-row:not(.off)').forEach(function(row) {
+        var hrs = parseFloat(row.querySelector('input[type=number]').value) || 0;
+        procTotal += hrs * BODY_RATE;
+    });
+
+    var inTotal = 0, outTotal = 0;
+    document.querySelectorAll('.ccp-row').forEach(function(row, i) {
+        if (row.classList.contains('off')) return;
+        var daysText = row.querySelector('.ccp-days').textContent;
+        var days = parseInt(daysText) || 0;
+        if (i === 0) inTotal  = days * 150;
+        else         outTotal = days * 150;
+    });
+
+    var subtotal   = procTotal + inTotal + outTotal;
+    var taxAmt     = subtotal * TAX_RATE;
+    var grandTotal = subtotal + taxAmt;
+
+    var rows = document.querySelectorAll('.totals-row .t-val');
+    if (rows.length >= 5) {
+        rows[0].textContent = fmt(procTotal);
+        rows[1].textContent = fmt(inTotal);
+        rows[2].textContent = fmt(outTotal);
+        rows[3].textContent = fmt(subtotal);
+        rows[4].textContent = fmt(taxAmt);
+        document.querySelector('.grand-val').textContent = fmt(grandTotal);
+    }
+
+    /* Update hero */
+    var whole  = Math.floor(grandTotal);
+    var cents  = Math.round((grandTotal - whole) * 100);
+    document.querySelector('.hero-number').innerHTML =
+        '$' + whole.toLocaleString() +
+        '<span class="hero-cents">.' + String(cents).padStart(2,'0') + '</span>';
+
+    /* Update CCP label */
+    var inDaysText = document.querySelector('.ccp-row:not(.off) .ccp-days');
+    var inDays = inDaysText ? (parseInt(inDaysText.textContent) || 0) : 0;
+    document.querySelectorAll('.totals-row')[1].querySelector('.t-lbl').textContent =
+        'Inside CC&P (' + inDays + ' days)';
+}
+
+/* ── Bottom nav active state ── */
+document.querySelectorAll('.nav-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+        document.querySelectorAll('.nav-btn').forEach(function(b) { b.classList.remove('active'); });
+        this.classList.add('active');
+    });
+});
+
+/* ── New: clear form ── */
+document.querySelector('.btn-new').addEventListener('click', function() {
+    if (!confirm('Start a new invoice? Current data will be cleared.')) return;
+    document.querySelectorAll('.field-inp').forEach(function(inp) { inp.value = ''; });
+    document.querySelectorAll('.meta-v').forEach(function(el) { el.textContent = '—'; });
+    document.querySelectorAll('.svc-chk').forEach(function(chk) {
+        chk.checked = true;
+        chk.closest('.svc-row').classList.remove('off');
+    });
+    document.querySelectorAll('.ccp-date-inp').forEach(function(inp) { inp.value = ''; });
+    recalculate();
+});
+
+/* ── Save: overwrite by RO# or Claim# ── */
+document.querySelector('.btn-save').addEventListener('click', function() {
+    var fields   = document.querySelectorAll('.field-inp');
+    var metaVals = document.querySelectorAll('.meta-v');
+    var roNum    = metaVals[2] ? metaVals[2].textContent.trim() : '';
+    var claimNum = fields[1] ? fields[1].value.trim() : '';
+
+    var record = {
+        id:      Date.now(),
+        savedOn: new Date().toLocaleString(),
+        roNum:   roNum,
+        vehicle: fields[0] ? fields[0].value : '',
+        claim:   claimNum,
+        date:    fields[2] ? fields[2].value : '',
+        vin:     fields[3] ? fields[3].value : '',
+        total:   document.querySelector('.grand-val').textContent
+    };
+
+    var records = JSON.parse(localStorage.getItem('3js_light_records') || '[]');
+    var existingIdx = -1;
+    if (roNum && roNum !== '—') {
+        existingIdx = records.findIndex(function(r) { return r.roNum === roNum; });
+    } else if (claimNum) {
+        existingIdx = records.findIndex(function(r) { return r.claim === claimNum; });
+    }
+    if (existingIdx >= 0) { record.id = records[existingIdx].id; records[existingIdx] = record; }
+    else { records.unshift(record); }
+    localStorage.setItem('3js_light_records', JSON.stringify(records));
+
+    /* Flash feedback */
+    var lbl = this.querySelector('.nav-lbl');
+    lbl.textContent = 'Saved!';
+    var self = this;
+    setTimeout(function() { lbl.textContent = 'Save'; }, 1500);
+});
+
+/* ── Records ── */
+document.querySelector('.btn-rec').addEventListener('click', function() {
+    var records = JSON.parse(localStorage.getItem('3js_light_records') || '[]');
+    if (!records.length) { alert('No saved records yet.'); return; }
+    var list = records.slice(0, 10).map(function(r, i) {
+        return (i+1) + '. ' + (r.vehicle || 'Unknown') + ' — ' + r.total + '  (' + r.savedOn + ')';
+    }).join('\n');
+    alert('Saved Records (' + records.length + '):\n\n' + list);
+});
+
+/* ── Print ── */
+document.querySelector('.btn-prt').addEventListener('click', function() { window.print(); });
+
+/* ── Set today's date on load ── */
+(function() {
+    var d = new Date();
+    var dateStr = (d.getMonth()+1).toString().padStart(2,'0') + ' / ' +
+                  d.getDate().toString().padStart(2,'0') + ' / ' + d.getFullYear();
+    var dateField = document.querySelectorAll('.field-inp')[2];
+    if (dateField && !dateField.value) dateField.value = dateStr;
+})();
+</script>
+</body>
+</html>
