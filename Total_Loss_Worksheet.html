@@ -2100,6 +2100,13 @@
            CSS 11 — PRINT STYLES
         ============================================================ */
         @media print {
+            /* Prevent right-edge overflow on all pages */
+            html, body {
+                width: 100% !important;
+                max-width: 100% !important;
+                overflow-x: hidden !important;
+            }
+
             /* Override Bootstrap font-family on every single element */
             *, *::before, *::after {
                 font-family: 'Montserrat', sans-serif !important;
@@ -2124,9 +2131,11 @@
             .ws-card {
                 border: none;
                 width: 100%;
+                max-width: 100% !important;
                 box-shadow: none;
                 margin: 0;
                 padding: 0;
+                overflow: visible !important;
             }
 
 
@@ -2197,11 +2206,12 @@
                 page-break-after: avoid;
             }
 
-            /* section-page-break class is kept on the rows for JS compat
-               but no longer forces a new page — content flows naturally. */
+            /* section-page-break forces a hard page break — only assigned to
+               "Return to Storage Area" so Page 1 = Vehicle Intake + Total Procurement,
+               Page 2 = Return to Storage Area + CC&P + Summary. */
             tr.section-page-break {
-                break-before: auto;
-                page-break-before: auto;
+                break-before: page !important;
+                page-break-before: always !important;
             }
 
             /* Prevent thead from repeating on every printed page */
@@ -2209,23 +2219,7 @@
                 display: table-row-group;
             }
 
-            /* On print: use flex ordering to move notes below header, above table */
-            #capture-area {
-                display: flex;
-                flex-direction: column;
-            }
-
-            .invoice-header-block { order: 1; }
-            .print-id-bar         { order: 2; }
-            .top-grid             { order: 3; }
-            .table-summary-unit   { order: 4; display: flex; flex-direction: column; }
-            .invoice-table-block  { order: 1; }
-            .summary-block        { order: 2; }
-            .print-notes-area     { order: 5; }
-            .invoice-closing      { order: 6; }
-            .legal-page           { order: 7; }
-
-            /* Hide the original notes block in its normal position */
+            /* Hide the screen notes block — print-notes-area is used instead */
             .notes-block {
                 display: none !important;
             }
@@ -2253,40 +2247,53 @@
                 min-height: 20px;
             }
 
-            /* Legal/signature section always on its own page, never splits */
+            /* Legal/signature section — always starts on its own page */
             .legal-page {
-                page-break-before: always;
-                page-break-inside: avoid;
+                page-break-before: always !important;
+                break-before: page !important;
             }
 
             /* Montserrat forced globally via * selector above */
 
-            /* Disclaimer page — print rules */
+            /* Disclaimer page — fills the full page height so footer pins to bottom */
             .legal-acknowledgment {
                 margin-top: 0 !important;
-                font-size: 9px !important;
-                line-height: 1.4 !important;
+                padding-top: 0 !important;
+                padding-bottom: 0 !important;
+                font-size: 9.5px !important;
+                line-height: 1.48 !important;
+                page-break-inside: avoid !important;
+                break-inside: avoid !important;
+                position: relative !important;
+                min-height: 97vh !important;
+            }
+
+            /* Eliminate any blank space at the top of the legal page */
+            .legal-page {
+                margin-top: 0 !important;
+                padding-top: 0 !important;
             }
 
             .disclaimer-header-bar {
                 -webkit-print-color-adjust: exact !important;
                 print-color-adjust: exact !important;
-                margin-bottom: 12px !important;
-                padding-bottom: 8px !important;
+                margin-bottom: 7px !important;
+                padding-bottom: 4px !important;
             }
 
             .disclaimer-logo {
-                height: 42px !important;
+                height: 38px !important;
             }
 
             .disclaimer-title {
                 font-size: 11px !important;
-                margin-bottom: 10px !important;
+                margin-bottom: 7px !important;
             }
 
             .disclaimer-body p {
                 font-size: 9px !important;
                 margin-bottom: 5px !important;
+                line-height: 1.48 !important;
             }
 
             .disclaimer-bullets {
@@ -2295,39 +2302,58 @@
 
             .disclaimer-bullets-col {
                 font-size: 9px !important;
-                gap: 2px !important;
+                gap: 3px !important;
+                line-height: 1.48 !important;
             }
 
             .disclaimer-ack {
                 font-size: 9px !important;
-                margin-top: 10px !important;
+                margin-top: 9px !important;
             }
 
-            /* Signature table — strong professional lines */
+            /* Signature table — never orphaned from the disclaimer text.
+               Each row individually kept together, whole table never splits. */
             .sig-table {
-                margin-top: 10px !important;
+                margin-top: 9px !important;
+                width: 100% !important;
+                break-inside: avoid !important;
+                page-break-inside: avoid !important;
+            }
+
+            .sig-table tr {
+                break-inside: avoid !important;
+                page-break-inside: avoid !important;
             }
 
             .sig-table td {
-                padding: 10px 14px 0 0 !important;
+                padding: 14px 12px 0 0 !important;
+                vertical-align: bottom !important;
             }
 
             .sig-lbl {
-                font-size: 8px !important;
-                margin-bottom: 4px !important;
+                font-size: 9px !important;
+                font-weight: 800 !important;
+                letter-spacing: 0.6px !important;
+                text-transform: uppercase !important;
+                margin-bottom: 5px !important;
             }
 
             .sig-ln {
-                min-height: 18px !important;
+                min-height: 22px !important;
                 border-bottom: 1.5px solid #000 !important;
             }
 
+            /* Footer gradient bar — pinned to absolute bottom of the legal page */
             .disclaimer-footer-line {
-                margin: 20px 0 0 0 !important;
+                position: absolute !important;
+                bottom: 0 !important;
+                left: 0 !important;
+                right: 0 !important;
+                margin: 0 !important;
                 padding: 0 !important;
             }
             .disclaimer-gradient-bar {
-                margin-bottom: 14px !important;
+                margin-bottom: 9px !important;
                 padding: 0 !important;
             }
 
@@ -2345,6 +2371,12 @@
             .table-summary-unit {
                 break-inside: auto;
                 page-break-inside: auto;
+            }
+
+            /* Keep totals box attached to the bottom of the table */
+            .invoice-table-block {
+                break-after: avoid;
+                page-break-after: avoid;
             }
 
             /* Summary table — Chrome natively keeps tr together */
@@ -2411,16 +2443,21 @@
                 display: inline-flex;
                 align-items: center;
                 gap: 2px;
+                position: static;
+            }
+
+            /* Reset absolute positioning from screen CSS so $ shows inline with value */
+            .cost-input-container > span {
+                position: static !important;
+                left: auto !important;
+                font-size: 9px;
+                flex-shrink: 0;
             }
 
             .cost-input-container input {
-                width: 58px;
-                padding: 2px 4px;
+                width: 68px;
+                padding: 2px 2px !important;
                 text-align: right;
-            }
-
-            .cost-input-container span {
-                flex-shrink: 0;
             }
 
             /* 2-column print layout for customer info */
@@ -2444,9 +2481,9 @@
             ────────────────────────────────────────────────────────── */
 
             /* Tighten letterhead for print */
-            .lh-grid { padding-bottom: 10px !important; }
-            .lh-logo { max-height: 62px !important; }
-            .lh-invoice-label { font-size: 20px !important; }
+            .lh-grid { padding-bottom: 4px !important; }
+            .lh-logo { max-height: 50px !important; }
+            .lh-invoice-label { font-size: 18px !important; }
 
             /* Tighten invoice title and date */
             .ws-card h6 {
@@ -2462,9 +2499,9 @@
 
             /* Customer info grid — compact internally, roomy gap below */
             .top-grid {
-                gap: 6px !important;
-                margin-bottom: 18px !important;
-                padding: 4px 10px !important;
+                gap: 4px !important;
+                margin-bottom: 8px !important;
+                padding: 2px 10px !important;
             }
 
             .customer-field {
@@ -2473,8 +2510,8 @@
 
             /* Notes area — clear gap above summary box */
             .print-notes-area {
-                margin-top: 16px !important;
-                margin-bottom: 18px !important;
+                margin-top: 6px !important;
+                margin-bottom: 6px !important;
             }
 
             .print-notes-area b {
@@ -2486,36 +2523,64 @@
                 line-height: 1.4 !important;
             }
 
-            /* Tight row heights — professional invoice spacing */
+            /* Row heights — professional invoice spacing */
             td {
-                padding: 4px 6px !important;
-                font-size: 9.5pt !important;
+                padding: 4px 4px !important;
+                font-size: 8.5pt !important;
                 font-weight: 600 !important;
-                letter-spacing: 0.2pt !important;
-                line-height: 1.25 !important;
+                letter-spacing: 0.1pt !important;
+                line-height: 1.2 !important;
             }
 
             th {
-                padding: 4px 5px !important;
-                font-size: 9pt !important;
+                padding: 4px 4px !important;
+                font-size: 8pt !important;
                 line-height: 1.2 !important;
             }
 
             /* Section header rows slightly taller for visual separation */
             .section-header {
-                padding: 5px 8px !important;
-                font-size: 9pt !important;
+                padding: 3px 8px !important;
+                font-size: 8pt !important;
             }
 
             /* Grand total — keep amber vivid on print */
             .grand-total-row td {
-                font-size: 1.15em !important;
-                padding: 8px 6px !important;
+                font-size: 1.05em !important;
+                padding: 4px 6px !important;
             }
 
             /* Invoice header block — tight below so customer box sits close */
             .invoice-header-block {
+                margin-bottom: 2px !important;
+            }
+
+            /* Personalization bar — compact on print */
+            .print-id-bar {
+                padding: 5px 10px !important;
                 margin-bottom: 4px !important;
+            }
+
+            /* RO# and Claim# always uppercase on print */
+            .pid-badge-value {
+                text-transform: uppercase !important;
+            }
+
+            /* Summary block — tight above */
+            .summary-block {
+                margin-top: 4px !important;
+            }
+
+            /* "Thank You" footer — pushed toward the bottom of page 2 via spacer */
+            .invoice-closing {
+                margin-top: 4px !important;
+                margin-bottom: 0 !important;
+            }
+
+            /* Spacer between notes and closing — pushes "Thank You" to bottom of page 2 */
+            .print-pg2-spacer {
+                display: block !important;
+                min-height: 80mm;
             }
 
             /* Small-claim mode: disclaimer allowed to flow onto same page as invoice */
@@ -2543,10 +2608,10 @@
             }
         }
 
-        /* Page setup — US Letter, margins match Chrome default so print dialog setting doesn't matter */
+        /* Page setup — US Letter, equal margins prevent right-edge cutoff */
         @page {
             size: letter portrait;
-            margin: 0.4in 0.4in 0.4in 0.4in;
+            margin: 0.2in 0.2in 0.2in 0.2in;
             @bottom-right {
                 content: "Page " counter(page) " of " counter(pages);
                 font-family: 'Montserrat', sans-serif;
@@ -2715,13 +2780,6 @@
                     </div>
                 </div>
             </div>
-
-            <!-- Print-only notes area — shown between header and table on print -->
-            <div class="print-notes-area" style="display:none;">
-                <b>Notes:</b>
-                <div class="notes-content" id="printNotesDisplay"></div>
-            </div>
-
 
             <!-- ============================================================
                  HTML 3 — RATES & CUSTOMER INFO
@@ -2942,6 +3000,11 @@
             </table><!-- /HTML 5 — SUMMARY & TOTALS -->
             </div><!-- /table-summary-unit -->
 
+            <!-- Print-only notes area — sits here naturally, no flex reordering needed -->
+            <div class="print-notes-area" style="display:none;">
+                <b>Notes:</b>
+                <div class="notes-content" id="printNotesDisplay"></div>
+            </div>
 
             <!-- ============================================================
                  HTML 6 — NOTES
@@ -2952,6 +3015,9 @@
             </div>
             <!-- /HTML 6 — NOTES -->
 
+
+            <!-- Print spacer — pushes Thank You closing to bottom of page 2 -->
+            <div class="print-pg2-spacer" style="display:none;"></div>
 
             <!-- Print-only closing line -->
             <div class="invoice-closing">
@@ -3138,6 +3204,7 @@
          - body / frame / mech / markup / photo_misc : standard rows
     ============================================================ */
     const services = [
+        { header: "Vehicle Intake",                                          type: "header" },
         { name: "Initial Contact (Obtain Contact Info)",           hrs: 0.2, type: "tl" },
         { name: "Create Opportunity in Software",                  hrs: 0.3, type: "tl" },
         { name: "Assign Repair Order Number",                      hrs: 0.2, type: "tl" },
@@ -3147,7 +3214,7 @@
         { name: "Prepaid Charges (Towing/Storage)",                hrs: 0,   type: "markup", id: "Prep" },
         { name: "Create In-House Tow Worksheet",                   hrs: 0,   type: "tl" },
         { type: "manual_add", sectionId: "sec-a" },
-        { header: "Total Procurement Charges",                               type: "header", pageBreak: true },
+        { header: "Total Procurement Charges",                               type: "header" },
         { name: "Update Insurance Info",                           hrs: 0.3, type: "tl" },
         { name: "Pre-Order Parts per Plan",                        hrs: 0.3, type: "tl" },
         { name: "Pre-Wash Vehicle",                                hrs: 0,   type: "body" },
@@ -3169,7 +3236,7 @@
         { name: "Communicate With Vehicle Owner",                  hrs: 0,   type: "tl" },
         { name: "Insurance Required Photos (Count)",               hrs: 0,   type: "photo_misc", id: "Photo" },
         { type: "manual_add", sectionId: "sec-b" },
-        { header: "Return to Storage Area",                                  type: "header" },
+        { header: "Return to Storage Area",                                  type: "header", pageBreak: true },
         { name: "Verify Restocking Fees",                          hrs: 0,   type: "tl" },
         { name: "Secure Damaged Parts",                            hrs: 0.2, type: "body" },
         { name: "Non-Returnable Parts Costs",                      hrs: 0,   type: "markup", id: "NonRet" },
@@ -3180,7 +3247,7 @@
         { name: "Move Vehicle to Protected Area",                  hrs: 0.3, type: "body" },
         { name: "Initiate CC&P Charges",                           hrs: 0.3, type: "tl" },
         { type: "manual_add", sectionId: "sec-c" },
-        { header: "Care, Custody and Protection",                            type: "header", pageBreak: true },
+        { header: "Care, Custody and Protection",                            type: "header" },
         { name: "CC&P Inside",  type: "special_ccp", subtype: "in" },
         { name: "CC&P Outside", type: "special_ccp", subtype: "out" },
         { name: "Assist Customer in Retrieving Personal Items & Removing Plates", hrs: 1.0, type: "tl" },
@@ -4219,20 +4286,18 @@
             updatePdfTitle();
         });
 
-        window.addEventListener('beforeprint', function() {
+        // Shared DOM prep for both window.print() and html2pdf export
+        window.preparePrintDom = function() {
             // Sync notes display
             var val = document.getElementById('NotesField').value;
             document.getElementById('printNotesDisplay').textContent = val;
-            updatePdfTitle();
 
             // Step 1 — hide unchecked service rows, empty manual rows, and add-button rows
             $('#worksheet-body tr').each(function() {
-                // Always hide the manual add-button rows
                 if ($(this).hasClass('manual-add-btn-row')) {
                     $(this).addClass('row-print-hide');
                     return;
                 }
-                // Hide manual rows with no description
                 if ($(this).hasClass('manual-row')) {
                     if (!$(this).find('.manual-name-input').val().trim()) {
                         $(this).addClass('row-print-hide');
@@ -4247,48 +4312,119 @@
                 }
             });
 
-            // Step 2 — hide section header rows whose entire section is empty.
-            // Walk every section-header row; if every data row before the NEXT
-            // header (or end of table) is hidden, hide the header too.
+            // Step 2 — hide section header rows whose entire section is empty
             var rows = $('#worksheet-body tr').toArray();
             for (var i = 0; i < rows.length; i++) {
                 if (!$(rows[i]).find('.section-header').length) continue;
-                // found a header row — scan forward for visible data rows
                 var hasVisible = false;
                 for (var j = i + 1; j < rows.length; j++) {
-                    if ($(rows[j]).find('.section-header').length) break; // next header
-                    if (!$(rows[j]).hasClass('row-print-hide')) {
-                        hasVisible = true;
-                        break;
-                    }
+                    if ($(rows[j]).find('.section-header').length) break;
+                    if (!$(rows[j]).hasClass('row-print-hide')) { hasVisible = true; break; }
                 }
                 if (!hasVisible) $(rows[i]).addClass('row-print-hide');
             }
 
-            // Step 3 — smart disclaimer page break based on visible row count.
-            // For small claims (≤ 12 rows visible), the invoice content is short enough
-            // that forcing the disclaimer to a new page creates a nearly-empty page.
-            // Allow it to flow naturally instead. For larger claims, keep it on its own page.
-            var visibleDataRows = $('#worksheet-body tr')
-                .not('.row-print-hide')
-                .filter(function() { return !$(this).find('.section-header').length; })
-                .length;
+            // Step 3 — page break before "Return to Storage Area".
+            // Adds class pdf-page-break (for html2pdf's 'before' selector) + inline style
+            // (for native window.print). The inline style is stripped in doneAction before
+            // html2pdf runs so the canvas renders without a gap.
+            $('#worksheet-body tr').each(function() {
+                $(this).removeClass('pdf-page-break');
+                $(this).css({ 'page-break-before': '', 'break-before': '' });
+                var hdrCell = $(this).find('.section-header');
+                if (!hdrCell.length) return;
+                var txt = hdrCell.text().trim().toLowerCase();
+                if (txt.indexOf('return to storage') !== -1) {
+                    $(this).addClass('pdf-page-break');
+                    $(this).css({ 'page-break-before': 'always', 'break-before': 'page' });
+                }
+            });
+
+            // Step 4 — legal page starts on its own page.
+            // Apply as an inline style on the block <div> so html2pdf mode:'css' detects it
+            // via getComputedStyle (CSS @media print rules are invisible to html2pdf).
             var legalPage = document.querySelector('.legal-page');
             if (legalPage) {
-                if (visibleDataRows <= 12) {
-                    legalPage.classList.add('legal-page-auto-break');
-                } else {
-                    legalPage.classList.remove('legal-page-auto-break');
-                }
+                legalPage.classList.remove('legal-page-auto-break');
+                legalPage.style.pageBreakBefore = 'always';
+                legalPage.style.breakBefore = 'page';
             }
+        };
+
+        window.restorePrintDom = function() {
+            $('#worksheet-body tr').removeClass('row-print-hide');
+            $('#worksheet-body tr').removeClass('pdf-page-break');
+            $('#worksheet-body tr').each(function() {
+                $(this).css({ 'page-break-before': '', 'break-before': '' });
+            });
+            var legalPage = document.querySelector('.legal-page');
+            if (legalPage) {
+                legalPage.classList.remove('legal-page-auto-break');
+                legalPage.style.pageBreakBefore = '';
+                legalPage.style.breakBefore = '';
+            }
+        };
+
+        // Split the service table at "Return to Storage Area" for clean html2pdf page breaks.
+        // A block <div style="page-break-before:always"> between two <table> elements is
+        // reliably detected by html2pdf mode:'css'. page-break on <tr> causes canvas gaps;
+        // html2pdf's 'before' selector misplaces the injected break div inside table markup.
+        window.splitTableForPdf = function() {
+            // Clear inline page-break CSS from the <tr> — not needed here
+            $('.pdf-page-break').css({ 'page-break-before': '', 'break-before': '' });
+
+            var tbody1 = document.getElementById('worksheet-body');
+            if (!tbody1) return;
+            var allRows = Array.from(tbody1.rows);
+            var splitIdx = -1;
+            for (var ri = 0; ri < allRows.length; ri++) {
+                if (allRows[ri].classList.contains('pdf-page-break')) { splitIdx = ri; break; }
+            }
+            if (splitIdx === -1) return;
+
+            var origTable = tbody1.closest('table');
+            var origParent = origTable.parentNode;
+
+            // Block page-break div — html2pdf mode:'css' detects this correctly
+            var breakDiv = document.createElement('div');
+            breakDiv.id = 'pdf-split-break';
+            breakDiv.style.cssText = 'page-break-before:always;break-before:page;height:0;overflow:hidden;line-height:0;font-size:0;';
+
+            // Second table carries all rows from "Return to Storage Area" onwards
+            var table2 = document.createElement('table');
+            table2.id = 'worksheet-table-2';
+            table2.className = origTable.className;
+            table2.style.cssText = 'width:100%;border-collapse:collapse;';
+            var tbody2 = document.createElement('tbody');
+            tbody2.id = 'worksheet-body-2';
+            allRows.slice(splitIdx).forEach(function(row) { tbody2.appendChild(row); });
+            table2.appendChild(tbody2);
+
+            var anchor = origTable.nextSibling;
+            origParent.insertBefore(breakDiv, anchor);
+            origParent.insertBefore(table2, breakDiv.nextSibling);
+        };
+
+        window.mergeTableForPdf = function() {
+            var table2   = document.getElementById('worksheet-table-2');
+            var breakDiv = document.getElementById('pdf-split-break');
+            if (!table2) return;
+            var tbody1 = document.getElementById('worksheet-body');
+            var tbody2 = document.getElementById('worksheet-body-2');
+            if (tbody1 && tbody2) {
+                Array.from(tbody2.rows).forEach(function(row) { tbody1.appendChild(row); });
+            }
+            if (breakDiv && breakDiv.parentNode) breakDiv.parentNode.removeChild(breakDiv);
+            if (table2.parentNode) table2.parentNode.removeChild(table2);
+        };
+
+        window.addEventListener('beforeprint', function() {
+            updatePdfTitle();
+            window.preparePrintDom();
         });
 
         window.addEventListener('afterprint', function() {
-            // Restore all hidden rows after printing
-            $('#worksheet-body tr').removeClass('row-print-hide');
-            // Restore disclaimer page break
-            var legalPage = document.querySelector('.legal-page');
-            if (legalPage) legalPage.classList.remove('legal-page-auto-break');
+            window.restorePrintDom();
         });
 
         // Auto-save: save record automatically whenever a field changes
@@ -5092,14 +5228,83 @@ function saveAction() {
     // Cloud status updated by saveRecord's then/catch
 }
 
-/* ── Done action — save + PDF ── */
+/* ── Done action — save + PDF via html2pdf (guaranteed filename) ── */
 function doneAction() {
     setCloud('amber');
     var ok = false;
     try { saveRecord(true); ok = true; } catch(e) { ok = false; }
     if (!ok) { setCloud('red'); showConfirm(false, 'Save failed.'); return; }
-    if (typeof window.updatePdfTitle === 'function') window.updatePdfTitle();
-    window.print();
+
+    // Build filename
+    var ro       = ($('#WONum').val() || 'RO').trim().replace(/\s/g, '_');
+    var owner    = ($('#Cust').val()  || '').trim();
+    var parts    = owner.split(/\s+/).filter(Boolean);
+    var lastName = parts.length > 0 ? parts[parts.length - 1] : '';
+    function cap(s) { return s.charAt(0).toUpperCase() + s.slice(1).toLowerCase(); }
+    if (lastName) lastName = cap(lastName);
+    ro = ro.split('_').map(cap).join('_');
+    var filename = ro + (lastName ? '_' + lastName : '') + '_Total_Loss_Invoice.pdf';
+
+    // Prepare DOM (hide unchecked rows, sync notes, etc.)
+    if (typeof window.preparePrintDom === 'function') window.preparePrintDom();
+
+    // Split service table at "Return to Storage Area" so a block <div page-break-before:always>
+    // sits between two <table> elements — the only reliable page break for html2pdf inside a table.
+    if (typeof window.splitTableForPdf === 'function') window.splitTableForPdf();
+
+    var captureArea = document.getElementById('capture-area');
+
+    var opt = {
+        margin:      [0.2, 0.3, 0.2, 0.3],
+        filename:    filename,
+        image:       { type: 'jpeg', quality: 0.98 },
+        html2canvas: {
+            scale: 2,
+            useCORS: true,
+            height: captureArea.scrollHeight,
+            onclone: function(doc) {
+                // Extract all @media print rules and inject them as regular CSS so
+                // html2canvas renders the print layout (hides checkboxes, input borders, etc.)
+                // IMPORTANT: try/catch is per-stylesheet so a CORS error on an external
+                // stylesheet (e.g. Google Fonts CDN) doesn't abort the entire extraction.
+                var printCss = '';
+                var sheets = document.styleSheets;
+                for (var i = 0; i < sheets.length; i++) {
+                    var rules;
+                    try { rules = sheets[i].cssRules || []; } catch(e) { continue; }
+                    for (var j = 0; j < rules.length; j++) {
+                        if (rules[j] instanceof CSSMediaRule &&
+                            rules[j].conditionText === 'print') {
+                            for (var k = 0; k < rules[j].cssRules.length; k++) {
+                                printCss += rules[j].cssRules[k].cssText + '\n';
+                            }
+                        }
+                    }
+                }
+                if (printCss) {
+                    var style = doc.createElement('style');
+                    style.textContent = printCss;
+                    doc.head.appendChild(style);
+                }
+                // Also hide row-print-hide rows (driven by a print rule)
+                doc.querySelectorAll('.row-print-hide').forEach(function(el) {
+                    el.style.display = 'none';
+                });
+                // Hide the second table's thead if it got one copied (shouldn't, but safety)
+                var t2 = doc.getElementById('worksheet-table-2');
+                if (t2) { var th = t2.querySelector('thead'); if (th) th.style.display = 'none'; }
+            }
+        },
+        jsPDF:       { unit: 'in', format: 'letter', orientation: 'portrait' },
+        pagebreak:   { mode: ['css'] }
+    };
+
+    html2pdf().set(opt).from(captureArea).save()
+        .then(function() {
+            if (typeof window.mergeTableForPdf  === 'function') window.mergeTableForPdf();
+            if (typeof window.restorePrintDom   === 'function') window.restorePrintDom();
+            showConfirm(true, 'Done!');
+        });
 }
 
 /* ── Slide-confirm delete: slide to green check, then delete ── */
