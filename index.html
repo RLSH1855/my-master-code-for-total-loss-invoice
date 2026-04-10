@@ -2282,11 +2282,15 @@
                 margin-top: 0 !important;
                 padding-top: 0 !important;
                 padding-bottom: 0 !important;
-                font-size: 8.5px !important;
-                line-height: 1.32 !important;
+                font-size: 10px !important;
+                line-height: 1.8 !important;
                 page-break-inside: avoid !important;
                 break-inside: avoid !important;
-                position: relative !important;
+                position: static !important;
+                min-height: 9.4in !important;
+                box-sizing: border-box !important;
+                display: flex !important;
+                flex-direction: column !important;
             }
 
             /* Eliminate any blank space at the top of the legal page */
@@ -2303,18 +2307,18 @@
             }
 
             .disclaimer-logo {
-                height: 38px !important;
+                height: 52px !important;
             }
 
             .disclaimer-title {
-                font-size: 11px !important;
-                margin-bottom: 7px !important;
+                font-size: 13px !important;
+                margin-bottom: 24px !important;
             }
 
             .disclaimer-body p {
-                font-size: 8.5px !important;
-                margin-bottom: 3px !important;
-                line-height: 1.32 !important;
+                font-size: 10px !important;
+                margin-bottom: 8px !important;
+                line-height: 1.8 !important;
             }
 
             .disclaimer-bullets {
@@ -2322,14 +2326,14 @@
             }
 
             .disclaimer-bullets-col {
-                font-size: 8.5px !important;
-                gap: 2px !important;
-                line-height: 1.32 !important;
+                font-size: 10px !important;
+                gap: 3px !important;
+                line-height: 1.8 !important;
             }
 
             .disclaimer-ack {
-                font-size: 9px !important;
-                margin-top: 9px !important;
+                font-size: 10px !important;
+                margin-top: 14px !important;
             }
 
             /* Signature table — never orphaned from the disclaimer text.
@@ -2347,7 +2351,7 @@
             }
 
             .sig-table td {
-                padding: 8px 12px 0 0 !important;
+                padding: 16px 12px 0 0 !important;
                 vertical-align: bottom !important;
             }
 
@@ -2356,22 +2360,21 @@
                 font-weight: 800 !important;
                 letter-spacing: 0.6px !important;
                 text-transform: uppercase !important;
-                margin-bottom: 5px !important;
+                margin-bottom: 8px !important;
             }
 
             .sig-ln {
-                min-height: 22px !important;
+                min-height: 30px !important;
                 border-bottom: 1.5px solid #000 !important;
             }
 
-            /* Footer gradient bar — pinned to absolute bottom of the legal page */
+            /* Footer gradient bar — margin-top: auto pushes it to the very bottom */
             .disclaimer-footer-line {
-                position: absolute !important;
-                bottom: 0 !important;
-                left: 0 !important;
-                right: 0 !important;
-                margin: 0 !important;
+                position: static !important;
+                margin-top: auto !important;
+                margin-bottom: 0 !important;
                 padding: 0 !important;
+                width: 100% !important;
             }
             .disclaimer-gradient-bar {
                 margin-bottom: 9px !important;
@@ -2598,10 +2601,10 @@
                 margin-bottom: 0 !important;
             }
 
-            /* Spacer between notes and closing — nudges "Thank You" down on page 2 */
+            /* Spacer between notes and closing — pushes "Thank You" near bottom of page 2 */
             .print-pg2-spacer {
                 display: block !important;
-                min-height: 30mm;
+                min-height: 2in;
             }
 
             /* Small-claim mode: disclaimer allowed to flow onto same page as invoice */
@@ -5267,115 +5270,16 @@ function saveAction() {
     // Cloud status updated by saveRecord's then/catch
 }
 
-/* ── Done action — save + PDF via html2pdf (guaranteed filename) ── */
+/* ── Done action — save + open browser print dialog ── */
 function doneAction() {
     setCloud('amber');
     var ok = false;
     try { saveRecord(true); ok = true; } catch(e) { ok = false; }
     if (!ok) { setCloud('red'); showConfirm(false, 'Save failed.'); return; }
-
-    // Build filename
-    var ro       = ($('#WONum').val() || 'RO').trim().replace(/\s/g, '_');
-    var owner    = ($('#Cust').val()  || '').trim();
-    var parts    = owner.split(/\s+/).filter(Boolean);
-    var lastName = parts.length > 0 ? parts[parts.length - 1] : '';
-    function cap(s) { return s.charAt(0).toUpperCase() + s.slice(1).toLowerCase(); }
-    if (lastName) lastName = cap(lastName);
-    ro = ro.split('_').map(cap).join('_');
-    var filename = ro + (lastName ? '_' + lastName : '') + '_Total_Loss_Invoice.pdf';
-
-    // Prepare DOM (hide unchecked rows, sync notes, etc.)
-    if (typeof window.preparePrintDom === 'function') window.preparePrintDom();
-
-    // Split service table at "Return to Storage Area" so a block <div page-break-before:always>
-    // sits between two <table> elements — the only reliable page break for html2pdf inside a table.
-    if (typeof window.splitTableForPdf === 'function') window.splitTableForPdf();
-
-    var captureArea = document.getElementById('capture-area');
-
-    var opt = {
-        margin:      [0.2, 0.2, 0.2, 0.2],
-        filename:    filename,
-        image:       { type: 'jpeg', quality: 0.98 },
-        html2canvas: {
-            scale: 2,
-            useCORS: true,
-            // NOTE: Do NOT set height here. html2canvas will auto-detect the cloned
-            // document's rendered height, which includes print CSS changes (spacer,
-            // font reductions, etc.). Setting height to captureArea.scrollHeight
-            // locks it to the screen layout height and clips the legal page.
-            onclone: function(doc) {
-                // Extract all @media print rules and inject them as regular CSS so
-                // html2canvas renders the print layout (hides checkboxes, input borders, etc.)
-                // IMPORTANT: try/catch is per-stylesheet so a CORS error on an external
-                // stylesheet (e.g. Google Fonts CDN) doesn't abort the entire extraction.
-                var printCss = '';
-                var sheets = document.styleSheets;
-                for (var i = 0; i < sheets.length; i++) {
-                    var rules;
-                    try { rules = sheets[i].cssRules || []; } catch(e) { continue; }
-                    for (var j = 0; j < rules.length; j++) {
-                        if (rules[j] instanceof CSSMediaRule &&
-                            rules[j].conditionText === 'print') {
-                            for (var k = 0; k < rules[j].cssRules.length; k++) {
-                                printCss += rules[j].cssRules[k].cssText + '\n';
-                            }
-                        }
-                    }
-                }
-                if (printCss) {
-                    var style = doc.createElement('style');
-                    style.textContent = printCss;
-                    doc.head.appendChild(style);
-                }
-                // Also hide row-print-hide rows (driven by a print rule)
-                doc.querySelectorAll('.row-print-hide').forEach(function(el) {
-                    el.style.display = 'none';
-                });
-
-                // Fix markup rows: replace the cost-input-container with a plain
-                // "$X.XX" text span so it renders correctly in the PDF.
-                doc.querySelectorAll('tr[data-type="markup"] .cost-input-container').forEach(function(container) {
-                    var input = container.querySelector('input');
-                    if (!input) return;
-                    var val = parseFloat(input.value) || 0;
-                    container.style.cssText = 'display:inline-block;';
-                    container.innerHTML = '<span style="font-size:9px;font-weight:600;font-family:Montserrat,sans-serif;">$' + val.toFixed(2) + '</span>';
-                });
-                // Hide the second table's thead if it got one copied (shouldn't, but safety)
-                var t2 = doc.getElementById('worksheet-table-2');
-                if (t2) { var th = t2.querySelector('thead'); if (th) th.style.display = 'none'; }
-
-                // Show the Thank You spacer — fixed height keeps closing near bottom of page 2
-                var spacer = doc.querySelector('.print-pg2-spacer');
-                if (spacer) { spacer.style.display = 'block'; }
-
-                // Safety net: if the legal section is taller than one PDF page,
-                // scale it down so it always fits. Page content height = 10.6in at 96dpi = ~1018px.
-                var legalEl = doc.querySelector('.legal-acknowledgment');
-                if (legalEl) {
-                    void legalEl.offsetHeight; // force layout reflow before measuring
-                    var legalH = legalEl.scrollHeight;
-                    var MAX_PAGE_PX = 1000; // conservative page content height in CSS pixels
-                    if (legalH > MAX_PAGE_PX) {
-                        var sc = MAX_PAGE_PX / legalH;
-                        legalEl.style.transformOrigin = 'top left';
-                        legalEl.style.transform = 'scale(' + sc.toFixed(4) + ')';
-                        legalEl.style.width = Math.ceil(100 / sc) + '%';
-                    }
-                }
-            }
-        },
-        jsPDF:       { unit: 'in', format: 'letter', orientation: 'portrait' },
-        pagebreak:   { mode: ['css'] }
-    };
-
-    html2pdf().set(opt).from(captureArea).save()
-        .then(function() {
-            if (typeof window.mergeTableForPdf  === 'function') window.mergeTableForPdf();
-            if (typeof window.restorePrintDom   === 'function') window.restorePrintDom();
-            showConfirm(true, 'Done!');
-        });
+    // beforeprint fires preparePrintDom (hides rows, sets page breaks, syncs notes)
+    // afterprint fires restorePrintDom (cleans up DOM)
+    window.print();
+    showConfirm(true, 'Done!');
 }
 
 /* ── Slide-confirm delete: slide to green check, then delete ── */
