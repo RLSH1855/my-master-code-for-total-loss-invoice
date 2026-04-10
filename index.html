@@ -1746,26 +1746,6 @@
             .invoice-closing { display: none; }
         }
 
-        /* ── CC&P clear button ── */
-        .ccp-clear-btn {
-            background: none;
-            border: 1px solid #e74c3c;
-            border-radius: 3px;
-            cursor: pointer;
-            color: #e74c3c;
-            font-size: 14px;
-            font-weight: 700;
-            line-height: 1;
-            padding: 1px 6px;
-            flex-shrink: 0;
-            opacity: 0.75;
-            transition: opacity 0.15s, background 0.15s;
-        }
-        .ccp-clear-btn:hover {
-            opacity: 1;
-            background: #fde8e8;
-        }
-
         /* ── CC&P Flatpickr range input ── */
         .ccp-range-input {
             padding: 4px 10px;
@@ -2275,9 +2255,7 @@
 
             /* Montserrat forced globally via * selector above */
 
-            /* Disclaimer page — fits entirely on one page, never splits.
-               min-height uses absolute px (= ~9.4in) so it's viewport-independent
-               and always stays safely under the 10.6in PDF page content area. */
+            /* Disclaimer page — fills the full page height so footer pins to bottom */
             .legal-acknowledgment {
                 margin-top: 0 !important;
                 padding-top: 0 !important;
@@ -2287,7 +2265,7 @@
                 page-break-inside: avoid !important;
                 break-inside: avoid !important;
                 position: relative !important;
-                min-height: 900px !important;
+                min-height: 97vh !important;
             }
 
             /* Eliminate any blank space at the top of the legal page */
@@ -3319,7 +3297,6 @@
                             <span style="font-weight:700; flex-shrink:0;">${label} CC&amp;P:</span>
                             <div style="display:flex; align-items:center; gap:8px; flex-shrink:0;">
                                 <input type="text" class="ccp-range-input" id="${s.subtype}RangeInput" placeholder="Select date range…" readonly>
-                                <button type="button" class="ccp-clear-btn no-print" id="${s.subtype}ClearBtn" onclick="clearCCPPicker('${s.subtype}')" style="display:none;" title="Clear dates">×</button>
                                 <input type="hidden" class="ccp-input" id="${s.subtype}Start">
                                 <input type="hidden" class="ccp-input" id="${s.subtype}Stop">
                             </div>
@@ -5133,11 +5110,9 @@ function initCCPPickers() {
                 $('#inStart').val(fmt(selectedDates[0]));
                 $('#inStop').val(fmt(selectedDates[1]));
                 $('#inStart').trigger('change');
-                $('#inClearBtn').show();
             } else if (selectedDates.length === 0) {
                 $('#inStart').val(''); $('#inStop').val('');
                 $('#inStart').trigger('change');
-                $('#inClearBtn').hide();
             }
         }
     });
@@ -5165,25 +5140,12 @@ function initCCPPickers() {
                 $('#outStart').val(fmt(selectedDates[0]));
                 $('#outStop').val(fmt(selectedDates[1]));
                 $('#outStart').trigger('change');
-                $('#outClearBtn').show();
             } else if (selectedDates.length === 0) {
                 $('#outStart').val(''); $('#outStop').val('');
                 $('#outStart').trigger('change');
-                $('#outClearBtn').hide();
             }
         }
     });
-}
-
-/* Clears a CC&P date range picker and resets all associated values */
-function clearCCPPicker(subtype) {
-    let picker = (subtype === 'in') ? ccpInPicker : ccpOutPicker;
-    if (picker) picker.clear();
-    $('#' + subtype + 'Start').val('');
-    $('#' + subtype + 'Stop').val('');
-    $('#' + subtype + 'Start').trigger('change');
-    $('#' + subtype + 'ClearBtn').hide();
-    calculate();
 }
 
 /* Syncs Flatpickr display with whatever is in the hidden inputs.
@@ -5196,10 +5158,8 @@ function refreshCCPDisplay() {
         let e = $('#' + sub + 'Stop').val();
         if (s && e) {
             picker.setDate([s, e], false);
-            $('#' + sub + 'ClearBtn').show();
         } else {
             picker.clear();
-            $('#' + sub + 'ClearBtn').hide();
         }
     }
     setPickerFromHidden(ccpInPicker,  'in');
@@ -5295,7 +5255,7 @@ function doneAction() {
     var captureArea = document.getElementById('capture-area');
 
     var opt = {
-        margin:      [0.2, 0.2, 0.2, 0.2],
+        margin:      [0.2, 0.3, 0.2, 0.3],
         filename:    filename,
         image:       { type: 'jpeg', quality: 0.98 },
         html2canvas: {
@@ -5330,46 +5290,16 @@ function doneAction() {
                 doc.querySelectorAll('.row-print-hide').forEach(function(el) {
                     el.style.display = 'none';
                 });
-
-                // Fix markup rows: replace the cost-input-container with a plain
-                // "$X.XX" text span so it renders correctly in the PDF.
-                doc.querySelectorAll('tr[data-type="markup"] .cost-input-container').forEach(function(container) {
-                    var input = container.querySelector('input');
-                    if (!input) return;
-                    var val = parseFloat(input.value) || 0;
-                    container.style.cssText = 'display:inline-block;';
-                    container.innerHTML = '<span style="font-size:9px;font-weight:600;font-family:Montserrat,sans-serif;">$' + val.toFixed(2) + '</span>';
-                });
                 // Hide the second table's thead if it got one copied (shouldn't, but safety)
                 var t2 = doc.getElementById('worksheet-table-2');
                 if (t2) { var th = t2.querySelector('thead'); if (th) th.style.display = 'none'; }
+<<<<<<< HEAD
 
-                // Dynamic "Thank You" spacer — push closing to the bottom of page 2.
-                // Letter at 96 dpi = 1056px/page; 0.2in margins top+bottom = 38.4px;
-                // content height per page = 1017.6px. Page 2 ends at 2035.2px from
-                // the top of capture-area. We measure the spacer's actual position
-                // (after print CSS is applied) and calculate the exact height needed.
-                (function() {
-                    var area    = doc.getElementById('capture-area');
-                    var spacer  = doc.querySelector('.print-pg2-spacer');
-                    var closing = doc.querySelector('.invoice-closing');
-                    if (!area || !spacer || !closing) return;
-                    // Reset spacer so we get a clean measurement; min-height in the
-                    // injected print CSS has no !important so inline style wins.
-                    spacer.style.minHeight = '0px';
-                    spacer.style.height    = '0px';
-                    // Force layout flush before reading positions
-                    void area.offsetHeight;
-                    var pgH      = 1017.6;           // CSS px per page content area
-                    var pg2End   = pgH * 2;          // 2035.2px — bottom of page 2
-                    var areaTop  = area.getBoundingClientRect().top;
-                    var spcTop   = spacer.getBoundingClientRect().top  - areaTop;
-                    var clsH     = closing.getBoundingClientRect().height || 32;
-                    var needed   = Math.round(pg2End - spcTop - clsH - 8); // 8px buffer
-                    if (needed > 0) {
-                        spacer.style.height = needed + 'px';
-                    }
-                })();
+                // Show the Thank You spacer — fixed height keeps closing near bottom of page 2
+                var spacer = doc.querySelector('.print-pg2-spacer');
+                if (spacer) { spacer.style.display = 'block'; }
+=======
+>>>>>>> parent of 960cec0 (Implement CC&P clear button functionality)
             }
         },
         jsPDF:       { unit: 'in', format: 'letter', orientation: 'portrait' },
