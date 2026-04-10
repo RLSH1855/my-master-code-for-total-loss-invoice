@@ -5344,32 +5344,9 @@ function doneAction() {
                 var t2 = doc.getElementById('worksheet-table-2');
                 if (t2) { var th = t2.querySelector('thead'); if (th) th.style.display = 'none'; }
 
-                // Dynamic "Thank You" spacer — push closing to the bottom of page 2.
-                // Letter at 96 dpi = 1056px/page; 0.2in margins top+bottom = 38.4px;
-                // content height per page = 1017.6px. Page 2 ends at 2035.2px from
-                // the top of capture-area. We measure the spacer's actual position
-                // (after print CSS is applied) and calculate the exact height needed.
-                (function() {
-                    var area    = doc.getElementById('capture-area');
-                    var spacer  = doc.querySelector('.print-pg2-spacer');
-                    var closing = doc.querySelector('.invoice-closing');
-                    if (!area || !spacer || !closing) return;
-                    // Reset spacer so we get a clean measurement; min-height in the
-                    // injected print CSS has no !important so inline style wins.
-                    spacer.style.minHeight = '0px';
-                    spacer.style.height    = '0px';
-                    // Force layout flush before reading positions
-                    void area.offsetHeight;
-                    var pgH      = 1017.6;           // CSS px per page content area
-                    var pg2End   = pgH * 2;          // 2035.2px — bottom of page 2
-                    var areaTop  = area.getBoundingClientRect().top;
-                    var spcTop   = spacer.getBoundingClientRect().top  - areaTop;
-                    var clsH     = closing.getBoundingClientRect().height || 32;
-                    var needed   = Math.round(pg2End - spcTop - clsH - 8); // 8px buffer
-                    if (needed > 0) {
-                        spacer.style.height = needed + 'px';
-                    }
-                })();
+                // Show the Thank You spacer — fixed height keeps closing near bottom of page 2
+                var spacer = doc.querySelector('.print-pg2-spacer');
+                if (spacer) { spacer.style.display = 'block'; }
             }
         },
         jsPDF:       { unit: 'in', format: 'letter', orientation: 'portrait' },
@@ -5444,5 +5421,3 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 </body>
 </html> 
-
-
